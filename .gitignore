@@ -8,5 +8,8 @@
 .vscode/launch.json
 .vscode/ipch
 
-#
+# Node
 node_modules
+
+# Env
+.env
