@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 const shelfSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
+  warehouse: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Warehouse",
   },
   number: {
-    type: Number,
+    type: String,
+    unique: true,
     required: true,
   },
   location_in_warehouse: {
@@ -15,7 +15,7 @@ const shelfSchema = new mongoose.Schema({
     required: true,
   },
   aisle: {
-    type: Number,
+    type: String,
     required: true,
   },
   products: [
@@ -34,6 +34,6 @@ const shelfSchema = new mongoose.Schema({
   },
 });
 
-const Shelf = mongoose.model.Shelf || mongoose.model("Warehouse", shelfSchema);
+const Shelf = mongoose.model.Shelf || mongoose.model("Shelf", shelfSchema);
 
 module.exports = Shelf;

@@ -4,6 +4,7 @@ const cors = require("cors");
 
 const { connectDB } = require("./db/connect");
 const warehouseRouter = require("./routes/warehouse.routes");
+const shelfRouter = require("./routes/shelf.routes");
 
 dotenv.config();
 
@@ -17,7 +18,8 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1/warehouses", warehouseRouter);
+app.use("/api/v1", warehouseRouter);
+app.use("/api/v1", shelfRouter);
 
 const server = async () => {
   try {
