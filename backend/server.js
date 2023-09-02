@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 
 const { connectDB } = require("./db/connect");
+const warehouseRouter = require("./routes/warehouse.routes");
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ app.get("/", (req, res) => {
     message: "Welcome to the backend!",
   });
 });
+
+app.use("/api/v1/warehouses", warehouseRouter);
 
 const server = async () => {
   try {
