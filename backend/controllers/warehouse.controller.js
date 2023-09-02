@@ -1,4 +1,5 @@
 const Warehouse = require("../models/warehouse.model");
+const { errorLogger } = require("../debug/debug");
 
 const getWarehouses = async (req, res) => {
   try {
@@ -16,6 +17,9 @@ const getWarehouses = async (req, res) => {
 
     res.status(200).json({ status: "Success", data: warehouses });
   } catch (error) {
+    errorLogger("warehouse.controller", "getWarehouses").error({
+      message: error.message,
+    });
     res.status(500).json({ status: "Error", error: error.message });
   }
 };
@@ -49,6 +53,9 @@ const createWarehouse = async (req, res) => {
 
     res.status(200).json({ status: "Success", data: warehouse });
   } catch (error) {
+    errorLogger("warehouse.controller", "createWarehouse").error({
+      message: error.message,
+    });
     res.status(500).json({ status: "Error", error: error.message });
   }
 };

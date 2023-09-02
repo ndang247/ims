@@ -1,5 +1,6 @@
 const Shelf = require("../models/shelf.model");
 const Warehouse = require("../models/warehouse.model");
+const { errorLogger } = require("../debug/debug");
 
 const getShelves = async (req, res) => {
   try {
@@ -14,6 +15,9 @@ const getShelves = async (req, res) => {
 
     res.status(200).json({ status: "Success", data: shelves });
   } catch (error) {
+    errorLogger("shelf.controller", "getShelves").error({
+      message: error.message,
+    });
     res.status(500).json({ status: "Error", error: error.message });
   }
 };
@@ -57,6 +61,9 @@ const createShelf = async (req, res) => {
 
     res.status(200).json({ status: "Success", data: shelf });
   } catch (error) {
+    errorLogger("shelf.controller", "createShelf").error({
+      message: error.message,
+    });
     res.status(500).json({ status: "Error", error: error.message });
   }
 };

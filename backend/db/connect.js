@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { errorLogger } = require("../debug/debug");
 
 let isConnected = false;
 
@@ -26,7 +27,9 @@ const connectDB = async () => {
 
     console.log("MongoDB connection established");
   } catch (error) {
-    console.log(error);
+    errorLogger("connect", "connectDB").error({
+      message: error.message,
+    });
     throw new Error("MongoDB connection failed");
   }
 };

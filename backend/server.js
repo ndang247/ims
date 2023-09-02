@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 
 const { connectDB } = require("./db/connect");
+const { errorLogger } = require("./debug/debug");
 const warehouseRouter = require("./routes/warehouse.routes");
 const shelfRouter = require("./routes/shelf.routes");
 
@@ -29,7 +30,9 @@ const server = async () => {
       console.log(`Server is listening on port ${process.env.PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    errorLogger("server", "server").error({
+      message: error.message,
+    });
     throw new Error("Server failed to start");
   }
 };
