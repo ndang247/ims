@@ -1,10 +1,13 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
+  warehouse: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Warehouse",
+  },
+  shelf: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Shelf",
   },
   barcode: {
     type: String,
@@ -13,14 +16,6 @@ const productSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-  },
-  inventory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Inventory",
-  },
-  rfid_tag: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "RFID",
   },
   datetimecreated: {
     type: Date,

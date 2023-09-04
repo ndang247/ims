@@ -6,6 +6,7 @@ const { connectDB } = require("./db/connect");
 const { errorLogger } = require("./debug/debug");
 const warehouseRouter = require("./routes/warehouse.routes");
 const shelfRouter = require("./routes/shelf.routes");
+const productRouter = require("./routes/product.routes");
 
 dotenv.config();
 
@@ -19,8 +20,9 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1", warehouseRouter);
-app.use("/api/v1", shelfRouter);
+app.use(process.env.ENDPOINT, warehouseRouter);
+app.use(process.env.ENDPOINT, shelfRouter);
+app.use(process.env.ENDPOINT, productRouter);
 
 const server = async () => {
   try {

@@ -1,18 +1,13 @@
 const mongoose = require("mongoose");
 
 const inventorySchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
   },
   quantity: {
     type: Number,
     required: true,
-  },
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
   },
   datetimecreated: {
     type: Date,

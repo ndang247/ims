@@ -25,14 +25,15 @@ const getShelves = async (req, res) => {
 const createShelf = async (req, res) => {
   try {
     const {
+      // warehouse info
+      _id,
+      // shelf info
       number,
       location_in_warehouse,
       aisle,
       products,
       datetimecreated = new Date(),
       datetimeupdated = new Date(),
-      // warehouse info
-      _id,
     } = req.body;
 
     const shelfExist = await Shelf.findOne({ number });
