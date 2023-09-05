@@ -30,7 +30,7 @@ const createWarehouse = async (req, res) => {
       name,
       address,
       shelves,
-      products,
+      parcels,
       datetimecreated = new Date(),
       datetimeupdated = new Date(),
     } = req.body;
@@ -46,7 +46,7 @@ const createWarehouse = async (req, res) => {
       name,
       address,
       shelves,
-      products,
+      parcels,
       datetimecreated,
       datetimeupdated,
     });

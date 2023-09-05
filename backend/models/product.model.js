@@ -1,22 +1,20 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  warehouse: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Warehouse",
-  },
-  shelf: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Shelf",
-  },
   barcode: {
     type: String,
     required: true,
   },
-  status: {
+  upc_data: {
     type: String,
     required: true,
   },
+  parcels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Parcel",
+    },
+  ],
   datetimecreated: {
     type: Date,
     required: true,

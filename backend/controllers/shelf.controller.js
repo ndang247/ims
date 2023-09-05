@@ -31,7 +31,7 @@ const createShelf = async (req, res) => {
       number,
       location_in_warehouse,
       aisle,
-      products,
+      parcels,
       datetimecreated = new Date(),
       datetimeupdated = new Date(),
     } = req.body;
@@ -48,7 +48,7 @@ const createShelf = async (req, res) => {
       number,
       location_in_warehouse,
       aisle,
-      products,
+      parcels,
       datetimecreated,
       datetimeupdated,
     });

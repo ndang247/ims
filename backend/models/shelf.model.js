@@ -18,10 +18,10 @@ const shelfSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  products: [
+  parcels: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "Parcel",
     },
   ],
   datetimecreated: {

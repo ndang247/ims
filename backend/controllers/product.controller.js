@@ -1,84 +1,47 @@
 const Product = require("../models/product.model");
-const Warehouse = require("../models/warehouse.model");
 const Inventory = require("../models/inventory.model");
 const { errorLogger } = require("../debug/debug");
 
 const createProduct = async (req, res) => {
   try {
     const {
-      warehouse,
-      shelf,
       barcode,
-      status,
       datetimecreated = new Date(),
       datetimeupdated = new Date(),
     } = req.body;
 
     const productExist = await Product.findOne({ barcode });
 
-    if (productExist) {
-      // Update the inventory quantity of the existing product
-      const inventory = await Inventory.findOne({ product: productExist._id });
-      const inventoryUpdated = await Inventory.findByIdAndUpdate(
-        inventory._id,
-        { quantity: inventory.quantity + 1 },
-        { new: true, useFindAndModify: false }
-      );
+    if (productExist)
+      return res
+        .status(201)
+        .json({ message: "Product already exists", data: productExist });
 
-      // Create a new product with the same barcode
-      const product = await Product.create({
-        warehouse,
-        shelf,
-        barcode,
-        status,
-        datetimecreated,
-        datetimeupdated,
-      });
-
-      // Also add the product to the warehouse
-      const warehouseUpdated = await Warehouse.findByIdAndUpdate(
-        warehouse,
-        { $push: { products: product._id } },
-        { new: true, useFindAndModify: false }
-      );
-
-      return res.status(201).json({
-        message: "Product added to warehouse and inventory",
-        item: product,
-        warehouse: warehouseUpdated,
-        inventory: inventoryUpdated,
-      });
-    }
+    // TODO: Make API call to UPC database
+    const upc_data = JSON.stringify({
+      name: "Test Product",
+      description: "This is a test product",
+    });
 
     // Create a new product
     const product = await Product.create({
-      warehouse,
-      shelf,
       barcode,
-      status,
+      upc_data,
       datetimecreated,
       datetimeupdated,
     });
-
-    // Add product to warehouse
-    const warehouseUpdated = await Warehouse.findByIdAndUpdate(
-      warehouse,
-      { $push: { products: product._id } },
-      { new: true, useFindAndModify: false }
-    );
 
     // Create an inventory for the new product
     const inventory = await Inventory.create({
       product: product._id,
-      quantity: 1,
+      parcel_quantity: 0,
       datetimecreated,
       datetimeupdated,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       status: "Success",
       item: product,
-      warehouse: warehouseUpdated,
       inventory,
     });
   } catch (error) {

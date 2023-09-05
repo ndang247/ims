@@ -4,9 +4,11 @@ const cors = require("cors");
 
 const { connectDB } = require("./db/connect");
 const { errorLogger } = require("./debug/debug");
+
 const warehouseRouter = require("./routes/warehouse.routes");
 const shelfRouter = require("./routes/shelf.routes");
 const productRouter = require("./routes/product.routes");
+const parcelRouter = require("./routes/parcel.routes");
 
 dotenv.config();
 
@@ -23,6 +25,7 @@ app.get("/", (req, res) => {
 app.use(process.env.ENDPOINT, warehouseRouter);
 app.use(process.env.ENDPOINT, shelfRouter);
 app.use(process.env.ENDPOINT, productRouter);
+app.use(process.env.ENDPOINT, parcelRouter);
 
 const server = async () => {
   try {

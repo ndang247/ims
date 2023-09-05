@@ -15,10 +15,10 @@ const warehouseSchema = new mongoose.Schema({
       ref: "Shelf",
     },
   ],
-  products: [
+  parcels: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "Parcel",
     },
   ],
   datetimecreated: {
