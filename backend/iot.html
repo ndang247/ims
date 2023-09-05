@@ -12,7 +12,7 @@
     <script>
         const dataDiv = document.getElementById('data');
 
-        const eventSource = new EventSource('/iot/data-stream');
+        const eventSource = new EventSource('/iot/inbound-stream');
         eventSource.onmessage = (event) => {
             console.log('DATA RECEIVED', event.data);
             const data = JSON.parse(event.data);

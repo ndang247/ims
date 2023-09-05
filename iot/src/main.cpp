@@ -43,7 +43,7 @@ String serverAddress = "192.168.1.117";
 
 void getRequest() {
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("Connected to WiFi");
+    Serial.println("Connected to WiFi - Strength" + String(WiFi.RSSI()));
     WiFiClient client;
 
     // Send GET request
@@ -65,7 +65,7 @@ void getRequest() {
 
 void postTag(String tagID) {
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("Connected to WiFi");
+    Serial.println("Connected to WiFi - Strength" + String(WiFi.RSSI()));
     WiFiClient client;
 
     // Send POST request
