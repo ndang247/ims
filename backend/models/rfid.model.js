@@ -17,7 +17,6 @@ const rfidSchema = new mongoose.Schema({
   },
   tag_data: {
     type: String,
-    required: true,
   },
   status: {
     type: String,
