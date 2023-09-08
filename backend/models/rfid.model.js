@@ -13,7 +13,7 @@ const rfidSchema = new mongoose.Schema({
   ref_object: {
     type: String,
     required: true,
-    enum: ["product"],
+    enum: ["Product", "Parcel"],
   },
   tag_data: {
     type: String,

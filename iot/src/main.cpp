@@ -39,7 +39,9 @@ boolean getUID() {
   return true;
 }
 
-String serverAddress = "192.168.1.117";
+String SERVER_ADDRESS = "192.168.1.122";
+String SERVER_PORT = "3000";
+String postInboundRoute = "/iot/inbound";
 
 void getRequest() {
   if (WiFi.status() == WL_CONNECTED) {
@@ -47,9 +49,9 @@ void getRequest() {
     WiFiClient client;
 
     // Send GET request
-    if (client.connect("192.168.1.117", 3000)) {
-      client.println("GET /iot/esp8266 HTTP/1.1");
-      client.println("Host: " + String(serverAddress));
+    if (client.connect(String(SERVER_ADDRESS), 3000)) {
+      client.println("GET " + postInboundRoute + " HTTP/1.1");
+      client.println("Host: " + String(SERVER_ADDRESS));
       client.println("Connection: close");
       client.println();
       while (client.connected()) {
@@ -65,11 +67,11 @@ void getRequest() {
 
 void postTag(String tagID) {
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("Connected to WiFi - Strength" + String(WiFi.RSSI()));
+    Serial.println("Posting tag - Wifi Strength: " + String(WiFi.RSSI()));
     WiFiClient client;
 
     // Send POST request
-    if (client.connect("192.168.1.117", 3000)) {
+    if (client.connect( String(SERVER_ADDRESS), 3000)) {
       StaticJsonDocument<200> jsonDoc; // Adjust the size as needed
       jsonDoc["sensor"] = "ESP8266";
       jsonDoc["role"] = "inbound";
@@ -82,8 +84,8 @@ void postTag(String tagID) {
       String jsonStr;
       serializeJson(jsonDoc, jsonStr);
 
-      client.println("POST /iot/esp8266 HTTP/1.1");
-      client.println("Host: " + String(serverAddress));
+      client.println("POST " + postInboundRoute + " HTTP/1.1");
+      client.println("Host: " + String(SERVER_ADDRESS));
       client.println("Content-Type: application/json");
       client.print("Content-Length: ");
       client.println(jsonStr.length());
@@ -96,12 +98,28 @@ void postTag(String tagID) {
       }
       client.stop();
     } else {
-      Serial.println("POST Connection failed.");
+      Serial.println("POST Tag failed. Tag: " + tagID);
     }
 
 
   }
 }
+
+
+// Replace with your network credentials (STATION)
+const char* ssid = "WiFi-DFAE-5G-pro-5G";
+const char* password = "18190793";
+void initWifi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi ..");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print('.');
+    delay(1000);
+  }
+  Serial.println("WiFi connected");
+  Serial.println(WiFi.localIP());
+  }
 
 void setup() {
 	Serial.begin(9600);		// Initialize serial communications with the PC
@@ -125,7 +143,7 @@ void loop() {
   while (getUID()) 
   {
     Serial.println("Tag " + tagID + " detected");
-    getRequest();
+    // getRequest();
     postTag(tagID);
   }
 }
