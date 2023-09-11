@@ -28,7 +28,10 @@ const parcelSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const Parcel = mongoose.model.Parcel || mongoose.model("Parcel", parcelSchema);
 

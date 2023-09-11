@@ -27,7 +27,10 @@ const historySchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const History =
   mongoose.model.History || mongoose.model("History", historySchema);

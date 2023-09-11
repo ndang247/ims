@@ -17,7 +17,10 @@ const inventorySchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const Inventory =
   mongoose.model.Inventory || mongoose.model("Inventory", inventorySchema);

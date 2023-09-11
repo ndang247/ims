@@ -23,7 +23,10 @@ const productSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const Product =
   mongoose.model.Product || mongoose.model("Product", productSchema);

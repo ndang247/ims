@@ -30,7 +30,10 @@ const rfidSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const RFID = mongoose.model.RFID || mongoose.model("RFID", rfidSchema);
 

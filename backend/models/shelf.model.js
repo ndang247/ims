@@ -32,7 +32,10 @@ const shelfSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const Shelf = mongoose.model.Shelf || mongoose.model("Shelf", shelfSchema);
 
