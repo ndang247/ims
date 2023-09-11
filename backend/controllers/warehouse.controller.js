@@ -18,7 +18,7 @@ const getWarehouses = async (req, res) => {
     res.status(200).json({ status: "Success", data: warehouses });
   } catch (error) {
     errorLogger("warehouse.controller", "getWarehouses").error({
-      message: error.message,
+      message: error,
     });
     res.status(500).json({ status: "Error", error: error.message });
   }
@@ -54,7 +54,7 @@ const createWarehouse = async (req, res) => {
     res.status(200).json({ status: "Success", data: warehouse });
   } catch (error) {
     errorLogger("warehouse.controller", "createWarehouse").error({
-      message: error.message,
+      message: error,
     });
     res.status(500).json({ status: "Error", error: error.message });
   }
