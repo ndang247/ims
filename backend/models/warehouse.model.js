@@ -29,7 +29,10 @@ const warehouseSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const Warehouse =
   mongoose.model.Warehouse || mongoose.model("Warehouse", warehouseSchema);

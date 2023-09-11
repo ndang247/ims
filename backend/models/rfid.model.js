@@ -13,11 +13,10 @@ const rfidSchema = new mongoose.Schema({
   ref_object: {
     type: String,
     required: true,
-    enum: ["product"],
+    enum: ["Product", "Parcel"],
   },
   tag_data: {
     type: String,
-    required: true,
   },
   status: {
     type: String,
@@ -31,7 +30,10 @@ const rfidSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const RFID = mongoose.model.RFID || mongoose.model("RFID", rfidSchema);
 

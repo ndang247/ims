@@ -4,6 +4,7 @@ const shelfSchema = new mongoose.Schema({
   warehouse: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Warehouse",
+    required: true,
   },
   number: {
     type: String,
@@ -32,7 +33,10 @@ const shelfSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: {
+  createdAt: 'datetimecreated',
+  updatedAt: 'datetimeupdated'
+}});
 
 const Shelf = mongoose.model.Shelf || mongoose.model("Shelf", shelfSchema);
 
