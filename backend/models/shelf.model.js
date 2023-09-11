@@ -4,6 +4,7 @@ const shelfSchema = new mongoose.Schema({
   warehouse: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Warehouse",
+    required: true,
   },
   number: {
     type: String,

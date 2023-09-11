@@ -4,6 +4,7 @@ const inventorySchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
+    required: true,
   },
   parcel_quantity: {
     type: Number,
