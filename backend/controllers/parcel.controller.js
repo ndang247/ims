@@ -1,6 +1,4 @@
 const Parcel = require("../models/parcel.model");
-const Product = require("../models/product.model");
-const Warehouse = require("../models/warehouse.model");
 const Inventory = require("../models/inventory.model");
 const { errorLogger } = require("../debug/debug");
 
@@ -26,31 +24,10 @@ const createParcel = async (req, res) => {
         datetimecreated,
         datetimeupdated,
       });
-
-      // Add parcel to a warehouse
-      await Warehouse.findByIdAndUpdate(
-        warehouse,
-        {
-          $push: {
-            parcels: parcel._id,
-          },
-        },
-        { new: true, useFindAndModify: false }
-      );
-
-      // Add parcel to a product
-      await Product.findByIdAndUpdate(
-        product,
-        {
-          $push: {
-            parcels: parcel._id,
-          },
-        },
-        { new: true, useFindAndModify: false }
-      );
+      await parcel.save();
     }
 
-    // Update an inventory for the new parcel
+    // Update inventory parcel_quantity for the newly added parcels
     const inventory = await Inventory.findOne({ product });
     const inventoryUpdated = await Inventory.findByIdAndUpdate(
       inventory._id,

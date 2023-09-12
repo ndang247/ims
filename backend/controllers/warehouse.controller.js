@@ -3,17 +3,7 @@ const { errorLogger } = require("../debug/debug");
 
 const getWarehouses = async (req, res) => {
   try {
-    const warehouses = await Warehouse.find().populate({
-      path: "shelves",
-      // populate: {
-      //   path: "products",
-      //   model: "Product",
-      // },
-    });
-    // .populate({
-    //   path: "products",
-    //   model: "Product",
-    // });
+    const warehouses = await Warehouse.find();
 
     res.status(200).json({ status: "Success", data: warehouses });
   } catch (error) {
@@ -29,8 +19,6 @@ const createWarehouse = async (req, res) => {
     const {
       name,
       address,
-      shelves,
-      parcels,
       datetimecreated = new Date(),
       datetimeupdated = new Date(),
     } = req.body;
@@ -45,8 +33,6 @@ const createWarehouse = async (req, res) => {
     const warehouse = await Warehouse.create({
       name,
       address,
-      shelves,
-      parcels,
       datetimecreated,
       datetimeupdated,
     });

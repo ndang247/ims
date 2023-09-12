@@ -145,35 +145,9 @@ const postInboundProcess = async (req, res) => {
 
   await tag.save();
 
-  // Add parcel to a warehouse
-  console.log("Add parcel to a warehouse", defaultWarehouseId);
-  const updateWarehouseParcels = await Warehouse.findByIdAndUpdate(
-    defaultWarehouseId,
-    {
-      $push: {
-        parcels: parcel._id,
-      },
-    },
-    { new: true, useFindAndModify: false }
-  );
-
-  // Add parcel to a product
-  console.log("Add parcel to product", product._id);
-  const updateProductParcels = await Product.findByIdAndUpdate(
-    product._id,
-    {
-      $push: {
-        parcels: parcel._id,
-      },
-    },
-    { new: true, useFindAndModify: false }
-  );
-
   // await Promise.all([
   //   parcel.save(),
   //   tag.save(),
-  //   updateWarehouseParcels,
-  //   updateProductParcels
   // ])
 
   // Get the inventory for the product and increment parcel_quantity by 1
