@@ -1,4 +1,4 @@
-const https = require('https');
+const https = require("https");
 
 /**
  * Get UPC data from UPCItemDB API
@@ -9,54 +9,54 @@ const https = require('https');
  * 
  * {
  * 
-*  "code": "OK",
-*
-*  "total": 1,
+ *  "code": "OK",
+ *
+ *  "total": 1,
 
-*  "offset": 0,
+ *  "offset": 0,
 
-*  "items": [
-*    {
-*      "ean": "",
-*      "title": "",
-*      "description": "",
-*      "upc": "",
-*      "asin": "",
-*      "brand": "",
-*      "model": "",
-*      "color": "",
-*      "size": "",
-*      "dimension": "",
-*      "weight": "",
-*      "category": "Health & Beauty > Personal Care > Oral Care > Gum Stimulators",
-*      "lowest_recorded_price": 0.0,
-*      "highest_recorded_price": 0.0,
-*      "images": [],
-*      "offers": [],
-*      "elid": ""
-*    }
-*  ]
-*
-*  }
- */
+ *  "items": [
+ *    {
+ *      "ean": "",
+ *      "title": "",
+ *      "description": "",
+ *      "upc": "",
+ *      "asin": "",
+ *      "brand": "",
+ *      "model": "",
+ *      "color": "",
+ *      "size": "",
+ *      "dimension": "",
+ *      "weight": "",
+ *      "category": "Health & Beauty > Personal Care > Oral Care > Gum Stimulators",
+ *      "lowest_recorded_price": 0.0,
+ *      "highest_recorded_price": 0.0,
+ *      "images": [],
+ *      "offers": [],
+ *      "elid": ""
+ *    }
+ *  ]
+ *
+ * }
+*/
 async function fetchUPCData(upcCode) {
   const options = {
-    hostname: 'api.upcitemdb.com',
+    hostname: "api.upcitemdb.com",
     path: `/prod/trial/lookup?upc=${upcCode}`,
-    method: 'GET'
+    method: "GET",
   };
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      let data = '';
+      let data = "";
 
       // Receive data chunks
-      res.on('data', (chunk) => {
+      res.on("data", (chunk) => {
         data += chunk;
       });
 
       // Once the response is complete
-      res.on('end', () => {
+      res.on("end", () => {
         try {
           const parsedData = JSON.parse(data);
           resolve(parsedData);
@@ -66,7 +66,7 @@ async function fetchUPCData(upcCode) {
       });
     });
 
-    req.on('error', (error) => {
+    req.on("error", (error) => {
       reject(error);
     });
 
@@ -74,4 +74,4 @@ async function fetchUPCData(upcCode) {
   });
 }
 
-module.exports = { fetchUPCData }
+module.exports = { fetchUPCData };

@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ESP8266 Real-Time Data Display</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>ESP8266 Real-Time Data Display</h1>
     <div id="data"></div>
 
     <script>
-        const dataDiv = document.getElementById('data');
+      const dataDiv = document.getElementById("data");
 
-        const eventSource = new EventSource('/iot/inbound-stream');
-        eventSource.onmessage = (event) => {
-            console.log('DATA RECEIVED', event.data);
-            const data = JSON.parse(event.data);
-            dataDiv.textContent = JSON.stringify(data, null, 2);
-        };
+      const eventSource = new EventSource("/iot/inbound-stream");
+      eventSource.onmessage = (event) => {
+        console.log("DATA RECEIVED", event.data);
+        const data = JSON.parse(event.data);
+        dataDiv.textContent = JSON.stringify(data, null, 2);
+      };
     </script>
-</body>
+  </body>
 </html>

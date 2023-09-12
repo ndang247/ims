@@ -1,11 +1,11 @@
-const express = require('express');
+const express = require("express");
 const dotenv = require("dotenv");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
 const { connectDB } = require("./db/connect");
 const { errorLogger } = require("./debug/debug");
 
-const { ipAddress } = require('./helpers/network');
+const { ipAddress } = require("./helpers/network");
 
 dotenv.config();
 
@@ -15,8 +15,8 @@ const PORT = 3000; // You can change this to any available port
 // Parse JSON and URL-encoded bodies
 app.use(bodyParser.json());
 
-const iotRouter = require('./routes/iot.routes');
-app.use('/iot', iotRouter);
+const iotRouter = require("./routes/iot.routes");
+app.use("/iot", iotRouter);
 
 const iotServer = async () => {
   try {
@@ -26,11 +26,11 @@ const iotServer = async () => {
       console.log(`IoT Server is running on ${ipAddress}:${PORT}`);
     });
   } catch (error) {
-    errorLogger("iotServer", "iotServer").error({
-      message: error.message,
+    errorLogger("index", "iotServer").error({
+      message: error,
     });
     throw new Error("Server failed to start");
   }
-}
+};
 
 iotServer();
