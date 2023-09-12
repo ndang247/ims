@@ -21,7 +21,7 @@ const createShelf = async (req, res) => {
   try {
     const {
       // warehouse info
-      _id,
+      warehouse,
       // shelf info
       number,
       location_in_warehouse,
@@ -30,16 +30,20 @@ const createShelf = async (req, res) => {
       datetimeupdated = new Date(),
     } = req.body;
 
-    // TODO: need to check in a specific warehouse instead of just number
-    const shelfExist = await Shelf.findOne({ number });
+    // Need to check in a specific warehouse and at specific location
+    const shelfExist = await Shelf.find({
+      warehouse,
+      number,
+      aisle,
+    });
 
-    if (shelfExist)
+    if (shelfExist.length > 0)
       return res
         .status(201)
         .json({ message: "Shelf already exists", data: shelfExist });
 
     const shelf = await Shelf.create({
-      warehouse: _id,
+      warehouse,
       number,
       location_in_warehouse,
       aisle,
