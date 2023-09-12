@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const rfidSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     ref_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ref_object",
