@@ -1,4 +1,5 @@
 const Shelf = require("../models/shelf.model");
+const Warehouse = require("../models/warehouse.model");
 const { errorLogger } = require("../debug/debug");
 
 const getShelves = async (req, res) => {
@@ -37,10 +38,20 @@ const createShelf = async (req, res) => {
       aisle,
     });
 
-    if (shelfExist.length > 0)
+    // Check if warehouse exists
+    const warehouseExist = await Warehouse.findById(warehouse);
+    if (!warehouseExist)
       return res
-        .status(201)
-        .json({ message: "Shelf already exists", data: shelfExist });
+        .status(404)
+        .json({ status: "Not found", message: "Warehouse does not exist" });
+
+    // Check if there is already a shelf at that location in the same warehouse
+    if (shelfExist.length > 0)
+      return res.status(201).json({
+        status: "Success",
+        message: "Shelf location already occupied",
+        data: shelfExist,
+      });
 
     const shelf = await Shelf.create({
       warehouse,
