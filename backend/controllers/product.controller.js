@@ -1,5 +1,8 @@
 const Product = require("../models/product.model");
 const Inventory = require("../models/inventory.model");
+
+const { fetchUPCData } = require("../services/upc");
+
 const { errorLogger } = require("../debug/debug");
 
 const createProduct = async (req, res) => {
@@ -17,11 +20,13 @@ const createProduct = async (req, res) => {
         .status(201)
         .json({ message: "Product already exists", data: productExist });
 
-    // TODO: Make API call to UPC database
-    const upc_data = JSON.stringify({
-      name: "Test Product",
-      description: "This is a test product",
-    });
+    // Get product data from UPC API
+    const data = await fetchUPCData(barcode);
+    if (data.code.toLowerCase() !== "ok" && data.total !== 0) {
+      return res.status(400).send({ message: "Invalid barcode" });
+    }
+
+    const upc_data = JSON.stringify(data.items[0]);
 
     // Create a new product
     const product = await Product.create({

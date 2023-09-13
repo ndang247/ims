@@ -36,9 +36,8 @@ const server = async () => {
     });
   } catch (error) {
     errorLogger("server", "server").error({
-      message: error.message,
+      message: error,
     });
-    throw new Error("Server failed to start");
   }
 };
 

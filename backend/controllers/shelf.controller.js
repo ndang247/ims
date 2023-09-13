@@ -8,15 +8,11 @@ const getShelves = async (req, res) => {
       path: "warehouse",
       model: "Warehouse",
     });
-    //   .populate({
-    //     path: "products",
-    //     model: "Product",
-    //   });
 
     res.status(200).json({ status: "Success", data: shelves });
   } catch (error) {
     errorLogger("shelf.controller", "getShelves").error({
-      message: error.message,
+      message: error,
     });
     res.status(500).json({ status: "Error", error: error.message });
   }
@@ -26,44 +22,50 @@ const createShelf = async (req, res) => {
   try {
     const {
       // warehouse info
-      _id,
+      warehouse,
       // shelf info
       number,
       location_in_warehouse,
       aisle,
-      parcels,
       datetimecreated = new Date(),
       datetimeupdated = new Date(),
     } = req.body;
 
-    const shelfExist = await Shelf.findOne({ number });
+    // Need to check in a specific warehouse and at specific location
+    const shelfExist = await Shelf.find({
+      warehouse,
+      number,
+      aisle,
+    });
 
-    if (shelfExist)
+    // Check if warehouse exists
+    const warehouseExist = await Warehouse.findById(warehouse);
+    if (!warehouseExist)
       return res
-        .status(201)
-        .json({ message: "Shelf already exists", data: shelfExist });
+        .status(404)
+        .json({ status: "Not found", message: "Warehouse does not exist" });
+
+    // Check if there is already a shelf at that location in the same warehouse
+    if (shelfExist.length > 0)
+      return res.status(201).json({
+        status: "Success",
+        message: "Shelf location already occupied",
+        data: shelfExist,
+      });
 
     const shelf = await Shelf.create({
-      warehouse: _id,
+      warehouse,
       number,
       location_in_warehouse,
       aisle,
-      parcels,
       datetimecreated,
       datetimeupdated,
     });
 
-    // Add shelf to warehouse
-    await Warehouse.findByIdAndUpdate(
-      _id,
-      { $push: { shelves: shelf._id } },
-      { new: true, useFindAndModify: false }
-    );
-
     res.status(200).json({ status: "Success", data: shelf });
   } catch (error) {
     errorLogger("shelf.controller", "createShelf").error({
-      message: error.message,
+      message: error,
     });
     res.status(500).json({ status: "Error", error: error.message });
   }
