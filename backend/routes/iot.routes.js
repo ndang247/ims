@@ -2,10 +2,9 @@ const express = require("express");
 
 const router = express.Router();
 
-const {
-  updateInventory,
-  postInboundProcess,
-  getInboundStream,
+const { postInboundProcess, 
+  getInboundStream, 
+  getIoTHome 
 } = require("../controllers/iot.controller");
 
 // MAIN ROUTE: /iot
@@ -13,5 +12,7 @@ const {
 router.post("/inbound", postInboundProcess);
 
 router.get("/inbound-stream", getInboundStream);
+
+router.get('/', getIoTHome)
 
 module.exports = router;

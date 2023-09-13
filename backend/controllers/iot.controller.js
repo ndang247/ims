@@ -6,7 +6,9 @@ const Warehouse = require("../models/warehouse.model");
 
 const { createProduct } = require("./product.controller");
 
-const { fetchUPCData } = require("../services/upc");
+const { errorLogger } = require('../debug/debug')
+
+const { fetchUPCData } = require('../services/upc')
 
 const defaultWarehouseId = "64f672a6fce3fa0392448d51";
 
@@ -23,7 +25,7 @@ const updateInventory = async (req, res) => {
   console.log("Updating Inventory ", tagID, status);
 
   // Get the tag
-  const tag = await RFID.findOne({ id: tagID });
+  const tag = await RFID.findOne({ id: tagID, ref_object: "Parcel" });
 
   // If tag is not found
   if (!tag) {
@@ -81,19 +83,19 @@ const postInboundProcess = async (req, res) => {
   const existingTag = await RFID.findOne({ id: tagID });
 
   if (existingTag) {
-    // TODO: if tag exists, check if the tag is already associated with a parcel the update inventory
     return updateInventory(req, res);
     // return res.status(200).send({ message: "Tag already exists" });
   }
 
   if (!barcode) {
-    barcode = "93519441"; // TEMPORARY
+    barcode = "93519441" // FIX: TEMPORARY
     // return res.status(400).send({ message: "Barcode is required" });
   }
 
   let product = await Product.findOne({ barcode: barcode });
 
   if (!product) {
+    console.log('Creating product. No product found with barcode: ', barcode);
     // Get product from UPC database
     const upcData = await fetchUPCData(barcode);
     if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
@@ -109,7 +111,6 @@ const postInboundProcess = async (req, res) => {
       datetimecreated: new Date(),
       datetimeupdated: new Date(),
     });
-    await product.save();
 
     const inventory = new Inventory({
       product: product._id,
@@ -117,10 +118,23 @@ const postInboundProcess = async (req, res) => {
       datetimecreated: new Date(),
       datetimeupdated: new Date(),
     });
-    await inventory.save();
+
+    try {
+      await Promise.all([
+        product.save(),
+        inventory.save()
+      ])
+    } catch (error) {
+      console.log('Error when creating new product', error);
+      errorLogger("iot.controller", "postInboundProcess").error({
+        message: error,
+      });
+      return res.status(500).send({ message: "Error when creating new product" });
+    }
   }
 
   // Create a new Parcel
+  console.log('Create a new parcel');
   const parcel = new Parcel({
     product: product._id,
     warehouse: defaultWarehouseId,
@@ -129,10 +143,8 @@ const postInboundProcess = async (req, res) => {
     datetimeupdated: new Date(),
   });
 
-  await parcel.save();
-
   // Create a new Tag
-  console.log("Create a new tag", tagID);
+  console.log(`Create a new tag`, tagID);
   const tag = new RFID({
     id: tagID,
     ref_id: parcel._id,
@@ -143,22 +155,19 @@ const postInboundProcess = async (req, res) => {
     datetimeupdated: new Date(),
   });
 
-  await tag.save();
 
-  // await Promise.all([
-  //   parcel.save(),
-  //   tag.save(),
-  // ])
+  await Promise.all([
+    parcel.save(),
+    tag.save(),
+  ])
 
   // Get the inventory for the product and increment parcel_quantity by 1
   const inventory = await Inventory.findOne({ product: product._id });
   inventory.parcel_quantity += 1;
   await inventory.save();
 
-  console.log(
-    "Sucessfully process inbound data from IoT: ",
-    latestReceivedProduct
-  );
+  console.log('Sucessfully process inbound data from IoT: ', latestReceivedProduct);
+  console.log('Parcel with Product: ', product.barcode);
 
   res.send({ message: "Data processed successfully" });
 };
