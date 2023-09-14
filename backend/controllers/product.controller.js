@@ -1,5 +1,6 @@
 const Product = require("../models/product.model");
 const Inventory = require("../models/inventory.model");
+const Parcel = require("../models/parcel.model");
 
 const { fetchUPCData } = require("../services/upc");
 
@@ -54,7 +55,7 @@ const createProduct = async (req, res) => {
     errorLogger("product.controller", "createProduct").error({
       message: error,
     });
-    res.status(500).json({ status: "Error", error: error.message });
+    res.status(400).json({ status: "Error", error: error.message });
   }
 };
 
@@ -62,7 +63,14 @@ const getProduct = async (req, res) => {
   const id = req.params.id;
 
   console.log('Get product', id);
-  const product = await Product.findById(id);
+  let product = await Product.findById(id);
+
+  if (!product) {
+    product = await Product.findOne({ barcode: id });
+    if (!product) {
+      res.status(400).send({ status: "Error", error: error.message, message: "Product not found" });
+    }
+  }
   
   let upc_json = {}
   if (product.upc_data) {
@@ -91,10 +99,95 @@ const getProduct = async (req, res) => {
     }
   ];
 
-  const result = await Product.aggregate(pipeline);
-  let result_product = result[0];
-  result_product.upc_data = upc_json;
-  res.status(200).send(result_product);
+  try {
+    const result = await Product.aggregate(pipeline);
+    let result_product = result[0];
+    result_product.upc_data = upc_json;
+    res.status(200).send(result_product);
+
+  } catch (error) {
+    errorLogger("product.controller", "getProduct").error({
+      message: error,
+    });
+    res.status(400).json({ status: "Error", error: error.message , message: "Unable to get product " + product._id});
+  }
 }
 
-module.exports = { createProduct, getProduct };
+const getProducts = async (req, res) => {
+  try {
+    const warehouseId = req.body.warehouse_id;
+
+    if (!warehouseId) {
+      return res.status(400).send({ status: "Error", message: "Warehouse ID is required" });
+    }
+
+    const pipeline = [
+      {
+        $match: {
+          // Filter by warehouse id
+          warehouse: new mongoose.Types.ObjectId(warehouseId)
+        }
+      },
+      {
+        $group: {
+          // Group the results by product ID to give you distinct product IDs.
+          _id: "$product"
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      {
+        $unwind: "$product"
+      },
+      {
+        $lookup: {
+          from: "inventories",
+          localField: "product._id",
+          foreignField: "product",
+          as: "product.inventory"
+        }
+      },
+      {
+        $unwind: {
+          path: "$product.inventory",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: "$product"
+        }
+      }
+    ];
+
+    try {
+      let products = await Parcel.aggregate(pipeline);
+      products = products.map((product) => {
+        let upc_json = {}
+        if (product.upc_data) {
+          upc_json = JSON.parse(product.upc_data)
+        }
+        product.upc_data = upc_json;
+        return product;
+      })
+      res.status(200).send(products);
+    } catch (error) {
+      
+      res.status(400).send({ status: "Error", message: "Unable to get products." });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    errorLogger("product.controller", "getProducts").error({
+      message: error,
+    });
+    res.status(500).send({ status: "Error", error: error.message, message: "Internal Server Error" });
+  }
+}
+
+module.exports = { createProduct, getProduct, getProducts };
