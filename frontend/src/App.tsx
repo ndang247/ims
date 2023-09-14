@@ -1,4 +1,4 @@
-import { Dashboard, Items, Sidebar } from "./components";
+import { Dashboard, Items, Parcels, Sidebar } from "./components";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { Layout, theme } from "antd";
 import "./App.css";
@@ -19,11 +19,12 @@ const App = () => {
           <Content style={{ margin: "0 16px" }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/parcels" element={<Parcels />} />
               <Route path="/items" element={<Items />} />
             </Routes>
           </Content>
           <Footer style={{ textAlign: "center" }}>
-            IMS ©2023 Created by DC
+            IMS © 2023 Created by DC
           </Footer>
         </Layout>
       </Layout>

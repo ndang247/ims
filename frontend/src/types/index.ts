@@ -16,3 +16,8 @@ export function getItem(
     children,
   } as MenuItem;
 }
+
+export interface IParcel {
+  _id: string;
+  warehouse: string;
+}
