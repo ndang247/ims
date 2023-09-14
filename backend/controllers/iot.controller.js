@@ -10,7 +10,7 @@ const { errorLogger } = require('../debug/debug')
 
 const { fetchUPCData } = require('../services/upc')
 
-const defaultWarehouseId = "64f672a6fce3fa0392448d51";
+const DEFAULT_WAREHOUSE_ID = "650041c789d9fbf5b33516ca";
 
 let latestReceivedProduct = {};
 
@@ -38,7 +38,7 @@ const updateInventory = async (req, res) => {
   // Update the status of the parcel
   const previousStatus = parcel.status;
   parcel.status = status ?? "in_warehouse";
-  parcel.warehouse = defaultWarehouseId;
+  parcel.warehouse = DEFAULT_WAREHOUSE_ID;
   await parcel.save();
   console.log("Save parcel sucessfully", parcel);
 
@@ -137,7 +137,7 @@ const postInboundProcess = async (req, res) => {
   console.log('Create a new parcel');
   const parcel = new Parcel({
     product: product._id,
-    warehouse: defaultWarehouseId,
+    warehouse: DEFAULT_WAREHOUSE_ID,
     status: "in_warehouse",
     datetimecreated: new Date(),
     datetimeupdated: new Date(),
