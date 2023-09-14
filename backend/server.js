@@ -9,6 +9,7 @@ const warehouseRouter = require("./routes/warehouse.routes");
 const shelfRouter = require("./routes/shelf.routes");
 const productRouter = require("./routes/product.routes");
 const parcelRouter = require("./routes/parcel.routes");
+const debugRouter = require("./routes/debug.routes");
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(process.env.ENDPOINT, warehouseRouter);
 app.use(process.env.ENDPOINT, shelfRouter);
 app.use(process.env.ENDPOINT, productRouter);
 app.use(process.env.ENDPOINT, parcelRouter);
+app.use(process.env.ENDPOINT, debugRouter);
 
 const server = async () => {
   try {
