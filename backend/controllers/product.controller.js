@@ -4,6 +4,7 @@ const Inventory = require("../models/inventory.model");
 const { fetchUPCData } = require("../services/upc");
 
 const { errorLogger } = require("../debug/debug");
+const mongoose = require("mongoose");
 
 const createProduct = async (req, res) => {
   try {
@@ -57,4 +58,43 @@ const createProduct = async (req, res) => {
   }
 };
 
-module.exports = { createProduct };
+const getProduct = async (req, res) => {
+  const id = req.params.id;
+
+  console.log('Get product', id);
+  const product = await Product.findById(id);
+  
+  let upc_json = {}
+  if (product.upc_data) {
+    upc_json = JSON.parse(product.upc_data)
+  }
+
+  const pipeline = [
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(id)
+      }
+    },
+    {
+      $lookup: {
+        from: 'inventories',
+        localField: '_id',
+        foreignField: 'product',
+        as: 'inventory'
+      }
+    },
+    {
+      $unwind: {
+        path: '$inventory',
+        preserveNullAndEmptyArrays: true
+      }
+    }
+  ];
+
+  const result = await Product.aggregate(pipeline);
+  let result_product = result[0];
+  result_product.upc_data = upc_json;
+  res.status(200).send(result_product);
+}
+
+module.exports = { createProduct, getProduct };
