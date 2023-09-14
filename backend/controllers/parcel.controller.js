@@ -4,6 +4,8 @@ const Warehouse = require("../models/warehouse.model");
 const Shelf = require("../models/shelf.model");
 const Product = require("../models/product.model");
 
+const mongoose = require("mongoose");
+
 const { errorLogger } = require("../debug/debug");
 
 const createParcel = async (req, res) => {
@@ -61,4 +63,105 @@ const createParcel = async (req, res) => {
   }
 };
 
-module.exports = { createParcel };
+/**
+ * Get parcels for a warehouse
+ * 
+ * @RequestBody
+ * `warehouse_id`: warehouse id
+ * `product_id`: product id
+ * @ResponseBody { parcels }
+ */
+const getParcels = async (req, res) => {
+  try {
+    const { warehouse_id, product_id } = req.body;
+
+    if (!warehouse_id) {
+      return res.status(400).send({ message: "Warehouse ID is required" });
+    }
+
+    console.log('Warehouse ID: ', warehouse_id);
+    console.log(new mongoose.Types.ObjectId(warehouse_id));
+
+    // Construct the aggregation pipeline
+    let parcel_pipeline = [
+      {
+        $match: { // Filter the parcels by warehouse.
+          warehouse: new mongoose.Types.ObjectId(warehouse_id)
+        }
+      },
+      {
+        $lookup: { // Join the Parcel with the Product collection based on the product field
+          from: "products",
+          localField: "product",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      {
+        $unwind: "$product" // Parcel with 1 product instead of array of products
+      },
+    ];
+
+    // RFID added
+    parcel_pipeline = parcel_pipeline.concat([
+      {
+        $lookup: {
+          from: "rfids", // This should match the name of the RFID collection
+          let: { parcel_id: "$_id" },
+          pipeline: [
+            {
+              // Find the RFID with the same ref_id and ref_object as the Parcel
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$ref_id", "$$parcel_id"] },
+                    { $eq: ["$ref_object", "Parcel"] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "rfid"
+        }
+      },
+      {
+        $unwind: {
+          path: "$rfid",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          // Include fields you want in the result
+          warehouse: 1,
+          product: 1,
+          rfid: "$rfid"
+        }
+      }
+    ])
+
+    // Filter to a certain products if product_id is specified
+    if (product_id) {
+      parcel_pipeline.push({
+        $match: {
+          "product._id": new mongoose.Types.ObjectId(product_id)
+        }
+      });
+    }
+
+    const parcels = await Parcel.aggregate(parcel_pipeline);
+
+    res.send(parcels);
+} catch (error) {
+    console.error('Error:', error);
+    errorLogger("parcel.controller", "getParcels").error({
+        message: error,
+    });
+    res.status(500).send({ message: "Internal Server Error" });
+}
+};
+
+module.exports = { 
+  createParcel,
+  getParcels
+};
