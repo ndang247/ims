@@ -14,7 +14,7 @@ export const getParcels = async () => {
       params: {
         // TODO: Make these params dynamic
         warehouse_id: "650041c789d9fbf5b33516ca",
-        product_id: "6502fd92257fee7e80cae38a",
+        // product_id: "6502fd92257fee7e80cae38a",
       },
     });
     return response;

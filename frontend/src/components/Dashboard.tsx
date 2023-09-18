@@ -1,5 +1,6 @@
 import React from "react";
 import { Breadcrumb, theme } from "antd";
+import { Parcels } from ".";
 
 const Dashboard: React.FC = () => {
   const {
@@ -8,19 +9,24 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>User</Breadcrumb.Item>
-        <Breadcrumb.Item>Bill</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: <a href="/">Dashboard</a>,
+          },
+        ]}
+      />
+
+      <Parcels displayBreadcrumb={false} />
+
       <div
         style={{
-          padding: 24,
-          minHeight: 360,
+          padding: 15,
+          height: "50%",
           background: colorBgContainer,
         }}
-      >
-        Bill is a cat.
-      </div>
+      ></div>
     </>
   );
 };

@@ -14,9 +14,11 @@ import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
 import { Breadcrumb, theme } from "antd";
 
 import { getParcels } from "../api";
-import { IParcel } from "../types";
+import { IParcel, IParcelProps } from "../types";
 
-const Parcels: React.FC = () => {
+const Parcels: React.FC<IParcelProps> = ({
+  displayBreadcrumb = true,
+}: IParcelProps) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -28,9 +30,16 @@ const Parcels: React.FC = () => {
   const [columnDefs] = useState<ColDef[]>([
     { headerName: "ID", field: "_id", filter: true },
     { headerName: "Warehouse", field: "warehouse", filter: true },
-    // { field: "make", filter: true },
-    // { field: "model", filter: true },
-    // { field: "price" },
+    // { headerName: "Shelf", field: "shelf", filter: true },
+    { headerName: "Product", field: "product._id", filter: true },
+    { headerName: "Barcode", field: "product.barcode", filter: true },
+    { headerName: "UPC", field: "product.upc_data.data", filter: true },
+    { headerName: "RFID", field: "rfid.id", filter: true },
+    { headerName: "Tag Data", field: "rfid.tag_data", filter: true },
+    { headerName: "RFID Status", field: "rfid.status", filter: true },
+    { headerName: "Status", field: "status", filter: true },
+    { headerName: "Created At", field: "datetimecreated", filter: true },
+    { headerName: "Updated At", field: "datetimeupdated", filter: true },
   ]);
 
   // DefaultColDef sets props common to all Columns
@@ -47,9 +56,6 @@ const Parcels: React.FC = () => {
 
   // Example load data from server
   useEffect(() => {
-    // fetch("https://www.ag-grid.com/example-assets/row-data.json")
-    //   .then((result) => result.json())
-    //   .then((rowData) => setRowData(rowData));
     getParcels().then((result) => {
       setRowData(result?.data.parcels);
     });
@@ -69,22 +75,30 @@ const Parcels: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb
-        style={{ margin: "16px 0" }}
-        items={[
-          {
-            title: <a href="/parcels">Parcels</a>,
-          },
-        ]}
-      />
+      {displayBreadcrumb && (
+        <Breadcrumb
+          style={{ margin: "16px 0" }}
+          items={[
+            {
+              title: <a href="/">Dashboard</a>,
+            },
+            {
+              title: <a href="/parcels">Parcels</a>,
+            },
+          ]}
+        />
+      )}
       <div
         style={{
-          padding: 24,
-          minHeight: 360,
+          padding: 15,
+          height: "50%",
           background: colorBgContainer,
         }}
       >
-        <div>
+        <div
+          style={{ height: "calc(100% - 25px)" }}
+          className="ag-theme-alpine"
+        >
           {/* Example using Grid's API */}
           {/* <button
             onClick={buttonListener}
@@ -94,10 +108,7 @@ const Parcels: React.FC = () => {
           </button> */}
 
           {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
-          <div
-            className="ag-theme-alpine"
-            style={{ width: "100%", height: 500 }}
-          >
+          <div style={{ width: "100%", height: "100%" }}>
             <AgGridReact
               ref={gridRef} // Ref for accessing Grid's API
               rowData={rowData} // Row Data for Rows

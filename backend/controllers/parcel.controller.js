@@ -135,8 +135,13 @@ const getParcels = async (req, res) => {
       {
         $project: {
           // Include fields you want in the result
+          _id: 1,
           warehouse: 1,
+          // shelf: 1,
           product: 1,
+          status: 1,
+          datetimecreated: 1,
+          datetimeupdated: 1,
           rfid: "$rfid",
         },
       },
@@ -151,7 +156,27 @@ const getParcels = async (req, res) => {
       });
     }
 
-    const parcels = await Parcel.aggregate(parcel_pipeline);
+    let parcels = await Parcel.aggregate(parcel_pipeline);
+
+    parcels = parcels.map((parcel) => {
+      const formattedDateTimeCreated = formatDate(
+        new Date(parcel.datetimecreated)
+      );
+      const formattedDateTimeUpdated = formatDate(
+        new Date(parcel.datetimeupdated)
+      );
+
+      return {
+        ...parcel,
+        product: {
+          ...parcel.product,
+          upc_data: JSON.parse(parcel.product.upc_data),
+        },
+        // Convert datetime to local time
+        datetimecreated: formattedDateTimeCreated,
+        datetimeupdated: formattedDateTimeUpdated,
+      };
+    });
 
     res.status(200).json({
       status: "Success",
@@ -164,6 +189,14 @@ const getParcels = async (req, res) => {
     res.status(500).json({ status: "Error", error: error.message });
   }
 };
+
+function formatDate(date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+  const time = date.toLocaleTimeString();
+  return `${day}/${month}/${year}, ${time}`;
+}
 
 module.exports = {
   createParcel,

@@ -8,10 +8,17 @@ const Items: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb style={{ margin: "16px 0" }}>
-        <Breadcrumb.Item>User</Breadcrumb.Item>
-        <Breadcrumb.Item>Bill</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: <a href="/">Dashboard</a>,
+          },
+          {
+            title: <a href="/items">Items</a>,
+          },
+        ]}
+      />
       <div
         style={{
           padding: 24,

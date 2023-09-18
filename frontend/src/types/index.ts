@@ -21,3 +21,7 @@ export interface IParcel {
   _id: string;
   warehouse: string;
 }
+
+export interface IParcelProps {
+  displayBreadcrumb?: boolean;
+}

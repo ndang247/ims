@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import {
-  DesktopOutlined,
-  FileOutlined,
+  HomeOutlined,
   DropboxOutlined,
-  TeamOutlined,
-  UserOutlined,
+  BarcodeOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { MenuItem, getItem } from "../types";
@@ -13,12 +11,13 @@ import { Link } from "react-router-dom";
 const { Sider } = Layout;
 
 const items: MenuItem[] = [
+  getItem(<Link to="/">Dashboard</Link>, "dashboard", <HomeOutlined />),
   getItem(
     <Link to="/parcels">All Parcels</Link>,
     "parcels",
     <DropboxOutlined />
   ),
-  // getItem("Option 2", "2", <DesktopOutlined />),
+  getItem(<Link to="/items">Items</Link>, "items", <BarcodeOutlined />),
   // getItem("User", "sub1", <UserOutlined />, [
   //   getItem("Tom", "3"),
   //   getItem("Bill", "4"),
@@ -28,7 +27,6 @@ const items: MenuItem[] = [
   //   getItem("Team 1", "6"),
   //   getItem("Team 2", "8"),
   // ]),
-  // getItem("Files", "9", <FileOutlined />),
 ];
 
 const Sidebar: React.FC = () => {
