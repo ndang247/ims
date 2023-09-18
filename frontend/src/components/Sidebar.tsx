@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   HomeOutlined,
   DropboxOutlined,
   BarcodeOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
-import { MenuItem, getItem } from "../types";
 import { Link } from "react-router-dom";
 
 const { Sider } = Layout;
+
+import { MenuItem, getItem } from "../types";
 
 const items: MenuItem[] = [
   getItem(<Link to="/">Dashboard</Link>, "dashboard", <HomeOutlined />),
@@ -30,13 +31,16 @@ const items: MenuItem[] = [
 ];
 
 const Sidebar: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
-
   return (
     <Sider
-      collapsible
-      collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
+      breakpoint="lg"
+      collapsedWidth="0"
+      onBreakpoint={(broken) => {
+        console.log(broken);
+      }}
+      onCollapse={(collapsed, type) => {
+        console.log(collapsed, type);
+      }}
     >
       <div className="demo-logo-vertical" />
       <Menu
