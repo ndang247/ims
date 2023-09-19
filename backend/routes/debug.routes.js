@@ -30,6 +30,8 @@ router.get('/debug/removeParcelsForProduct/:id', removeAllParcelsForAProduct)
  * Generate parcels for testing
  * Each parcel has an RFID
  * Each product has one inventory
+ * 
+ * @requestBody {no_parcels} - Number of parcels to generate
  */
 router.get('/debug/generateParcelsToProducts/:id', generateParcelsToProducts)
 
