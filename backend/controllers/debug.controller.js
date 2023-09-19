@@ -7,27 +7,9 @@ const Shelf = require("../models/shelf.model");
 const Product = require("../models/product.model");
 const RFID = require("../models/rfid.model");
 
-function generateValidUPC() {
-  // Generate 11 random digits
-  let base = Math.floor(Math.random() * 1e11).toString().padStart(11, '0');
+const { generateValidUPC } = require("./debug.controller.helper");
 
-  // Calculate the 12th checksum digit
-  let evenSum = 0;
-  let oddSum = 0;
-  for (let i = 0; i < base.length; i++) {
-      if (i % 2 === 0) {
-          oddSum += parseInt(base[i]);
-      } else {
-          evenSum += parseInt(base[i]);
-      }
-  }
-  const totalSum = oddSum * 3 + evenSum;
-  const mod = totalSum % 10;
-  const checksum = (mod === 0) ? 0 : 10 - mod;
 
-  // Append the checksum digit to the original 11 digits to get a valid UPC-A barcode
-  return base + checksum;
-}
 
 // const DEFAULT_WAREHOUSE_ID = process.env.DEFAULT_WAREHOUSE_ID;
 const DEFAULT_WAREHOUSE_ID = '650041c789d9fbf5b33516ca'
@@ -38,10 +20,11 @@ async function addData() {
   const NO_PARCELS = 2;
     try {
         for (let i = 0; i < NO_PRODUCTS; i++) {
+            const upc = generateValidUPC()
             // Create and save product
             const product = new Product({
-                barcode: generateValidUPC(),
-                upc_data: JSON.stringify({ data: `upc_data_${i}` }),
+                barcode: upc.upc,
+                upc_data: upc.upcData,
                 datetimecreated: new Date(),
                 datetimeupdated: new Date()
             });
@@ -128,11 +111,20 @@ const removeAllParcelsForAProduct = async (req, res) => {
     }
     const parcels = await Parcel.find({ product: product_id });
 
+    let deleteOperations = []
+
     for (let parcel of parcels) {
-      await RFID.deleteMany({ ref_id: parcel._id, ref_object: 'Parcel' });
+      deleteOperations.push(RFID.deleteMany({ ref_id: parcel._id, ref_object: 'Parcel' }));
     }
 
-    await Parcel.deleteMany({ product: product_id });
+    deleteOperations.push(Parcel.deleteMany({ product: product_id }));
+
+    try {
+      await Promise.all(deleteOperations)
+    } catch (error) {
+      console.error('Delete Error:', error);
+      res.status(500).json({ status: "Error", error: error.message, message: 'Unable to delete parcels and RFIDs' });
+    }
 
     const inventory = await Inventory.findOne({ product: product_id });
     inventory.parcel_quantity = 0;
