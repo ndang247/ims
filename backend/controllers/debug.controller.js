@@ -16,13 +16,18 @@ const DEFAULT_WAREHOUSE_ID = '650041c789d9fbf5b33516ca'
 
 async function addData() {
   console.log('Add parcels', DEFAULT_WAREHOUSE_ID);
-  const NO_PRODUCTS =  2;
-  const NO_PARCELS = 2;
+  const NO_PRODUCTS =  5;
+  const NO_PARCELS = 5;
     try {
         for (let i = 0; i < NO_PRODUCTS; i++) {
             const upc = generateValidUPC()
             // Create and save product
-            const product = new Product({
+            let product = await Product.findOne({barcode: upc.upc})
+
+            console.log('product', product);
+            if (product) continue
+
+            product = new Product({
                 barcode: upc.upc,
                 upc_data: upc.upcData,
                 datetimecreated: new Date(),
@@ -38,6 +43,7 @@ async function addData() {
                 datetimeupdated: new Date()
             });
             await inventory.save();
+
 
  
             for (let j = 0; j < NO_PARCELS; j++) {
