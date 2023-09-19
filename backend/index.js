@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 
 const { connectDB } = require("./db/connect");
-const { errorLogger } = require("./debug/debug");
+const { errorLogger, requestTimeLogger } = require("./debug/debug");
 
 const { ipAddress } = require("./helpers/network");
 
@@ -14,6 +14,7 @@ const PORT = 3000; // You can change this to any available port
 
 // Parse JSON and URL-encoded bodies
 app.use(bodyParser.json());
+app.use(requestTimeLogger)
 
 const iotRouter = require("./routes/iot.routes");
 app.use("/iot", iotRouter);
