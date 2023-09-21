@@ -33,7 +33,14 @@ const Parcels: React.FC<IParcelProps> = ({
     // { headerName: "Shelf", field: "shelf", filter: true },
     { headerName: "Product", field: "product._id", filter: true },
     { headerName: "Barcode", field: "product.barcode", filter: true },
-    { headerName: "UPC", field: "product.upc_data.data", filter: true },
+    {
+      headerName: "UPC",
+      field: "title",
+      filter: true,
+      valueGetter: (params) => {
+        return params.data.product.upc_data.items[0].title;
+      },
+    },
     { headerName: "RFID", field: "rfid.id", filter: true },
     { headerName: "Tag Data", field: "rfid.tag_data", filter: true },
     { headerName: "RFID Status", field: "rfid.status", filter: true },
@@ -45,6 +52,7 @@ const Parcels: React.FC<IParcelProps> = ({
   // DefaultColDef sets props common to all Columns
   const defaultColDef = useMemo(() => {
     return {
+      resizable: true,
       sortable: true,
     };
   }, []);
