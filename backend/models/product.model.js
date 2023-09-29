@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const Inventory = require("./inventory.model");
+
 const productSchema = new mongoose.Schema(
   {
     barcode: {

@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const inboundSchema = new mongoose.Schema(
   {
+    warehouse: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Warehouse",
+      required: true,
+    },
     barcode_input: {
       type: String,
       required: true,
@@ -24,6 +29,6 @@ const inboundSchema = new mongoose.Schema(
 );
 
 const Inbound =
-  mongoose.model.Inbound || mongoose.model("Inboud", inboundSchema);
+  mongoose.model.Inbound || mongoose.model("Inbound", inboundSchema);
 
 module.exports = Inbound;

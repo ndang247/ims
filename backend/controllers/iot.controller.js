@@ -3,6 +3,7 @@ const Parcel = require("../models/parcel.model");
 const Inventory = require("../models/inventory.model");
 const Product = require("../models/product.model");
 const Warehouse = require("../models/warehouse.model");
+const Inbound = require("../models/inbound.model");
 
 const { createProduct } = require("./product.controller");
 
@@ -70,7 +71,7 @@ const updateInventory = async (req, res) => {
  */
 const postInboundProcess = async (req, res) => {
   let { sensor, role, value } = req.body;
-  let { tagID, barcode } = value;
+  let { tagID } = value;
 
   console.log("Perform post inbound: ", req.body);
 
@@ -87,39 +88,50 @@ const postInboundProcess = async (req, res) => {
     // return res.status(200).send({ message: "Tag already exists" });
   }
 
+  // Barcode Check
+
+  const inbound = await Inbound.findOne({
+    warehouse: DEFAULT_WAREHOUSE_ID
+  })
+
+  if (!inbound) {
+    return res.status(400).send({ message: "No inbound process found" });
+  }
+
+  const barcode = inbound.barcode_input
+
   if (!barcode) {
-    barcode = "93519441" // FIX: TEMPORARY
-    // return res.status(400).send({ message: "Barcode is required" });
+    return res.status(400).send({ message: "Barcode inbound is required" });
   }
 
   let product = await Product.findOne({ barcode: barcode });
 
   if (!product) {
-    console.log('Creating product. No product found with barcode: ', barcode);
-    // Get product from UPC database
-    const upcData = await fetchUPCData(barcode);
-    if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
-      return res.status(400).send({ message: "Invalid barcode" });
-    }
-    const upcItemData = upcData.items[0];
-    console.log(`Get barcode ${barcode} from UPC database: `, upcItemData);
-
-    // If product doesn't exist, create a new Product and Inventory
-    product = new Product({
-      barcode: barcode,
-      upc_data: JSON.stringify(upcItemData),
-      datetimecreated: new Date(),
-      datetimeupdated: new Date(),
-    });
-
-    const inventory = new Inventory({
-      product: product._id,
-      parcel_quantity: 0,
-      datetimecreated: new Date(),
-      datetimeupdated: new Date(),
-    });
-
     try {
+      console.log('Creating product. No product found with barcode: ', barcode);
+      // Get product from UPC database
+      const upcData = await fetchUPCData(barcode);
+      if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
+        return res.status(400).send({ message: "Invalid barcode" });
+      }
+      const upcItemData = upcData;
+      console.log(`Get barcode ${barcode} from UPC database: `, upcItemData);
+
+      // If product doesn't exist, create a new Product and Inventory
+      product = new Product({
+        barcode: barcode,
+        upc_data: JSON.stringify(upcItemData),
+        datetimecreated: new Date(),
+        datetimeupdated: new Date(),
+      });
+
+      const inventory = new Inventory({
+        product: product._id,
+        parcel_quantity: 0,
+        datetimecreated: new Date(),
+        datetimeupdated: new Date(),
+      });
+
       await Promise.all([
         product.save(),
         inventory.save()
