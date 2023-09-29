@@ -1,4 +1,4 @@
-import { Dashboard, Items, Parcels, Sidebar } from "./components";
+import { Dashboard, Items, Parcels, Sidebar, InboundPage } from "./components";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { Layout, theme } from "antd";
 import "./App.css";
@@ -21,6 +21,7 @@ const App = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/parcels" element={<Parcels />} />
               <Route path="/items" element={<Items />} />
+              <Route path="/inbound" element={<InboundPage />} />
             </Routes>
           </Content>
           <Footer style={{ textAlign: "center" }}>
