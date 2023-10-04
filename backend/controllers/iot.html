@@ -14,7 +14,7 @@
 
       const eventSource = new EventSource("/iot/inbound-stream");
       eventSource.onmessage = (event) => {
-        console.log("DATA RECEIVED", event.data);
+        console.log("DATA RECEIVED: ", event.data);
         const data = JSON.parse(event.data);
         dataDiv.textContent = JSON.stringify(data, null, 2);
       };

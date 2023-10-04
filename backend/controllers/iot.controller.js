@@ -2,14 +2,11 @@ const RFID = require("../models/rfid.model");
 const Parcel = require("../models/parcel.model");
 const Inventory = require("../models/inventory.model");
 const Product = require("../models/product.model");
-const Warehouse = require("../models/warehouse.model");
 const Inbound = require("../models/inbound.model");
 
-const { createProduct } = require("./product.controller");
+const { errorLogger } = require("../debug/debug");
 
-const { errorLogger } = require('../debug/debug')
-
-const { fetchUPCData } = require('../services/upc')
+const { fetchUPCData } = require("../services/upc");
 
 const DEFAULT_WAREHOUSE_ID = "650041c789d9fbf5b33516ca";
 
@@ -23,14 +20,16 @@ const updateInventory = async (req, res) => {
 
   const { tagID, status } = latestReceivedProduct.value;
 
-  console.log("Updating Inventory ", tagID, status);
+  console.log("Updating inventory: ", tagID, status);
 
   // Get the tag
   const tag = await RFID.findOne({ id: tagID, ref_object: "Parcel" });
 
   // If tag is not found
   if (!tag) {
-    return res.status(404).send({ message: "Tag not found" });
+    return res
+      .status(404)
+      .send({ status: "Not Found", error: "Tag not found" });
   }
 
   // Get the parcel using ref_id from the tag object
@@ -41,7 +40,7 @@ const updateInventory = async (req, res) => {
   parcel.status = status ?? "in_warehouse";
   parcel.warehouse = DEFAULT_WAREHOUSE_ID;
   await parcel.save();
-  console.log("Save parcel sucessfully", parcel);
+  console.log("Save parcel sucessfully: ", parcel);
 
   // If status is turned into out_for_delivery or archived
   if (
@@ -52,7 +51,9 @@ const updateInventory = async (req, res) => {
     const inventory = await Inventory.findOne({ product: parcel.product });
 
     if (!inventory) {
-      return res.status(404).send({ message: "Inventory not found" });
+      return res
+        .status(404)
+        .send({ status: "Not Found", message: "Inventory not found" });
     }
 
     // Deduct parcel_quantity by 1
@@ -62,7 +63,7 @@ const updateInventory = async (req, res) => {
 
   console.log("Successfully update inventory");
 
-  return res.status(200).json({ received: true });
+  return res.status(200).json({ status: "Success", received: true });
 };
 
 /**
@@ -85,34 +86,38 @@ const postInboundProcess = async (req, res) => {
 
   if (existingTag) {
     return updateInventory(req, res);
-    // return res.status(200).send({ message: "Tag already exists" });
   }
 
   // Barcode Check
-
   const inbound = await Inbound.findOne({
-    warehouse: DEFAULT_WAREHOUSE_ID
-  })
+    warehouse: DEFAULT_WAREHOUSE_ID,
+  });
 
   if (!inbound) {
-    return res.status(400).send({ message: "No inbound process found" });
+    return res
+      .status(400)
+      .send({ status: "Not Found", error: "No inbound process found" });
   }
 
-  const barcode = inbound.barcode_input
+  const barcode = inbound.barcode_input;
 
   if (!barcode) {
-    return res.status(400).send({ message: "Barcode inbound is required" });
+    return res
+      .status(400)
+      .send({ status: "Not Found", error: "Barcode inbound is required" });
   }
 
   let product = await Product.findOne({ barcode: barcode });
 
   if (!product) {
     try {
-      console.log('Creating product. No product found with barcode: ', barcode);
+      console.log("Creating product. No product found with barcode: ", barcode);
       // Get product from UPC database
       const upcData = await fetchUPCData(barcode);
       if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
-        return res.status(400).send({ message: "Invalid barcode" });
+        return res
+          .status(400)
+          .send({ status: "Not Found", error: "Invalid barcode" });
       }
       const upcItemData = upcData;
       console.log(`Get barcode ${barcode} from UPC database: `, upcItemData);
@@ -132,21 +137,20 @@ const postInboundProcess = async (req, res) => {
         datetimeupdated: new Date(),
       });
 
-      await Promise.all([
-        product.save(),
-        inventory.save()
-      ])
+      await Promise.all([product.save(), inventory.save()]);
     } catch (error) {
-      console.log('Error when creating new product', error);
+      console.log("Error when creating new product: ", error);
       errorLogger("iot.controller", "postInboundProcess").error({
         message: error,
       });
-      return res.status(500).send({ message: "Error when creating new product" });
+      return res
+        .status(500)
+        .send({ status: "Error", error: "Error when creating new product" });
     }
   }
 
   // Create a new Parcel
-  console.log('Create a new parcel');
+  console.log("Create a new parcel");
   const parcel = new Parcel({
     product: product._id,
     warehouse: DEFAULT_WAREHOUSE_ID,
@@ -156,7 +160,7 @@ const postInboundProcess = async (req, res) => {
   });
 
   // Create a new Tag
-  console.log(`Create a new tag`, tagID);
+  console.log(`Create a new tag: `, tagID);
   const tag = new RFID({
     id: tagID,
     ref_id: parcel._id,
@@ -167,21 +171,22 @@ const postInboundProcess = async (req, res) => {
     datetimeupdated: new Date(),
   });
 
-
-  await Promise.all([
-    parcel.save(),
-    tag.save(),
-  ])
+  await Promise.all([parcel.save(), tag.save()]);
 
   // Get the inventory for the product and increment parcel_quantity by 1
   const inventory = await Inventory.findOne({ product: product._id });
   inventory.parcel_quantity += 1;
   await inventory.save();
 
-  console.log('Sucessfully process inbound data from IoT: ', latestReceivedProduct);
-  console.log('Parcel with Product: ', product.barcode);
+  console.log(
+    "Sucessfully process inbound data from IoT: ",
+    latestReceivedProduct
+  );
+  console.log("Parcel with Product: ", product.barcode);
 
-  res.send({ message: "Data processed successfully" });
+  res
+    .status(200)
+    .send({ status: "Success", message: "Data processed successfully" });
 };
 
 const getIoTHome = (req, res) => {
@@ -189,7 +194,7 @@ const getIoTHome = (req, res) => {
 };
 
 const getInboundStream = async (req, res) => {
-  console.log("Data stream running", latestReceivedProduct);
+  console.log("Data stream running: ", latestReceivedProduct);
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");

@@ -33,17 +33,17 @@ export const postInboundBarcode = async (barcode: string) => {
     });
     return response;
   } catch (error) {
-    console.log('Error post inbound barcode');
+    console.log("Error post inbound barcode");
     console.log(error);
     throw error;
   }
-}
+};
 
 export const getCurrentInbound = async () => {
   const response = await api.get("/inbound/get", {
     params: {
       warehouse_id: DEFAULT_WAREHOUSE_ID,
-    }
+    },
   });
   return response.data;
-}
+};

@@ -3,7 +3,7 @@ import {
   HomeOutlined,
   DropboxOutlined,
   BarcodeOutlined,
-  TagOutlined
+  TagOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
@@ -20,6 +20,7 @@ const items: MenuItem[] = [
     <DropboxOutlined />
   ),
   getItem(<Link to="/items">Items</Link>, "items", <BarcodeOutlined />),
+  getItem(<Link to="/inbound">Inbound</Link>, "inbound", <TagOutlined />),
   // getItem("User", "sub1", <UserOutlined />, [
   //   getItem("Tom", "3"),
   //   getItem("Bill", "4"),
@@ -29,7 +30,6 @@ const items: MenuItem[] = [
   //   getItem("Team 1", "6"),
   //   getItem("Team 2", "8"),
   // ]),
-  getItem(<Link to="/inbound">Inbound</Link>, "inbound", <TagOutlined />)
 ];
 
 const Sidebar: React.FC = () => {

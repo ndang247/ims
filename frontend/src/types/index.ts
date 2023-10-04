@@ -25,3 +25,7 @@ export interface IParcel {
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
 }
+
+export interface ICurrentBarcodeData {
+  title: string;
+}
