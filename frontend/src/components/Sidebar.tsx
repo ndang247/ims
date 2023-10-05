@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 const { Sider } = Layout;
 
 import { MenuItem, getItem } from "../types";
+import Logo from "../assets/logo.svg";
 
 const items: MenuItem[] = [
   getItem(<Link to="/">Dashboard</Link>, "dashboard", <HomeOutlined />),
@@ -44,7 +45,9 @@ const Sidebar: React.FC = () => {
         console.log(collapsed, type);
       }}
     >
-      <div className="demo-logo-vertical" />
+      <div className="logo-vertical">
+        <img src={Logo} alt="ims-logo" />
+      </div>
       <Menu
         theme="dark"
         defaultSelectedKeys={["1"]}
