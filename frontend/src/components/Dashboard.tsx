@@ -1,6 +1,5 @@
 import React from "react";
 import { Breadcrumb, theme } from "antd";
-import { Parcels } from ".";
 
 const Dashboard: React.FC = () => {
   const {
@@ -17,9 +16,6 @@ const Dashboard: React.FC = () => {
           },
         ]}
       />
-
-      <Parcels displayBreadcrumb={false} />
-
       <div
         style={{
           padding: 15,

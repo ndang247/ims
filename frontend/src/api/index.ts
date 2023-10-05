@@ -14,9 +14,7 @@ export const getParcels = async () => {
         "Access-Control-Allow-Origin": "*",
       },
       params: {
-        // TODO: Make these params dynamic
         warehouse_id: DEFAULT_WAREHOUSE_ID,
-        // product_id: "6502fd92257fee7e80cae38a",
       },
     });
     return response;
@@ -46,4 +44,17 @@ export const getCurrentInbound = async () => {
     },
   });
   return response.data;
+};
+
+export const getProducts = async () => {
+  try {
+    const response = await api.get("/products", {
+      params: {
+        warehouseID: DEFAULT_WAREHOUSE_ID,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };

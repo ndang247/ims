@@ -19,7 +19,10 @@ export function getItem(
 
 export interface IParcel {
   _id: string;
-  warehouse: string;
+  warehouse: {
+    _id: string;
+    name: string;
+  };
 }
 
 export interface IParcelProps {
@@ -28,4 +31,21 @@ export interface IParcelProps {
 
 export interface ICurrentBarcodeData {
   title: string;
+}
+
+export interface IProduct {
+  _id: string;
+  barcode: string;
+  upc_data: {
+    items: [
+      {
+        title: string;
+        brand: string;
+        // images is an array of strings
+        images: string[];
+      }
+    ];
+  };
+  datetimecreated: Date;
+  datetimeupdated: Date;
 }
