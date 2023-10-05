@@ -85,9 +85,25 @@ const getParcels = async (req, res) => {
     // Construct the aggregation pipeline
     let parcel_pipeline = [
       {
-        $match: {
-          // Filter the parcels by warehouse.
-          warehouse: new mongoose.Types.ObjectId(warehouse_id),
+        $lookup: {
+          from: "warehouses",
+          let: { warehouse_id: "$warehouse" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$warehouse_id"],
+                },
+              },
+            },
+          ],
+          as: "warehouse",
+        },
+      },
+      {
+        $unwind: {
+          path: "$warehouse",
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
