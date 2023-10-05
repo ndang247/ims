@@ -39,7 +39,13 @@ const Items: React.FC = () => {
       >
         {loading ? (
           <div className="loading">
-            <Spin tip="Loading..." />
+            <Spin tip="Loading...">
+              <Alert
+                message="Loading..."
+                description="Please wait while we load the products."
+                type="info"
+              />
+            </Spin>
           </div>
         ) : (
           <Row gutter={[16, 16]}>
