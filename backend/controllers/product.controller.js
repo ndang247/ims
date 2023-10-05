@@ -125,9 +125,9 @@ const getProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   try {
-    const warehouseId = req.body.warehouse_id;
+    const { warehouseID } = req.query;
 
-    if (!warehouseId) {
+    if (!warehouseID) {
       return res
         .status(400)
         .send({ status: "Error", message: "Warehouse ID is required" });
@@ -137,7 +137,7 @@ const getProducts = async (req, res) => {
       {
         $match: {
           // Filter by warehouse id
-          warehouse: new mongoose.Types.ObjectId(warehouseId),
+          warehouse: new mongoose.Types.ObjectId(warehouseID),
         },
       },
       {
