@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from "react";
 
+import "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react"; // The AG Grid React Component
 import { ColDef } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
@@ -30,17 +31,34 @@ const Parcels: React.FC<IParcelProps> = ({
   // Each Column Definition results in one Column.
   const [columnDefs] = useState<ColDef[]>([
     { headerName: "ID", field: "_id", filter: true },
-    { headerName: "Warehouse", field: "warehouse", filter: true },
+    { headerName: "Warehouse", field: "warehouse.name", filter: true },
     // { headerName: "Shelf", field: "shelf", filter: true },
-    { headerName: "Product", field: "product._id", filter: true },
-    { headerName: "Barcode", field: "product.barcode", filter: true },
     {
-      headerName: "UPC",
+      headerName: "Product",
       field: "title",
       filter: true,
       valueGetter: (params) => {
         return params.data.product.upc_data.items[0].title;
       },
+    },
+    { headerName: "Barcode", field: "product.barcode", filter: true },
+    {
+      headerName: "Brand",
+      field: "brand",
+      filter: true,
+      valueGetter: (params) => {
+        return params.data.product.upc_data.items[0].brand;
+      },
+    },
+    {
+      headerName: "Image",
+      cellRenderer: (params: any) => (
+        <img
+          style={{ height: "100px", width: "100px" }}
+          src={params.data.product.upc_data.items[0].images[1]}
+          alt=""
+        />
+      ),
     },
     { headerName: "RFID", field: "rfid.id", filter: true },
     { headerName: "Tag Data", field: "rfid.tag_data", filter: true },
@@ -51,10 +69,12 @@ const Parcels: React.FC<IParcelProps> = ({
   ]);
 
   // DefaultColDef sets props common to all Columns
-  const defaultColDef = useMemo(() => {
+  const defaultColDef = useMemo<ColDef>(() => {
     return {
-      resizable: true,
+      editable: true,
       sortable: true,
+      filter: true,
+      resizable: true,
     };
   }, []);
 
@@ -70,11 +90,11 @@ const Parcels: React.FC<IParcelProps> = ({
     });
   }, []);
 
-  useEffect(() => {
-    if (gridRef.current && rowData) {
-      gridRef.current.api.sizeColumnsToFit();
-    }
-  }, [rowData]);
+  // useEffect(() => {
+  //   if (gridRef.current && rowData) {
+  //     gridRef.current.api.sizeColumnsToFit();
+  //   }
+  // }, [rowData]);
 
   // Example using Grid's API
   //   const buttonListener = useCallback((e: object) => {
@@ -100,14 +120,11 @@ const Parcels: React.FC<IParcelProps> = ({
       <div
         style={{
           padding: 15,
-          height: "50%",
+          height: "95%",
           background: colorBgContainer,
         }}
       >
-        <div
-          style={{ height: "calc(100% - 25px)" }}
-          className="ag-theme-alpine"
-        >
+        <div style={{ height: "100%" }} className="ag-theme-alpine">
           {/* Example using Grid's API */}
           {/* <button
             onClick={buttonListener}
@@ -117,15 +134,17 @@ const Parcels: React.FC<IParcelProps> = ({
           </button> */}
 
           {/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
-          <div style={{ width: "100%", height: "100%" }}>
+          <div style={{ height: "100%" }}>
             <AgGridReact
               ref={gridRef} // Ref for accessing Grid's API
               rowData={rowData} // Row Data for Rows
               columnDefs={columnDefs} // Column Defs for Columns
               defaultColDef={defaultColDef} // Default Column Properties
+              sideBar={"columns"} // Optional - allows columns to be shown/hidden
               animateRows={true} // Optional - set to 'true' to have rows animate when sorted
               rowSelection="multiple" // Options - allows click selection of rows
               onCellClicked={cellClickedListener} // Optional - registering for Grid Event
+              pagination={true} // Optional - turn on Pagination with default options
             />
           </div>
         </div>
