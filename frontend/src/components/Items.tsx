@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Card, Col, Row, Alert, Space, Spin } from "antd";
-const { Meta } = Card;
+import { Breadcrumb, Alert } from "antd";
 
 import { getProducts } from "../api";
-import { IProduct } from "@src/types";
+import { Loading, ProductDisplay } from ".";
 
 const Items: React.FC = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    getProducts().then((data) => {
-      setProducts(data.products);
-      setLoading(false);
-    });
+    getProducts()
+      .then((data) => {
+        setProducts(data.products);
+      })
+      .catch((error) => {
+        setError(error?.response?.data?.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -37,41 +43,16 @@ const Items: React.FC = () => {
           borderRadius: "5px",
         }}
       >
-        {loading ? (
-          <div className="loading">
-            <Spin tip="Loading...">
-              <Alert
-                message="Loading..."
-                description="Please wait while we load the products."
-                type="info"
-              />
-            </Spin>
-          </div>
-        ) : (
-          <Row gutter={[16, 16]}>
-            {products.map((product: IProduct, key: number) => {
-              return (
-                <Col span={6} key={key}>
-                  <Card
-                    loading={loading}
-                    hoverable
-                    cover={
-                      <img
-                        alt={product.upc_data.items[0].title}
-                        src={product.upc_data.items[0].images[0]}
-                      />
-                    }
-                    bordered={false}
-                  >
-                    <Meta
-                      title={product.upc_data.items[0].title}
-                      description={product.upc_data.items[0].brand}
-                    />
-                  </Card>
-                </Col>
-              );
-            })}
-          </Row>
+        {loading && !error && (
+          <Loading description="Please wait while we load the products." />
+        )}
+
+        {!loading && error && (
+          <Alert message="Error" description={error} type="error" showIcon />
+        )}
+
+        {!loading && !error && (
+          <ProductDisplay products={products} loading={loading} />
         )}
       </div>
     </>

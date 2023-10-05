@@ -56,5 +56,6 @@ export const getProducts = async () => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };

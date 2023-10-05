@@ -17,6 +17,7 @@ export function getItem(
   } as MenuItem;
 }
 
+// Parcels
 export interface IParcel {
   _id: string;
   warehouse: {
@@ -24,15 +25,16 @@ export interface IParcel {
     name: string;
   };
 }
-
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
 }
+//
 
 export interface ICurrentBarcodeData {
   title: string;
 }
 
+// Products
 export interface IProduct {
   _id: string;
   barcode: string;
@@ -49,3 +51,14 @@ export interface IProduct {
   datetimecreated: Date;
   datetimeupdated: Date;
 }
+export interface IProductDisplayProps {
+  loading: boolean;
+  products: IProduct[];
+}
+//
+
+// Loading
+export interface ILoadingProps {
+  description?: string;
+}
+//
