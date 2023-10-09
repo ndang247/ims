@@ -4,6 +4,9 @@ import Items from "./Items";
 import Parcels from "./Parcels";
 import InboundPage from "./InboundPage";
 import ProductDisplay from "./ProductDisplay";
+import LoginPage from "./LoginPage";
+import SignupPage from "./SignUpPage";
+
 import Loading from "./Loading";
 
 export {
@@ -13,5 +16,7 @@ export {
   Parcels,
   InboundPage,
   ProductDisplay,
+  LoginPage,
+  SignupPage,
   Loading,
 };
