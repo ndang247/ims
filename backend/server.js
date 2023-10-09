@@ -11,6 +11,9 @@ const productRouter = require("./routes/product.routes");
 const parcelRouter = require("./routes/parcel.routes");
 const debugRouter = require("./routes/debug.routes");
 const inboundRouter = require("./routes/inbound.routes");
+const authRouter = require("./routes/auth.routes");
+
+const { authenticateJWT } = require("./middleware/auth");
 
 dotenv.config();
 
@@ -24,12 +27,16 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use(process.env.ENDPOINT, authRouter);
+
+app.use(authenticateJWT);
 app.use(process.env.ENDPOINT, warehouseRouter);
 app.use(process.env.ENDPOINT, shelfRouter);
 app.use(process.env.ENDPOINT, productRouter);
 app.use(process.env.ENDPOINT, parcelRouter);
 app.use(process.env.ENDPOINT, debugRouter);
 app.use(process.env.ENDPOINT, inboundRouter);
+
 
 const server = async () => {
   try {
