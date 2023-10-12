@@ -59,3 +59,54 @@ export const getProducts = async () => {
     throw error;
   }
 };
+
+export const postLogin = async (username: string, password: string) => {
+  try {
+    const response = await api.post('/login', {
+      username: username,
+      password: password
+    });
+
+    if (response.data && response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    } else {
+      // Handle login failure
+      throw new Error('Login failed');
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export const postSignUp = async (username: string, password: string, role: string, warehouses: string[]) => {
+  try {
+
+    const response = await api.post('/signup', {
+      username: username,
+      password: password,
+      role: role,
+      warehouses: warehouses
+    });
+
+  } catch {
+    throw new Error('Sign up failed');
+  }
+}
+
+export const getWarehouses = async () => {
+  try {
+    const response = await api.get('/warehouses');
+
+    
+    if (response.data) {
+      return response.data.data;
+    }
+
+    return [];
+
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
