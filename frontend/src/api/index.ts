@@ -12,6 +12,7 @@ export const getParcels = async () => {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
+        Authorization: localStorage.getItem("token"),
       },
       params: {
         warehouse_id: DEFAULT_WAREHOUSE_ID,
@@ -25,10 +26,20 @@ export const getParcels = async () => {
 
 export const postInboundBarcode = async (barcode: string) => {
   try {
-    const response = await api.post("/inbound/barcode-input", {
-      warehouse_id: DEFAULT_WAREHOUSE_ID,
-      barcode,
-    });
+    const response = await api.post(
+      "/inbound/barcode-input",
+      {
+        warehouse_id: DEFAULT_WAREHOUSE_ID,
+        barcode,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        },
+      }
+    );
     return response;
   } catch (error) {
     console.log("Error post inbound barcode");
@@ -39,6 +50,11 @@ export const postInboundBarcode = async (barcode: string) => {
 
 export const getCurrentInbound = async () => {
   const response = await api.get("/inbound/get", {
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      Authorization: localStorage.getItem("token"),
+    },
     params: {
       warehouse_id: DEFAULT_WAREHOUSE_ID,
     },
@@ -49,8 +65,29 @@ export const getCurrentInbound = async () => {
 export const getProducts = async () => {
   try {
     const response = await api.get("/products", {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: localStorage.getItem("token"),
+      },
       params: {
         warehouseID: DEFAULT_WAREHOUSE_ID,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getProductByID = async (productID: string) => {
+  try {
+    const response = await api.get(`/product/?id=${productID}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: localStorage.getItem("token"),
       },
     });
     return response.data;

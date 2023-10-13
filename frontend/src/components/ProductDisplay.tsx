@@ -22,6 +22,9 @@ const ProductDisplay: React.FC<IProductDisplayProps> = ({
                 />
               }
               bordered={false}
+              onClick={() => {
+                window.location.href = `/items/${product._id}`;
+              }}
             >
               <Meta
                 title={product.upc_data.items[0].title}

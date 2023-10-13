@@ -8,6 +8,7 @@ import {
   SignupPage,
   OutletPage,
   NewOrderPage,
+  ProductDetails,
 } from "./components";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Layout } from "antd";
@@ -24,7 +25,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route
-          path="/"
+          path="*"
           element={
             token ? (
               <Layout style={{ minHeight: "100vh" }}>
@@ -36,6 +37,7 @@ const App = () => {
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/parcels" element={<Parcels />} />
                       <Route path="/items" element={<Items />} />
+                      <Route path="/items/:id" element={<ProductDetails />} />
                       <Route path="/inbound" element={<InboundPage />} />
                       <Route path="/outlet" element={<OutletPage />} />
                       <Route

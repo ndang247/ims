@@ -1,9 +1,10 @@
 import React from "react";
-import type { MenuProps } from "antd";
+import type { MenuProps, TabsProps } from "antd";
 
 export type MenuItem = Required<MenuProps>["items"][number];
+export type TabItem = Required<TabsProps>["items"][number];
 
-export function getItem(
+export function getMenuItem(
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
@@ -15,6 +16,18 @@ export function getItem(
     icon,
     children,
   } as MenuItem;
+}
+
+export function getTabItem(
+  key: React.Key,
+  label: React.ReactNode,
+  children?: React.ReactNode
+): TabItem {
+  return {
+    label,
+    key,
+    children,
+  } as TabItem;
 }
 
 // Parcels
@@ -86,3 +99,4 @@ export interface IWarehouse {
   name: string;
   address: string;
 }
+//

@@ -8,6 +8,7 @@ import LoginPage from "./LoginPage";
 import SignupPage from "./SignUpPage";
 import OutletPage from "./Outlet/OutletPage";
 import NewOrderPage from "./Outlet/NewOrderPage";
+import ProductDetails from "./ProductDetails";
 
 import Loading from "./Loading";
 
@@ -22,5 +23,6 @@ export {
   SignupPage,
   OutletPage,
   NewOrderPage,
+  ProductDetails,
   Loading,
 };
