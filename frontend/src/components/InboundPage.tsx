@@ -4,7 +4,7 @@ import { Button, Input, Breadcrumb, Tooltip, Spin } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
 import { postInboundBarcode, getCurrentInbound } from "../api";
-import { ICurrentBarcodeData } from "@src/types";
+import { ICurrentBarcodeData, IInventory } from "@src/types";
 
 const InboundPage: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
@@ -12,11 +12,34 @@ const InboundPage: React.FC = () => {
   const [currentBarcode, setCurrentBarcode] = useState("");
   const [currentBarcodeData, setCurrentBarcodeData] =
     useState<ICurrentBarcodeData>();
+
+  const [currentInventory, setCurrentInventory] = useState<IInventory>();
+  const [lastFetched, setLastFetched] = useState<Date>();
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    init();
+    init();    
   }, []);
+
+  useEffect(() => {
+    const eventSource = new EventSource(`http://localhost:8080/api/v1/inventory/${currentBarcode}/stream`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data) {
+        console.log('Receive inventory data', data);
+        setCurrentInventory(data);
+        setLastFetched(new Date());
+      }
+      // Update your frontend state here
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("EventSource failed:", error);
+      eventSource.close();
+    };
+  }, [currentBarcode])
 
   async function init() {
     try {
@@ -52,6 +75,7 @@ const InboundPage: React.FC = () => {
         console.log("Set input");
         setCurrentBarcode(response.data.barcode_input);
         setCurrentBarcodeData(response.data.upc_data.items[0]);
+        setLastFetched(new Date());
       }
 
       setInputValue("");
@@ -78,12 +102,21 @@ const InboundPage: React.FC = () => {
         ]}
       />
       <div className="d-flex flex-column border rounded p-2">
-        <span className="fs-6 fw-bold">Current Barcode</span>
+        <span className="fs-6 fw-bold">Current Barcode 
+          <span className="ms-2" style={{border: '1px solid green', borderRadius: '5px', color: 'green'}}>
+            Live
+          </span>
+        </span>
         <span className="pb-2" style={{ color: "grey" }}>
           Incoming parcels with tag will be registered under this barcode
         </span>
         <span>{currentBarcode}</span>
         <span>{currentBarcodeData?.title ?? ""}</span>
+        <span>Invetory: {currentInventory?.parcel_quantity}</span>
+        <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'end', flexDirection: 'column', color: 'gray', fontSize: '12px'}}>
+          <span>Last Updated: {currentInventory?.datetimeupdated}</span>
+          <span>Last Fetched: {lastFetched?.toISOString()} </span>
+        </div>
       </div>
       <h5 className="mt-2">
         Barcode Inbound Registeration
@@ -117,7 +150,7 @@ const InboundPage: React.FC = () => {
         disabled={loading}
       >
         {loading && <Spin />}
-        Update barcode
+        Update Inbound Barcode
       </Button>
     </div>
   );

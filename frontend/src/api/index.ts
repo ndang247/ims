@@ -157,4 +157,14 @@ export const getWarehouses = async () => {
     console.log(error);
     throw error;
   }
-};
+}
+
+export const getInventoryStream = async (barcode: string) => {
+  const eventSource = new EventSource(`http://localhost:8080/api/v1/inventory/${barcode}/stream`);
+
+  eventSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Data received from server:", data);
+    // Update your frontend state here
+  };
+}
