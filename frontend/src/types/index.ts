@@ -55,7 +55,14 @@ export interface IProductDisplayProps {
   loading: boolean;
   products: IProduct[];
 }
-//
+// Inventory
+export interface IInventory {
+  _id: string;
+  product: string;
+  parcel_quantity: number;
+  datetimecreated: string;
+  datetimeupdated: string;
+}
 
 // Loading
 export interface ILoadingProps {
