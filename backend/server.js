@@ -28,9 +28,8 @@ app.get("/", (req, res) => {
 });
 
 app.use(process.env.ENDPOINT, authRouter);
+app.use(authenticateJWT);
 app.use(process.env.ENDPOINT, warehouseRouter);
-
-// app.use(authenticateJWT);
 app.use(process.env.ENDPOINT, shelfRouter);
 app.use(process.env.ENDPOINT, productRouter);
 app.use(process.env.ENDPOINT, parcelRouter);
