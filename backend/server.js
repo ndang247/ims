@@ -29,7 +29,6 @@ app.get("/", (req, res) => {
 });
 
 app.use(process.env.ENDPOINT, authRouter);
-
 app.use(process.env.ENDPOINT, warehouseRouter);
 
 // app.use(authenticateJWT);
@@ -39,7 +38,6 @@ app.use(process.env.ENDPOINT, parcelRouter);
 app.use(process.env.ENDPOINT, debugRouter);
 app.use(process.env.ENDPOINT, inboundRouter);
 app.use(process.env.ENDPOINT, inventoryRouter)
-
 
 const server = async () => {
   try {

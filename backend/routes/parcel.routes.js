@@ -1,6 +1,9 @@
 const express = require("express");
 
-const { createParcel, getParcels } = require("../controllers/parcel.controller");
+const {
+  createParcel,
+  getParcels,
+} = require("../controllers/parcel.controller");
 
 const router = express.Router();
 

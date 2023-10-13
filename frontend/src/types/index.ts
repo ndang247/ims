@@ -69,3 +69,27 @@ export interface ILoadingProps {
   description?: string;
 }
 //
+
+// Login
+export interface ILogin {
+  username: string;
+  password: string;
+}
+//
+
+// Sign Up
+export interface ISignUp {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  role: string;
+  warehouse: string;
+}
+//
+
+// Warehouse
+export interface IWarehouse {
+  _id: string;
+  name: string;
+  address: string;
+}

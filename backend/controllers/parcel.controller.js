@@ -1,7 +1,6 @@
 const Parcel = require("../models/parcel.model");
 const Inventory = require("../models/inventory.model");
 const Warehouse = require("../models/warehouse.model");
-const Shelf = require("../models/shelf.model");
 const Product = require("../models/product.model");
 
 const mongoose = require("mongoose");
