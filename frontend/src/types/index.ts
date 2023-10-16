@@ -41,6 +41,10 @@ export interface IParcel {
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
 }
+
+export interface IGroupedParcels {
+  [key: string]: IParcel[];
+}
 //
 
 export interface ICurrentBarcodeData {
@@ -56,6 +60,7 @@ export interface IProduct {
       {
         title: string;
         brand: string;
+        category: string;
         // images is an array of strings
         images: string[];
       }
@@ -68,6 +73,8 @@ export interface IProductDisplayProps {
   loading: boolean;
   products: IProduct[];
 }
+//
+
 // Inventory
 export interface IInventory {
   _id: string;
@@ -76,6 +83,7 @@ export interface IInventory {
   datetimecreated: string;
   datetimeupdated: string;
 }
+//
 
 // Loading
 export interface ILoadingProps {
