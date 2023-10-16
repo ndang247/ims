@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Breadcrumb, theme } from "antd";
+import './Dashboard.css'
 
 const Dashboard: React.FC = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  useEffect(() => {
+    console.log('Load');
+  }, [])
 
   return (
     <>
@@ -22,7 +27,19 @@ const Dashboard: React.FC = () => {
           height: "50%",
           background: colorBgContainer,
         }}
-      ></div>
+      >
+        <div className="grid-container">
+          <div className="grid-item">
+            Inventory Summary
+            <div>Number of Products: </div>
+            <div>Quantity in Hand: </div>
+          </div>
+          <div className="grid-item">Low Quantity Stocks:</div>
+        </div>
+        <div>
+          Recent Update Item
+        </div>
+      </div>
     </>
   );
 };
