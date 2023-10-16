@@ -10,26 +10,26 @@ import { Link } from "react-router-dom";
 
 const { Sider } = Layout;
 
-import { MenuItem, getItem } from "../types";
+import { MenuItem, getMenuItem } from "../types";
 import Logo from "../assets/logo.svg";
 
 const items: MenuItem[] = [
-  getItem(<Link to="/">Dashboard</Link>, "dashboard", <HomeOutlined />),
-  getItem(
+  getMenuItem(<Link to="/">Dashboard</Link>, "dashboard", <HomeOutlined />),
+  getMenuItem(
     <Link to="/parcels">All Parcels</Link>,
     "parcels",
     <DropboxOutlined />
   ),
-  getItem(<Link to="/items">Items</Link>, "items", <BarcodeOutlined />),
-  getItem(<Link to="/inbound">Inbound</Link>, "inbound", <TagOutlined />),
-  // getItem("User", "sub1", <UserOutlined />, [
-  //   getItem("Tom", "3"),
-  //   getItem("Bill", "4"),
-  //   getItem("Alex", "5"),
+  getMenuItem(<Link to="/items">Items</Link>, "items", <BarcodeOutlined />),
+  getMenuItem(<Link to="/inbound">Inbound</Link>, "inbound", <TagOutlined />),
+  // getMenuItem("User", "sub1", <UserOutlined />, [
+  //   getMenuItem("Tom", "3"),
+  //   getMenuItem("Bill", "4"),
+  //   getMenuItem("Alex", "5"),
   // ]),
-  // getItem("Team", "sub2", <TeamOutlined />, [
-  //   getItem("Team 1", "6"),
-  //   getItem("Team 2", "8"),
+  // getMenuItem("Team", "sub2", <TeamOutlined />, [
+  //   getMenuItem("Team 1", "6"),
+  //   getMenuItem("Team 2", "8"),
   // ]),
 ];
 

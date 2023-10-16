@@ -18,6 +18,7 @@ const LoginPage = () => {
     } catch (error) {
       console.log(error);
       message.error("Failed to login. Please try again!");
+      setFormLoading(false);
     }
   };
 

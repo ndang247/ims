@@ -45,3 +45,17 @@
   justify-content: center;
   margin: 1em;
 }
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  text-align: left;
+  padding: 1rem;
+  /* border: 1px solid #dddddd; */
+  width: 70%;
+}
