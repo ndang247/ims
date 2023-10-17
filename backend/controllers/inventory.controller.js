@@ -1,6 +1,7 @@
 const { errorLogger } = require('../debug/debug');
 const Inventory = require('../models/inventory.model');
 const Product = require('../models/product.model');
+const jwt = require('jsonwebtoken');
 
 const getInventory = async (req, res) => {
   try {
@@ -40,7 +41,7 @@ const getInventory = async (req, res) => {
 
 let clients = [];
 /**
- * Route: /inventory/:id/stream
+ * Route: /stream/inventory/:id
  * Method: GET
  * 
  * Streaming Inventory Data to Client
@@ -48,19 +49,33 @@ let clients = [];
 const inventoryStream = async (req, res) => {
   const { id: barcode } = req.params;
 
-  res.set({
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-store",
-    "Connection": "keep-alive",
+  const {token} = req.query
+
+  console.log('Token', token);
+
+  if (!token) {
+    return res.sendStatus(401)
+  }
+
+  jwt.verify(token, process.env.JWT_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    
+    res.set({
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-store",
+      "Connection": "keep-alive",
+    });
+
+    clients.push({res, barcode});
+
+    res.flushHeaders();
+    req.on('close', () => {
+      console.log('Client disconnected');
+      clients = clients.filter(client => client.res !== res);
+    });
   });
 
-  clients.push({res, barcode});
-
-  res.flushHeaders();
-  req.on('close', () => {
-    console.log('Client disconnected');
-    clients = clients.filter(client => client.res !== res);
-  });
 
 }
 

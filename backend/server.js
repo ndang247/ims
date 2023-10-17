@@ -13,6 +13,7 @@ const debugRouter = require("./routes/debug.routes");
 const inboundRouter = require("./routes/inbound.routes");
 const authRouter = require("./routes/auth.routes");
 const inventoryRouter = require("./routes/inventory.routes")
+const streamRouter = require("./routes/stream.routes")
 
 const { authenticateJWT } = require("./middleware/auth");
 
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 });
 
 app.use(process.env.ENDPOINT, authRouter);
+app.use(process.env.ENDPOINT, streamRouter);
 app.use(authenticateJWT);
 app.use(process.env.ENDPOINT, warehouseRouter);
 app.use(process.env.ENDPOINT, shelfRouter);
