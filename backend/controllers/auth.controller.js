@@ -134,12 +134,26 @@ const authenticateAdminOrOwnerMiddleware = (req, res, next) => {
 };
 
 const addUser = async (req, res) => {
-  const { username, password, role, warehouses } = req.body;
+  console.log('Add user', req.body);
+  const { username, password, role, status, warehouses } = req.body;
+
+  let warehousesData = warehouses
 
   // Validation
-  if (!username || !password || !role || !Array.isArray(warehouses)) {
+  if (!username || !password || !role ) {
     return res.status(400).json({ message: "All fields are required" });
   }
+
+  if (typeof warehouses === 'string') {
+    warehousesData = [warehouses];
+  }
+
+  if (!Array.isArray(warehousesData)) {
+    console.log('No warehouse', warehouses, typeof warehouses, typeof warehouses === 'string', typeof warehouses === 'object');
+    return res.status(400).json({ message: "Invalid warehouses" });
+  }
+
+
 
   if (!['owner', 'manager', 'worker', 'outlet', 'supplier', ''].includes(role)) {
     return res.status(400).json({ message: "Invalid role type" });
@@ -149,7 +163,8 @@ const addUser = async (req, res) => {
     username,
     password,
     role,
-    warehouses
+    status,
+    warehouses: warehousesData
   }
 
   try {
@@ -169,7 +184,7 @@ const updateUser = async (req, res) => {
     return res.status(400).json({ message: "Invalid input" });
   }
 
-  if (role && !['owner', 'manager', 'worker', 'outlet', 'supplier'].includes(role)) {
+  if (role && !['owner', 'manager', 'staff', 'outlet', 'supplier'].includes(role)) {
     return res.status(400).json({ message: "Invalid role type" });
   }
 

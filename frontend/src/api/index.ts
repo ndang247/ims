@@ -146,7 +146,13 @@ export const postSignUp = async (
 
 export const getWarehouses = async () => {
   try {
-    const response = await api.get("/warehouses");
+    const response = await api.get("/warehouses", {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: localStorage.getItem("token"),
+      },
+    });
 
     if (response.data) {
       return response.data.data;
@@ -169,8 +175,8 @@ export const getInventoryStream = async (barcode: string) => {
   };
 }
 
-type UserModel = {
-  id: string | undefined;
+export type UserModel = {
+  _id: string | null | undefined;
   username: string;
   password: string;
   role: string;
@@ -213,10 +219,10 @@ export class User {
   }
 
   static async update(user: UserModel) {
-    if (!user.id) throw new Error("Invalid user id")
+    if (!user._id) throw new Error("Invalid user id")
 
     try {
-      const response = await api.post(`/users/${user.id}/update`, user, {
+      const response = await api.post(`/users/${user._id}/update`, user, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",

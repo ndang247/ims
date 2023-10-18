@@ -9,6 +9,7 @@ import SignupPage from "./SignUpPage";
 import OutletPage from "./Outlet/OutletPage";
 import NewOrderPage from "./Outlet/NewOrderPage";
 import ProductDetails from "./ProductDetails";
+import UserManagement from "./UserManagement";
 
 import Loading from "./Loading";
 
@@ -25,4 +26,5 @@ export {
   NewOrderPage,
   ProductDetails,
   Loading,
+  UserManagement
 };
