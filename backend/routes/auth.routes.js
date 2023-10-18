@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const { login, signup, authenticateAdminOrOwnerMiddleware: authenticateAdminOrOwner,
-  addUser, updateUser, removeUser, acceptUser,
+  addUser, updateUser, removeUser, verifyUser,
   getSingleUser,
   listUsers
 } = require("../controllers/auth.controller");
@@ -22,7 +22,7 @@ router.get('/users', authenticateJWT, authenticateAdminOrOwner, listUsers);
 router.post('/users', authenticateJWT, authenticateAdminOrOwner, addUser);
 router.post('/users/:id/update', authenticateJWT, authenticateAdminOrOwner, updateUser);
 router.post('/users/:id/delete', authenticateJWT, authenticateAdminOrOwner, removeUser);
-router.post('/users/:id/accept', authenticateJWT, authenticateAdminOrOwner, acceptUser);
+router.post('/users/:id/verify', authenticateJWT, authenticateAdminOrOwner, verifyUser);
 router.get('/users/:id', authenticateJWT, authenticateAdminOrOwner, getSingleUser);
 
 module.exports = router;

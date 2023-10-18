@@ -145,8 +145,15 @@ const addUser = async (req, res) => {
     return res.status(400).json({ message: "Invalid role type" });
   }
 
+  let userData = {
+    username,
+    password,
+    role,
+    warehouses
+  }
+
   try {
-    const newUser = new User(req.body);
+    const newUser = new User(userData);
     await newUser.save();
     res.status(201).json(newUser);
   } catch (err) {
@@ -187,14 +194,18 @@ const removeUser = async (req, res) => {
   }
 }
 
-const acceptUser = async (req, res) => {
+const verifyUser = async (req, res) => {
   // Again, validation is minimal since we're updating based on ID
   if (!req.params.id) {
     return res.status(400).json({ message: "Invalid User ID" });
   }
 
+  if (req.body.status !== 'accepted' || req.body.status !== 'rejected') {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { status: 'accepted' }, { new: true });
+    const user = await User.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
     res.status(200).json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -238,7 +249,7 @@ module.exports = {
   addUser,
   updateUser,
   removeUser,
-  acceptUser,
+  verifyUser,
   listUsers,
   getSingleUser
 };
