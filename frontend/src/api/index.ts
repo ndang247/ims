@@ -168,3 +168,117 @@ export const getInventoryStream = async (barcode: string) => {
     // Update your frontend state here
   };
 }
+
+type UserModel = {
+  id: string | undefined;
+  username: string;
+  password: string;
+  role: string;
+  status: string;
+  warehouses: string[];
+}
+export class User {
+
+  static async get(id: string): Promise<UserModel> {
+    if (!id) throw new Error("Invalid user id")
+    try {
+      const response = await api.get(`/users/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      return response.data as UserModel;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  static async add(user: UserModel) {
+    try {
+      const response = await api.post(`/users`, user, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      return response.data as UserModel;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  static async update(user: UserModel) {
+    if (!user.id) throw new Error("Invalid user id")
+
+    try {
+      const response = await api.post(`/users/${user.id}/update`, user, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      return response.data as UserModel;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  static async delete(id: string) {
+    if (!id) throw new Error("Invalid user id")
+
+    try {
+      const response = await api.post(`/users/${id}/delete`, {}, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      return response.data as UserModel;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  static async listUsers() {
+    try {
+      const response = await api.get(`/users`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      return response.data as UserModel[];
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  static async verifyUser(id: string, status: 'accepted' | 'rejected') {
+    try {
+      await api.post(`/users/${id}/verify`, {
+        status: status
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        }
+      })
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+}
