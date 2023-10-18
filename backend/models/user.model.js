@@ -9,6 +9,11 @@ const userSchema = new mongoose.Schema({
     default: "worker",
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
+  },
   warehouses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Warehouse" }],
 });
 

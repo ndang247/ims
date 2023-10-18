@@ -94,7 +94,7 @@ setInterval(async () => {
     }
   }
   );
-}, 6000)
+}, 60000) //Change to 6000 for production
 
 module.exports = {
   getInventory,

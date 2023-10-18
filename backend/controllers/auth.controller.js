@@ -123,7 +123,122 @@ const signup = async (req, res) => {
   }
 };
 
+const authenticateAdminOrOwnerMiddleware = (req, res, next) => {
+  console.log('Authenticate admin', req.user);
+  const user = req.user;  // Assuming req.user is populated by your auth middleware
+  if (user && (user.role === 'admin' || user.role === 'owner' || user.role === 'manager')) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Forbidden: You do not have permission to perform this action.' });
+  }
+};
+
+const addUser = async (req, res) => {
+  const { username, password, role, warehouses } = req.body;
+
+  // Validation
+  if (!username || !password || !role || !Array.isArray(warehouses)) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  if (!['owner', 'manager', 'worker', 'outlet', 'supplier', ''].includes(role)) {
+    return res.status(400).json({ message: "Invalid role type" });
+  }
+
+  try {
+    const newUser = new User(req.body);
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+const updateUser = async (req, res) => {
+  const { username, role, warehouses } = req.body;
+
+  // Validation
+  if (username === '' || role === '' || (warehouses && !Array.isArray(warehouses))) {
+    return res.status(400).json({ message: "Invalid input" });
+  }
+
+  if (role && !['owner', 'manager', 'worker', 'outlet', 'supplier'].includes(role)) {
+    return res.status(400).json({ message: "Invalid role type" });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
+const removeUser = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Invalid User ID" });
+  }
+
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
+const acceptUser = async (req, res) => {
+  // Again, validation is minimal since we're updating based on ID
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Invalid User ID" });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, { status: 'accepted' }, { new: true });
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+const listUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+
+const getSingleUser = async (req, res) => {
+
+  // Validate the user ID
+  if (!req.params.id) {
+    return res.status(400).json({ message: 'Invalid ID' });
+  }
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+
 module.exports = {
   login,
   signup,
+  authenticateAdminOrOwnerMiddleware,
+
+  addUser,
+  updateUser,
+  removeUser,
+  acceptUser,
+  listUsers,
+  getSingleUser
 };

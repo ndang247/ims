@@ -91,7 +91,7 @@ setInterval(async () => {
     }
   }
   );
-}, 5000)
+}, 300000) // Change to 5000 for production
 
 module.exports = {
   dashboardStream
