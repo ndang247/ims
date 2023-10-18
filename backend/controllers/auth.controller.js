@@ -15,6 +15,14 @@ const login = async (req, res) => {
         .json({ status: "Not Found", error: "User not found" });
     }
 
+    if (user.status === 'pending') {
+      return res.status(401).json({ status: "Not Found", error: "User is pending approval. Please contact admin." });
+    }
+
+    if (user.status === 'rejected') {
+      return res.status(401).json({ status: "Not Found", error: "User is rejected. Please contact admin." });
+    }
+
     // Convert incoming password to Base64
     const base64Password = Buffer.from(password).toString("base64");
 
