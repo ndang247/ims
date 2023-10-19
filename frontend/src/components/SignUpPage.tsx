@@ -39,16 +39,15 @@ const SignupPage = () => {
         return;
       }
 
-      const token = await postSignUp(username, password, role, [warehouse]);
+      await postSignUp(username, password, role, [warehouse]);
 
-      if (token) {
-        message.success("Successfully signed up!");
-        // Wait for 3 seconds before redirecting
-        setTimeout(() => {
-          window.location.href = "/login";
-          form.resetFields();
-        }, 3000);
-      }
+      message.success("Successfully signed up! Please wait for admin to review your account.");
+      // Wait for 3 seconds before redirecting
+      setTimeout(() => {
+        window.location.href = "/";
+        form.resetFields();
+      }, 4000);
+      
     } catch (error) {
       console.log(error);
       message.error("Failed to sign up. Please try again!");

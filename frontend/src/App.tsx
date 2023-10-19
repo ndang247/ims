@@ -83,12 +83,32 @@ const App = () => {
 };
 
 export function OutletRoute() {
+
+  const { currentUser, logout } = useAuth()
+
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <>{currentUser?.username}</>
+      )
+    },
+    {
+      key: '2',
+      label: (
+        <Button onClick={() => {logout()}}>
+          Log out
+        </Button>
+      )
+    },
+  ]
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Layout>
         <Header style={{ background: '#4796bd', padding: '0 50px' }}>
           <div style={{ float: 'right', marginTop: '5px', marginBottom: '5px' }}>
-            {/* <Dropdown menu={{items}} placement="bottomRight">
+            <Dropdown menu={{items}} placement="bottomRight">
               <Button 
                 type="primary" 
                 shape="circle" 
@@ -101,7 +121,7 @@ export function OutletRoute() {
                   justifyContent: 'center' 
                 }}
               />
-            </Dropdown> */}
+            </Dropdown>
           </div>
         </Header>
         <Content style={{ margin: "0 16px" }}>

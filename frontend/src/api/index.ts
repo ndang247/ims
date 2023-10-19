@@ -138,8 +138,8 @@ export const postSignUp = async (
     });
 
     if (response.data && response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      return response.data.token;
+      // localStorage.setItem("token", response.data.token);
+      // return response.data.token;
     } else {
       // Handle login failure
       throw new Error("Sign up failed");
