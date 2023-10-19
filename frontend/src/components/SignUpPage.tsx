@@ -14,18 +14,18 @@ const SignupPage = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchWarehouses();
+    // fetchWarehouses();
   }, []);
 
-  const fetchWarehouses = async () => {
-    try {
-      const warehouses = await getWarehouses();
-      console.log(warehouses);
-      setWarehouses(warehouses);
-    } catch (error) {
-      message.error("Failed to get warehouses. Please reload the page!");
-    }
-  };
+  // const fetchWarehouses = async () => {
+  //   try {
+  //     const warehouses = await getWarehouses();
+  //     console.log(warehouses);
+  //     setWarehouses(warehouses);
+  //   } catch (error) {
+  //     message.error("Failed to get warehouses. Please reload the page!");
+  //   }
+  // };
 
   const onFinish = async (values: ISignUp) => {
     setFormLoading(true);
@@ -100,7 +100,7 @@ const SignupPage = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="warehouse"
             rules={[{ required: true, message: "Please select a warehouse!" }]}
           >
@@ -111,7 +111,7 @@ const SignupPage = () => {
                 </Option>
               ))}
             </Select>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
             <Button
@@ -122,7 +122,7 @@ const SignupPage = () => {
             >
               Sign up
             </Button>
-            <Button
+            {/* <Button
               style={{ width: "100%", marginTop: 10 }}
               type="default"
               onClick={() => {
@@ -130,7 +130,7 @@ const SignupPage = () => {
               }}
             >
               Login
-            </Button>
+            </Button> */}
           </Form.Item>
         </Form>
       </Card>

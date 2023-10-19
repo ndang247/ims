@@ -5,7 +5,8 @@ const router = express.Router();
 const { login, signup, authenticateAdminOrOwnerMiddleware: authenticateAdminOrOwner,
   addUser, updateUser, removeUser, verifyUser,
   getSingleUser,
-  listUsers
+  listUsers,
+  getCurrentUser
 } = require("../controllers/auth.controller");
 
 const {authenticateJWT} = require("../middleware/auth");
@@ -23,6 +24,7 @@ router.post('/users', authenticateJWT, authenticateAdminOrOwner, addUser);
 router.post('/users/:id/update', authenticateJWT, authenticateAdminOrOwner, updateUser);
 router.post('/users/:id/delete', authenticateJWT, authenticateAdminOrOwner, removeUser);
 router.post('/users/:id/verify', authenticateJWT, authenticateAdminOrOwner, verifyUser);
+router.get('/users/profile', authenticateJWT, getCurrentUser);
 router.get('/users/:id', authenticateJWT, authenticateAdminOrOwner, getSingleUser);
 
 module.exports = router;

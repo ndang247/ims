@@ -75,22 +75,22 @@ const signup = async (req, res) => {
         .json({ status: "Not Found", error: "Missing required fields" });
     }
 
-    // Validate warehouse
-    if (!Array.isArray(warehouses)) {
-      return res
-        .status(400)
-        .json({ status: "Not Found", error: "Invalid warehouses" });
-    }
+    // // Validate warehouse
+    // if (!Array.isArray(warehouses)) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: "Not Found", error: "Invalid warehouses" });
+    // }
 
-    const validWarehouses = await Warehouse.find({
-      _id: { $in: warehouses },
-    });
+    // const validWarehouses = await Warehouse.find({
+    //   _id: { $in: warehouses },
+    // });
 
-    if (validWarehouses.length !== warehouses.length) {
-      return res
-        .status(400)
-        .json({ status: "Not Found", error: "Invalid warehouse IDs" });
-    }
+    // if (validWarehouses.length !== warehouses.length) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: "Not Found", error: "Invalid warehouse IDs" });
+    // }
 
     // Convert password to Base64
     const base64Password = Buffer.from(password).toString("base64");
@@ -100,7 +100,7 @@ const signup = async (req, res) => {
       username,
       password: base64Password,
       role: role,
-      warehouses: warehouses,
+      // warehouses: warehouses,
     });
 
     await newUser.save();
@@ -263,6 +263,10 @@ const getSingleUser = async (req, res) => {
   }
 };
 
+const getCurrentUser = async (req, res) => {
+  res.json({ user: req.user });
+}
+
 
 module.exports = {
   login,
@@ -274,5 +278,6 @@ module.exports = {
   removeUser,
   verifyUser,
   listUsers,
-  getSingleUser
+  getSingleUser,
+  getCurrentUser
 };

@@ -10,7 +10,7 @@ const LoginPage = () => {
   const onFinish = async (values: ILogin) => {
     setFormLoading(true);
     try {
-      const token = await postLogin(values.username, values.password);
+      const {token} = await postLogin(values.username, values.password);
       if (token) {
         message.success("Successfully logged in!");
         window.location.href = "/";
@@ -53,7 +53,7 @@ const LoginPage = () => {
             >
               Log in
             </Button>
-            <Button
+            {/* <Button
               style={{ width: "100%", marginTop: 10 }}
               type="default"
               onClick={() => {
@@ -61,7 +61,7 @@ const LoginPage = () => {
               }}
             >
               Sign Up
-            </Button>
+            </Button> */}
           </Form.Item>
         </Form>
       </Card>

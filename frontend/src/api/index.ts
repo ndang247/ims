@@ -112,7 +112,7 @@ export const postLogin = async (username: string, password: string) => {
 
     if (response.data && response.data.token) {
       localStorage.setItem("token", response.data.token);
-      return response.data.token;
+      return response.data;
     } else {
       // Handle login failure
       throw new Error("Login failed");
@@ -149,6 +149,11 @@ export const postSignUp = async (
     throw error;
   }
 };
+
+export const postLogout = () => {
+  localStorage.removeItem("token");
+  window.location.reload();
+}
 
 export const getWarehouses = async () => {
   try {
@@ -192,6 +197,22 @@ export type UserModel = {
   warehouses: string[];
 }
 export class User {
+
+  static async getCurrent(): Promise<UserModel> {
+    try {
+      const response = await api.get(`/users/profile`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      return response.data.user as UserModel;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 
   static async get(id: string): Promise<UserModel> {
     if (!id) throw new Error("Invalid user id")
