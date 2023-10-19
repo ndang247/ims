@@ -113,9 +113,9 @@ export const postLogin = async (username: string, password: string) => {
     if (response.data && response.data.token) {
       localStorage.setItem("token", response.data.token);
       return response.data;
-    } else {
+    } else if (response.data && response.data.error) {
       // Handle login failure
-      throw new Error("Login failed");
+        throw new Error(response.data.error);
     }
   } catch (error) {
     console.log(error);

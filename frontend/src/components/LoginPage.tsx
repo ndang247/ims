@@ -17,7 +17,12 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.log(error);
-      message.error("Failed to login. Please try again!");
+      const errorMessage = error.response.data.error ?? error.response.data.message;
+      if (error.response && errorMessage) {
+        message.error(errorMessage);
+      } else {
+        message.error("Login failed! Please try again");
+      }
       setFormLoading(false);
     }
   };

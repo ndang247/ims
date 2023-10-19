@@ -12,10 +12,10 @@ import {
   UserManagement,
 } from "./components";
 import { Route, Routes, Navigate, Outlet, useLocation } from "react-router-dom";
-import { Layout, Dropdown, Button, Menu } from "antd";
-import { UserOutlined, DownOutlined } from '@ant-design/icons';
+import { Layout, Dropdown, Button } from "antd";
+import { UserOutlined } from '@ant-design/icons';
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { MenuProps } from 'antd';
 
 import { useAuth } from "./Auth";
@@ -27,9 +27,13 @@ const App = () => {
 
   const { currentUser, loading} = useAuth()
 
-  useEffect(() => {
-    // setToken(localStorage.getItem('token'))
-  }, [])
+  const routeType = useMemo(() => {
+    if (currentUser) {
+      console.log('Route type', currentUser.role);
+      return currentUser.role
+    }
+    return 'guest'
+  }, [currentUser?.role])
 
   if (loading) {
     return <>Loading...</>
@@ -50,25 +54,75 @@ const App = () => {
 
   return (
       <Routes>
-        <Route element={<AuthRoute />}>
+        { (routeType === 'manager' || routeType === 'owner' || routeType === 'staff') && (
+        <Route element={<ManagerRoute />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/parcels" element={<Parcels />} />
           <Route path="/items" element={<Items />} />
           <Route path="/items/:id" element={<ProductDetails />} />
           <Route path="/inbound" element={<InboundPage />} />
           <Route path="/outlet" element={<OutletPage />} />
-          <Route
-            path="/outlet/new-order"
-            element={<NewOrderPage />}
-          />
+          
           <Route path="/users" element={<UserManagement />} />
           <Route path="/*" element={<Navigate to="/" />} />
         </Route>
+        )
+        }
+        { routeType === 'outlet' && (
+        <Route element={<OutletRoute/>}>
+          <Route path="/" element={<OutletPage/>}/>
+          <Route
+            path="/new-order"
+            element={<NewOrderPage />}
+          />
+        </Route>
+        )
+        }
       </Routes>
   );
 };
 
-export function AuthRoute() {
+export function OutletRoute() {
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      <Layout>
+        <Header style={{ background: '#4796bd', padding: '0 50px' }}>
+          <div style={{ float: 'right', marginTop: '5px', marginBottom: '5px' }}>
+            {/* <Dropdown menu={{items}} placement="bottomRight">
+              <Button 
+                type="primary" 
+                shape="circle" 
+                icon={<UserOutlined />} 
+                style={{ 
+                  width: '50px', 
+                  height: '50px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center' 
+                }}
+              />
+            </Dropdown> */}
+          </div>
+        </Header>
+        <Content style={{ margin: "0 16px" }}>
+            <Outlet />
+        </Content>
+        <Footer
+          style={{
+            backgroundColor: "#4796bd",
+            textAlign: "center",
+            color: "#fff",
+            fontSize: "1.15em",
+          }}
+        >
+          IMS © 2023 Created by DC
+        </Footer>
+      </Layout>
+    </Layout>
+  )
+}
+
+export function ManagerRoute() {
 
   const location = useLocation()
 
