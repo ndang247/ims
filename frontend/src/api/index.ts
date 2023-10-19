@@ -2,6 +2,11 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8080/api/v1",
+  headers: {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    Authorization: localStorage.getItem("token"),
+  },
 });
 
 const DEFAULT_WAREHOUSE_ID = "650041c789d9fbf5b33516ca";
@@ -316,4 +321,56 @@ export class User {
     }
   }
 
+}
+
+export class OutletOrder {
+  // Create new Outlet Order
+  static async createOutletOrder(data) {
+    try {
+      const response = await api.post("/outlet/order/create", data);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  }
+
+  // Update existing Outlet Order by ID
+  static async updateOutletOrder(id: string, data) {
+    try {
+      const response = await api.post(`/outlet/order/${id}/update`, data);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  }
+
+  // Get single Outlet Order by ID
+  static async getSingleOutletOrder(id: string) {
+    try {
+      const response = await api.get(`/outlet/order/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  }
+
+  // Get all Outlet Orders
+  static async getManyOutletOrders() {
+    try {
+      const response = await api.get("/outlet/orders");
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  }
+
+  // Delete Outlet Order by ID
+  static async deleteOutletOrder(id: string) {
+    try {
+      const response = await api.post(`/outlet/order/${id}/delete`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  }
 }
