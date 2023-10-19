@@ -5,45 +5,45 @@ const jwt = require('jsonwebtoken');
 
 const getInventory = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
     if (!id) {
       return res.status(400).json({
         status: "Error",
         error: "Invalid inventory ID",
-        message: "Invalid inventory ID"
-      })
+        message: "Invalid inventory ID",
+      });
     }
-    const inventory = await Inventory.findById(id)
+    const inventory = await Inventory.findById(id);
 
     if (!inventory) {
       return res.status(400).json({
         status: "Error",
         error: "Inventory not found",
-        message: "Inventory not found"
-      })
+        message: "Inventory not found",
+      });
     }
 
     return res.status(200).json({
       status: "Success",
-      inventory
-    })
+      inventory,
+    });
   } catch (error) {
     errorLogger("inventory.controller", "getInventory").error({
-      message: error
-    })
+      message: error,
+    });
     res.status(500).json({
       status: "Error",
       error: error.message,
-      message: "Error when getting inventory data"
-    })
+      message: "Error when getting inventory data",
+    });
   }
-}
+};
 
 let clients = [];
 /**
  * Route: /stream/inventory/:id
  * Method: GET
- * 
+ *
  * Streaming Inventory Data to Client
  */
 const inventoryStream = async (req, res) => {
@@ -80,15 +80,14 @@ const inventoryStream = async (req, res) => {
 }
 
 setInterval(async () => {
-  console.log('Do send something');
+  console.log("Do send something");
   clients.forEach(async (client) => {
     try {
-      const { res, barcode } = client
-      const product = await Product.findOne({ barcode })
-      const inventory = await Inventory.findOne({ product: product._id })
+      const { res, barcode } = client;
+      const product = await Product.findOne({ barcode });
+      const inventory = await Inventory.findOne({ product: product._id });
 
       res.write(`data: ${JSON.stringify(inventory)}\n\n`);
-  
     } catch (error) {
       console.error(error);
     }
@@ -98,5 +97,5 @@ setInterval(async () => {
 
 module.exports = {
   getInventory,
-  inventoryStream
-}
+  inventoryStream,
+};

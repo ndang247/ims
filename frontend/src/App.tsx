@@ -14,7 +14,7 @@ import {
 import { Route, Routes, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Layout } from "antd";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const { Header, Content, Footer } = Layout;
 

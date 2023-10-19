@@ -6,7 +6,15 @@ const api = axios.create({
 
 const DEFAULT_WAREHOUSE_ID = "650041c789d9fbf5b33516ca";
 
-export const getParcels = async () => {
+export const getParcels = async (productID?: string) => {
+  const paramsObj = productID
+    ? {
+        warehouse_id: DEFAULT_WAREHOUSE_ID,
+        product_id: productID,
+      }
+    : {
+        warehouse_id: DEFAULT_WAREHOUSE_ID,
+      };
   try {
     const response = await api.get("/parcels", {
       headers: {
@@ -14,11 +22,9 @@ export const getParcels = async () => {
         "Access-Control-Allow-Origin": "*",
         Authorization: localStorage.getItem("token"),
       },
-      params: {
-        warehouse_id: DEFAULT_WAREHOUSE_ID,
-      },
+      params: paramsObj,
     });
-    return response;
+    return response.data;
   } catch (error) {
     console.log(error);
   }
@@ -163,14 +169,16 @@ export const getWarehouses = async () => {
     console.log(error);
     throw error;
   }
-}
+};
 
 export const getInventoryStream = async (barcode: string) => {
-  const eventSource = new EventSource(`http://localhost:8080/api/v1/inventory/${barcode}/stream`);
+  const eventSource = new EventSource(
+    `http://localhost:8080/api/v1/inventory/${barcode}/stream`
+  );
 
   eventSource.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log("Data received from server:", data);
+    console.log("Data received from server: ", data);
     // Update your frontend state here
   };
 }

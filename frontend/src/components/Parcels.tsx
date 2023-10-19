@@ -67,10 +67,10 @@ const Parcels: React.FC<IParcelProps> = ({
     { headerName: "Created At", field: "datetimecreated", filter: true },
     { headerName: "Updated At", field: "datetimeupdated", filter: true },
   ]);
-  
+
   useEffect(() => {
-    console.log('Load Dashboard');
-  }, [])
+    console.log("Load Dashboard");
+  }, []);
 
   // DefaultColDef sets props common to all Columns
   const defaultColDef = useMemo<ColDef>(() => {
@@ -90,7 +90,7 @@ const Parcels: React.FC<IParcelProps> = ({
   // Example load data from server
   useEffect(() => {
     getParcels().then((result) => {
-      setRowData(result?.data.parcels);
+      setRowData(result?.parcels);
     });
   }, []);
 
