@@ -29,6 +29,7 @@ const login = async (req, res) => {
     if (user.password === base64Password) {
       const token = jwt.sign(
         {
+          _id: user._id,
           username: user.username,
           role: user.role,
           warehouses: user.warehouses,
@@ -107,6 +108,7 @@ const signup = async (req, res) => {
 
     const token = jwt.sign(
       {
+        _id: newUser._id,
         username: newUser.username,
         role: newUser.role,
         warehouses: newUser.warehouses,
