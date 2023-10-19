@@ -22,11 +22,6 @@ export const getParcels = async (productID?: string) => {
       };
   try {
     const response = await api.get("/parcels", {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization: localStorage.getItem("token"),
-      },
       params: paramsObj,
     });
     return response.data;
@@ -42,13 +37,6 @@ export const postInboundBarcode = async (barcode: string) => {
       {
         warehouse_id: DEFAULT_WAREHOUSE_ID,
         barcode,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        },
       }
     );
     return response;
@@ -61,11 +49,6 @@ export const postInboundBarcode = async (barcode: string) => {
 
 export const getCurrentInbound = async () => {
   const response = await api.get("/inbound/get", {
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      Authorization: localStorage.getItem("token"),
-    },
     params: {
       warehouse_id: DEFAULT_WAREHOUSE_ID,
     },
@@ -76,11 +59,6 @@ export const getCurrentInbound = async () => {
 export const getProducts = async () => {
   try {
     const response = await api.get("/products", {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization: localStorage.getItem("token"),
-      },
       params: {
         warehouseID: DEFAULT_WAREHOUSE_ID,
       },
@@ -94,13 +72,7 @@ export const getProducts = async () => {
 
 export const getProductByID = async (productID: string) => {
   try {
-    const response = await api.get(`/product/?id=${productID}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization: localStorage.getItem("token"),
-      },
-    });
+    const response = await api.get(`/product/?id=${productID}`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -162,13 +134,7 @@ export const postLogout = () => {
 
 export const getWarehouses = async () => {
   try {
-    const response = await api.get("/warehouses", {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization: localStorage.getItem("token"),
-      },
-    });
+    const response = await api.get("/warehouses");
 
     if (response.data) {
       return response.data.data;
@@ -205,13 +171,7 @@ export class User {
 
   static async getCurrent(): Promise<UserModel> {
     try {
-      const response = await api.get(`/users/profile`, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await api.get(`/users/profile`);
       return response.data.user as UserModel;
     } catch (error) {
       console.log(error);
@@ -222,13 +182,7 @@ export class User {
   static async get(id: string): Promise<UserModel> {
     if (!id) throw new Error("Invalid user id")
     try {
-      const response = await api.get(`/users/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await api.get(`/users/${id}`);
       return response.data as UserModel;
     } catch (error) {
       console.log(error);
@@ -238,13 +192,7 @@ export class User {
 
   static async add(user: UserModel) {
     try {
-      const response = await api.post(`/users`, user, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await api.post(`/users`, user);
       return response.data as UserModel;
     } catch (error) {
       console.log(error);
@@ -256,13 +204,7 @@ export class User {
     if (!user._id) throw new Error("Invalid user id")
 
     try {
-      const response = await api.post(`/users/${user._id}/update`, user, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await api.post(`/users/${user._id}/update`, user);
       return response.data as UserModel;
     } catch (error) {
       console.log(error);
@@ -274,13 +216,7 @@ export class User {
     if (!id) throw new Error("Invalid user id")
 
     try {
-      const response = await api.post(`/users/${id}/delete`, {}, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await api.post(`/users/${id}/delete`, {});
       return response.data as UserModel;
     } catch (error) {
       console.log(error);
@@ -290,13 +226,7 @@ export class User {
 
   static async listUsers() {
     try {
-      const response = await api.get(`/users`, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await api.get(`/users`);
       return response.data as UserModel[];
     } catch (error) {
       console.log(error);
@@ -308,12 +238,6 @@ export class User {
     try {
       await api.post(`/users/${id}/verify`, {
         status: status
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          Authorization: localStorage.getItem("token"),
-        }
       })
     } catch (error) {
       console.log(error);
