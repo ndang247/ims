@@ -10,6 +10,7 @@ import {
   NewOrderPage,
   ProductDetails,
   UserManagement,
+  OutletOrderManagement,
 } from "./components";
 import { Route, Routes, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Layout, Dropdown, Button } from "antd";
@@ -61,7 +62,7 @@ const App = () => {
           <Route path="/items" element={<Items />} />
           <Route path="/items/:id" element={<ProductDetails />} />
           <Route path="/inbound" element={<InboundPage />} />
-          <Route path="/outlet" element={<OutletPage />} />
+          <Route path="/outlet" element={<OutletOrderManagement />} />
           
           <Route path="/users" element={<UserManagement />} />
           <Route path="/*" element={<Navigate to="/" />} />

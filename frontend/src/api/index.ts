@@ -247,22 +247,36 @@ export class User {
 
 }
 
+export interface ProductOrder {
+  product: string;
+  quantity: number;
+}
+
+export interface OutletOrderModel {
+  _id: string | null | undefined;
+  user: string;
+  description: string;
+  status: "pending" | "accepted" | "processed" | "delivered" | "rejected";
+  products: ProductOrder[];
+  datetimecreated: Date;
+}
+
 export class OutletOrder {
   // Create new Outlet Order
-  static async createOutletOrder(data) {
+  static async createOutletOrder(data: OutletOrder) {
     try {
       const response = await api.post("/outlet/order/create", data);
-      return response.data;
+      return response.data as OutletOrderModel;
     } catch (error) {
       throw error.response.data;
     }
   }
 
   // Update existing Outlet Order by ID
-  static async updateOutletOrder(id: string, data) {
+  static async updateOutletOrder(id: string, data: OutletOrderModel) {
     try {
       const response = await api.post(`/outlet/order/${id}/update`, data);
-      return response.data;
+      return response.data as OutletOrderModel;
     } catch (error) {
       throw error.response.data;
     }
@@ -272,7 +286,7 @@ export class OutletOrder {
   static async getSingleOutletOrder(id: string) {
     try {
       const response = await api.get(`/outlet/order/${id}`);
-      return response.data;
+      return response.data as OutletOrderModel;
     } catch (error) {
       throw error.response.data;
     }
@@ -282,7 +296,7 @@ export class OutletOrder {
   static async getManyOutletOrders() {
     try {
       const response = await api.get("/outlet/orders");
-      return response.data;
+      return response.data as OutletOrderModel[];
     } catch (error) {
       throw error.response.data;
     }

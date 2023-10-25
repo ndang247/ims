@@ -4,7 +4,8 @@ import {
   DropboxOutlined,
   BarcodeOutlined,
   TagOutlined,
-  UserOutlined
+  UserOutlined,
+  AuditOutlined
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
@@ -24,6 +25,7 @@ const items: MenuItem[] = [
   getMenuItem(<Link to="/items">Items</Link>, "items", <BarcodeOutlined />),
   getMenuItem(<Link to="/inbound">Inbound</Link>, "inbound", <TagOutlined />),
   getMenuItem(<Link to="/users">User Management</Link>, "users", <UserOutlined />),
+  getMenuItem(<Link to="/outlet">Outlet Order Management</Link>, "outlet_orders", <AuditOutlined />),
   // getMenuItem("User", "sub1", <UserOutlined />, [
   //   getMenuItem("Tom", "3"),
   //   getMenuItem("Bill", "4"),
