@@ -2,12 +2,10 @@ const express = require("express");
 
 const router = express.Router();
 
-const {
-  inventoryStream,
-} = require("../controllers/inventory.controller");
 
 const {
-  dashboardStream
+  dashboardStream,
+  inventoryStream
 } = require("../controllers/stream.controller")
 
 router.get("/stream/inventory/:id", inventoryStream);
