@@ -141,6 +141,7 @@ const OutletOrderManagement = () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue() as OutletOrderModel;
+      console.log('Handle ok, values', values);
 
       if (isOrderSelected) {
         await OutletOrder.updateOutletOrder(selectedOrder._id as string, values);
@@ -149,6 +150,7 @@ const OutletOrderManagement = () => {
       }
 
       form.resetFields();
+      setStatusMessage('')
       await init();
       setIsModalVisible(false);
     } catch (error) {
@@ -189,7 +191,11 @@ const OutletOrderManagement = () => {
         open={isModalVisible}
         onOk={handleOk}
         okText="Submit"
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          form.resetFields()  
+          setStatusMessage('')
+          setIsModalVisible(false)
+        }}
       >
         <Divider />
         <Form form={form} layout="vertical">
@@ -215,15 +221,15 @@ const OutletOrderManagement = () => {
               <Option value="delivered">Delivered</Option>
               <Option value="rejected">Rejected</Option>
             </Select>
-            {statusMessage && (
-          <span className="text-secondary py-2">{statusMessage}</span>
-        )}
           </Form.Item>
+          {statusMessage && (
+            <span className="text-secondary py-2">{statusMessage}</span>
+          )}
 
           <div>
             <span className="fs-6">Products</span>
             {selectedOrder?.products.map(product => {
-              return <div>{product.product.barcode} - Quantity: {product.quantity}</div>
+              return <div className="border rounded-1 p-1 m-2">{product.product.upc_data.items[0].title} - Quantity: {product.quantity}</div>
             })}
           </div>
 
