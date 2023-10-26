@@ -63,18 +63,35 @@ const outletOrderController = {
     }
   },
 
-  // Get Multiple Outlet Orders
   async getMany(req, res) {
     try {
       const orders = await OutletOrder.find()
         .populate('user')
         .populate('products.product')
         .sort({ datetimecreated: -1 });
-      res.status(200).json(orders);
+
+      const transformedOrders = orders.map(order => {
+        const orderObject = order.toObject();
+        orderObject.products = orderObject.products.map(productItem => {
+          if (typeof productItem.product.upc_data === 'string') {
+            try {
+              // Parse the JSON string to JSON object
+              productItem.product.upc_data = JSON.parse(productItem.product.upc_data);
+            } catch (err) {
+              console.error("Error parsing JSON string: ", err);
+            }
+          }
+          return productItem;
+        });
+        return orderObject; 
+      });
+  
+      res.status(200).json(transformedOrders);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   },
+  
 
   // Delete Outlet Order
   async delete(req, res) {
