@@ -13,6 +13,8 @@ const OutletOrderManagement = () => {
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>("");
 
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+
   const [statusMessage, setStatusMessage] = useState('');
 
   const handleStatusChange = (value) => {
@@ -158,8 +160,30 @@ const OutletOrderManagement = () => {
 
   return (
     <>
-      
-      <Table dataSource={orders} columns={columns} />
+    <div className='d-flex flex-row justify-content-end mt-2'>
+      <Select
+        style={{ width: 200, marginBottom: 20 }}
+        placeholder="Filter by Status"
+        allowClear
+        onChange={(value) => {
+          setFilterStatus(value as string);
+        }}
+        onClear={() => {
+          setFilterStatus(null);
+        }}
+      >
+        <Option value="pending">Pending</Option>
+        <Option value="accepted">Accepted</Option>
+        <Option value="processed">Processed</Option>
+        <Option value="delivered">Delivered</Option>
+        <Option value="rejected">Rejected</Option>
+        <Option value="">All</Option>
+      </Select>
+    </div>
+      <Table 
+        dataSource={filterStatus ? orders.filter(order => order.status === filterStatus) : orders} 
+        columns={columns} 
+      />
       <Modal 
         title={isOrderSelected ? `Outlet Order from ${selectedOrder?.user.username ?? "N/A"}` : "Add Order"}
         open={isModalVisible}
