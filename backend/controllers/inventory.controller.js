@@ -1,6 +1,7 @@
-const { errorLogger } = require("../debug/debug");
-const Inventory = require("../models/inventory.model");
-const Product = require("../models/product.model");
+const { errorLogger } = require('../debug/debug');
+const Inventory = require('../models/inventory.model');
+const Product = require('../models/product.model');
+const jwt = require('jsonwebtoken');
 
 const getInventory = async (req, res) => {
   try {
@@ -38,47 +39,6 @@ const getInventory = async (req, res) => {
   }
 };
 
-let clients = [];
-/**
- * Route: /inventory/:id/stream
- * Method: GET
- *
- * Streaming Inventory Data to Client
- */
-const inventoryStream = async (req, res) => {
-  const { id: barcode } = req.params;
-
-  res.set({
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-store",
-    Connection: "keep-alive",
-  });
-
-  clients.push({ res, barcode });
-
-  res.flushHeaders();
-  req.on("close", () => {
-    console.log("Client disconnected");
-    clients = clients.filter((client) => client.res !== res);
-  });
-};
-
-setInterval(async () => {
-  console.log("Do send something");
-  clients.forEach(async (client) => {
-    try {
-      const { res, barcode } = client;
-      const product = await Product.findOne({ barcode });
-      const inventory = await Inventory.findOne({ product: product._id });
-
-      res.write(`data: ${JSON.stringify(inventory)}\n\n`);
-    } catch (error) {
-      console.error(error);
-    }
-  });
-}, 6000);
-
 module.exports = {
   getInventory,
-  inventoryStream,
 };

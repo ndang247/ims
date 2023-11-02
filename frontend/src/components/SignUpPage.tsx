@@ -14,18 +14,18 @@ const SignupPage = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchWarehouses();
+    // fetchWarehouses();
   }, []);
 
-  const fetchWarehouses = async () => {
-    try {
-      const warehouses = await getWarehouses();
-      console.log(warehouses);
-      setWarehouses(warehouses);
-    } catch (error) {
-      message.error("Failed to get warehouses. Please reload the page!");
-    }
-  };
+  // const fetchWarehouses = async () => {
+  //   try {
+  //     const warehouses = await getWarehouses();
+  //     console.log(warehouses);
+  //     setWarehouses(warehouses);
+  //   } catch (error) {
+  //     message.error("Failed to get warehouses. Please reload the page!");
+  //   }
+  // };
 
   const onFinish = async (values: ISignUp) => {
     setFormLoading(true);
@@ -39,16 +39,15 @@ const SignupPage = () => {
         return;
       }
 
-      const token = await postSignUp(username, password, role, [warehouse]);
+      await postSignUp(username, password, role, [warehouse]);
 
-      if (token) {
-        message.success("Successfully signed up!");
-        // Wait for 3 seconds before redirecting
-        setTimeout(() => {
-          window.location.href = "/login";
-          form.resetFields();
-        }, 3000);
-      }
+      message.success("Successfully signed up! Please wait for admin to review your account.");
+      // Wait for 3 seconds before redirecting
+      setTimeout(() => {
+        window.location.href = "/";
+        form.resetFields();
+      }, 4000);
+      
     } catch (error) {
       console.log(error);
       message.error("Failed to sign up. Please try again!");
@@ -92,15 +91,12 @@ const SignupPage = () => {
 
           <Form.Item name="role">
             <Select style={{ width: "100%" }} placeholder="Select role">
-              <Option value="owner">Owner</Option>
-              <Option value="manager">Manager</Option>
-              <Option value="worker">Worker</Option>
               <Option value="outlet">Outlet</Option>
               <Option value="supplier">Supplier</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="warehouse"
             rules={[{ required: true, message: "Please select a warehouse!" }]}
           >
@@ -111,7 +107,7 @@ const SignupPage = () => {
                 </Option>
               ))}
             </Select>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
             <Button
@@ -122,7 +118,7 @@ const SignupPage = () => {
             >
               Sign up
             </Button>
-            <Button
+            {/* <Button
               style={{ width: "100%", marginTop: 10 }}
               type="default"
               onClick={() => {
@@ -130,7 +126,7 @@ const SignupPage = () => {
               }}
             >
               Login
-            </Button>
+            </Button> */}
           </Form.Item>
         </Form>
       </Card>

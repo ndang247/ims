@@ -13,6 +13,8 @@ const debugRouter = require("./routes/debug.routes");
 const inboundRouter = require("./routes/inbound.routes");
 const authRouter = require("./routes/auth.routes");
 const inventoryRouter = require("./routes/inventory.routes")
+const streamRouter = require("./routes/stream.routes")
+const outletOrderRouter = require("./routes/outlet_order.routes")
 
 const { authenticateJWT } = require("./middleware/auth");
 
@@ -29,6 +31,7 @@ app.get("/", (req, res) => {
 });
 
 app.use(process.env.ENDPOINT, authRouter);
+app.use(process.env.ENDPOINT, streamRouter);
 app.use(authenticateJWT);
 app.use(process.env.ENDPOINT, warehouseRouter);
 app.use(process.env.ENDPOINT, shelfRouter);
@@ -37,6 +40,7 @@ app.use(process.env.ENDPOINT, parcelRouter);
 app.use(process.env.ENDPOINT, debugRouter);
 app.use(process.env.ENDPOINT, inboundRouter);
 app.use(process.env.ENDPOINT, inventoryRouter)
+app.use(process.env.ENDPOINT, outletOrderRouter)
 
 const server = async () => {
   try {

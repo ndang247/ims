@@ -115,3 +115,26 @@ export interface IWarehouse {
   address: string;
 }
 //
+
+export interface IProductOrder {
+  product: string;
+  quantity: number;
+}
+
+export interface IOutletOrderModel {
+  _id: string | null | undefined;
+  user: string;
+  description: string;
+  status: "pending" | "accepted" | "processed" | "delivered" | "rejected";
+  products: IProductOrder[];
+  datetimecreated: Date;
+}
+
+export type IUserModel = {
+  _id: string | null | undefined;
+  username: string;
+  password: string;
+  role: string;
+  status: string;
+  warehouses: string[];
+}

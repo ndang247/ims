@@ -1,14 +1,47 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Breadcrumb, theme } from "antd";
 import './Dashboard.css'
+
+type DashboardData = {
+  numberOfProducts: number;
+  totalInventory: number;
+  lowQuantityStocks: number;
+  recentUpdateItem: [];
+}
 
 const Dashboard: React.FC = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const [dashboardData, setDashboardData] = useState<DashboardData>({
+    numberOfProducts: 0,
+    totalInventory: 0,
+    lowQuantityStocks: 0,
+    recentUpdateItem: [],
+  });
+
   useEffect(() => {
-    console.log('Load');
+    const eventSource = new EventSource(`http://localhost:8080/api/v1/stream/dashboard?token=${localStorage.getItem('token')}`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data) {
+        console.log('Receive dashboard data', data);
+        setDashboardData({
+          numberOfProducts: data.totalProducts,
+          totalInventory: data.totalInventory,
+          lowQuantityStocks: data.lowQuantityStocks,
+          recentUpdateItem: data.recentUpdateItem,
+        })
+      }
+      // Update your frontend state here
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("EventSource failed:", error);
+      eventSource.close();
+    };
   }, [])
 
   return (
@@ -31,8 +64,8 @@ const Dashboard: React.FC = () => {
         <div className="grid-container">
           <div className="grid-item">
             Inventory Summary
-            <div>Number of Products: </div>
-            <div>Quantity in Hand: </div>
+            <div>Number of Products: {dashboardData.numberOfProducts}</div>
+            <div>Quantity in Hand: {dashboardData.totalInventory}</div>
           </div>
           <div className="grid-item">Low Quantity Stocks:</div>
         </div>

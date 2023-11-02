@@ -10,7 +10,7 @@ const OutletPage: React.FC = () => {
     <h1>Outlet Page</h1>
     <Button
       onClick={() => {
-        navigate("/outlet/new-order")
+        navigate("/new-order")
       }}
     >Make a new order</Button>
   </div>)

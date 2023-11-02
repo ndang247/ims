@@ -10,14 +10,19 @@ const LoginPage = () => {
   const onFinish = async (values: ILogin) => {
     setFormLoading(true);
     try {
-      const token = await postLogin(values.username, values.password);
+      const {token} = await postLogin(values.username, values.password);
       if (token) {
         message.success("Successfully logged in!");
         window.location.href = "/";
       }
     } catch (error) {
       console.log(error);
-      message.error("Failed to login. Please try again!");
+      const errorMessage = error.response.data.error ?? error.response.data.message;
+      if (error.response && errorMessage) {
+        message.error(errorMessage);
+      } else {
+        message.error("Login failed! Please try again");
+      }
       setFormLoading(false);
     }
   };
@@ -53,7 +58,7 @@ const LoginPage = () => {
             >
               Log in
             </Button>
-            <Button
+            {/* <Button
               style={{ width: "100%", marginTop: 10 }}
               type="default"
               onClick={() => {
@@ -61,7 +66,7 @@ const LoginPage = () => {
               }}
             >
               Sign Up
-            </Button>
+            </Button> */}
           </Form.Item>
         </Form>
       </Card>

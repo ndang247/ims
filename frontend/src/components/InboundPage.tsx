@@ -23,7 +23,10 @@ const InboundPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const eventSource = new EventSource(`http://localhost:8080/api/v1/inventory/${currentBarcode}/stream`);
+    if (!currentBarcode) {
+      return;
+    }
+    const eventSource = new EventSource(`http://localhost:8080/api/v1/stream/inventory/${currentBarcode}?token=${localStorage.getItem('token')}`);
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);

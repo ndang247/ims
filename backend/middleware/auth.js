@@ -15,6 +15,11 @@ function authenticateJWT(req, res, next) {
 
   jwt.verify(token, process.env.JWT_KEY, (err, user) => {
     if (err) return res.sendStatus(403);
+    if (user.status === "pending") {
+      return res.status(401).send({
+        error: "User is pending. Please contact admin.",
+      });
+    }
     req.user = user;
     next();
   });
@@ -25,7 +30,7 @@ function authenticateJWT(req, res, next) {
  */
 function enableRoleAccess(roles) {
   return (req, res, next) => {
-    if (!roles.includes(req.user))
+    if (!roles.includes(req.user.role))
       return res.status(403).send({
         error: "Forbidden",
       });
