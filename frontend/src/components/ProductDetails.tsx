@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Breadcrumb, message, Tabs } from "antd";
 import { getParcels, getProductByID } from "../api";
-import { IGroupedParcels, IParcel, IProduct, IInventory, getTabItem } from "../types";
+import {
+  IGroupedParcels,
+  IParcel,
+  IProduct,
+  IInventory,
+  getTabItem,
+} from "../types";
 import { Loading } from ".";
 
 const ProductDetails: React.FC = () => {
@@ -10,7 +16,6 @@ const ProductDetails: React.FC = () => {
   const [product, setProduct] = useState({} as IProduct);
   const [groupedParcels, setGroupedParcels] = useState({} as IGroupedParcels);
   const [loading, setLoading] = useState(true);
-
   const [currentInventory, setCurrentInventory] = useState<IInventory>();
   const [lastFetched, setLastFetched] = useState<Date>();
 
@@ -23,12 +28,16 @@ const ProductDetails: React.FC = () => {
     if (!product.barcode) {
       return;
     }
-    const eventSource = new EventSource(`http://localhost:8080/api/v1/stream/inventory/${product.barcode}?token=${localStorage.getItem('token')}`);
+    const eventSource = new EventSource(
+      `http://localhost:8080/api/v1/stream/inventory/${
+        product.barcode
+      }?token=${localStorage.getItem("token")}`
+    );
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data) {
-        console.log('Receive inventory data', data);
+        console.log("Receive inventory data", data);
         setCurrentInventory(data);
         setLastFetched(new Date());
       }
@@ -39,7 +48,7 @@ const ProductDetails: React.FC = () => {
       console.error("EventSource failed:", error);
       eventSource.close();
     };
-  }, [product.barcode])
+  }, [product.barcode]);
 
   const fetchProductByID = async () => {
     try {
@@ -269,18 +278,26 @@ const ProductDetails: React.FC = () => {
                   </div>
                 ),
                 getTabItem(
-                  '2',
-                  'Live Inventory',
+                  "2",
+                  "Live Inventory",
                   <div className="d-flex flex-column">
-                      <span className="fs-2">WH-1  
-                        <span className="ms-2" style={{border: '1px solid green', borderRadius: '5px', color: 'green'}}>
-                          Live
-                        </span>
+                    <span className="fs-2">
+                      WH-1
+                      <span
+                        className="ms-2"
+                        style={{
+                          border: "1px solid green",
+                          borderRadius: "5px",
+                          color: "green",
+                        }}
+                      >
+                        Live
                       </span>
-                      <span>Inventory: {currentInventory?.parcel_quantity}</span>
-                      <span className="">{lastFetched?.toLocaleString()}</span>
+                    </span>
+                    <span>Inventory: {currentInventory?.parcel_quantity}</span>
+                    <span>{lastFetched?.toLocaleString()}</span>
                   </div>
-                )
+                ),
               ]}
               onChange={onChange}
             />

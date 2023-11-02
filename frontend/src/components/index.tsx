@@ -1,4 +1,4 @@
-import Dashboard from "./Dashboard";
+import Dashboard from "./Dashboard/Dashboard";
 import Sidebar from "./Sidebar";
 import Items from "./Items";
 import Parcels from "./Parcels";
@@ -11,7 +11,6 @@ import NewOrderPage from "./Outlet/NewOrderPage";
 import ProductDetails from "./ProductDetails";
 import UserManagement from "./UserManagement";
 import OutletOrderManagement from "./OutletOrderManagementPage";
-
 import Loading from "./Loading";
 
 export {
@@ -28,5 +27,5 @@ export {
   ProductDetails,
   Loading,
   UserManagement,
-  OutletOrderManagement
+  OutletOrderManagement,
 };

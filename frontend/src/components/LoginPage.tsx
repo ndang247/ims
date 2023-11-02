@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Form, Input, Button, Card, message, Layout } from "antd";
-
 import { postLogin } from "../api";
 import { ILogin } from "@src/types";
 
@@ -10,14 +9,15 @@ const LoginPage = () => {
   const onFinish = async (values: ILogin) => {
     setFormLoading(true);
     try {
-      const {token} = await postLogin(values.username, values.password);
+      const { token } = await postLogin(values.username, values.password);
       if (token) {
         message.success("Successfully logged in!");
         window.location.href = "/";
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      const errorMessage = error.response.data.error ?? error.response.data.message;
+      const errorMessage =
+        error.response.data.error ?? error.response.data.message;
       if (error.response && errorMessage) {
         message.error(errorMessage);
       } else {

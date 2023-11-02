@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Breadcrumb, Alert } from "antd";
-
 import { getProducts } from "../api";
 import { Loading, ProductDisplay } from ".";
+import { IProduct } from "@src/types";
 
 const Items: React.FC = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -14,7 +14,7 @@ const Items: React.FC = () => {
       .then((data) => {
         setProducts(data.products);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setError(error?.response?.data?.message);
       })
       .finally(() => {

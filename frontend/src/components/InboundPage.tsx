@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, Breadcrumb, Tooltip, Spin } from "antd";
-
 import { InfoCircleOutlined } from "@ant-design/icons";
-
 import { postInboundBarcode, getCurrentInbound } from "../api";
 import { ICurrentBarcodeData, IInventory } from "@src/types";
 
@@ -19,19 +17,23 @@ const InboundPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    init();    
+    init();
   }, []);
 
   useEffect(() => {
     if (!currentBarcode) {
       return;
     }
-    const eventSource = new EventSource(`http://localhost:8080/api/v1/stream/inventory/${currentBarcode}?token=${localStorage.getItem('token')}`);
+    const eventSource = new EventSource(
+      `http://localhost:8080/api/v1/stream/inventory/${currentBarcode}?token=${localStorage.getItem(
+        "token"
+      )}`
+    );
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data) {
-        console.log('Receive inventory data', data);
+        console.log("Receive inventory data", data);
         setCurrentInventory(data);
         setLastFetched(new Date());
       }
@@ -42,7 +44,7 @@ const InboundPage: React.FC = () => {
       console.error("EventSource failed:", error);
       eventSource.close();
     };
-  }, [currentBarcode])
+  }, [currentBarcode]);
 
   async function init() {
     try {
@@ -105,8 +107,16 @@ const InboundPage: React.FC = () => {
         ]}
       />
       <div className="d-flex flex-column border rounded p-2">
-        <span className="fs-6 fw-bold">Current Barcode 
-          <span className="ms-2" style={{border: '1px solid green', borderRadius: '5px', color: 'green'}}>
+        <span className="fs-6 fw-bold">
+          Current Barcode
+          <span
+            className="ms-2"
+            style={{
+              border: "1px solid green",
+              borderRadius: "5px",
+              color: "green",
+            }}
+          >
             Live
           </span>
         </span>
@@ -116,7 +126,16 @@ const InboundPage: React.FC = () => {
         <span>{currentBarcode}</span>
         <span>{currentBarcodeData?.title ?? ""}</span>
         <span>Invetory: {currentInventory?.parcel_quantity}</span>
-        <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'end', flexDirection: 'column', color: 'gray', fontSize: '12px'}}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "end",
+            flexDirection: "column",
+            color: "gray",
+            fontSize: "12px",
+          }}
+        >
           <span>Last Updated: {currentInventory?.datetimeupdated}</span>
           <span>Last Fetched: {lastFetched?.toISOString()} </span>
         </div>

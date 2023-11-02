@@ -1,16 +1,12 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Card, Select, message, Layout } from "antd";
-
-import { getWarehouses, postSignUp } from "../api";
-import { ISignUp, IWarehouse } from "@src/types";
+import { postSignUp } from "../api";
+import { ISignUp } from "@src/types";
 
 const { Option } = Select;
 
-const SignupPage = () => {
-  const [warehouses, setWarehouses] = useState([]);
-
+const SignupPage: React.FC = () => {
   const [formLoading, setFormLoading] = useState(false);
-
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -29,7 +25,7 @@ const SignupPage = () => {
 
   const onFinish = async (values: ISignUp) => {
     setFormLoading(true);
-    console.log("Received values of form: ", values);
+    console.log("Received values of form:", values);
     // Perform your signup logic here
     try {
       const { username, password, confirmPassword, role, warehouse } = values;
@@ -41,13 +37,14 @@ const SignupPage = () => {
 
       await postSignUp(username, password, role, [warehouse]);
 
-      message.success("Successfully signed up! Please wait for admin to review your account.");
+      message.success(
+        "Successfully signed up! Please wait for admin to review your account."
+      );
       // Wait for 3 seconds before redirecting
       setTimeout(() => {
         window.location.href = "/";
         form.resetFields();
       }, 4000);
-      
     } catch (error) {
       console.log(error);
       message.error("Failed to sign up. Please try again!");

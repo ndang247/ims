@@ -68,6 +68,7 @@ export interface IProduct {
   };
   datetimecreated: Date;
   datetimeupdated: Date;
+  inventory: IInventory;
 }
 export interface IProductDisplayProps {
   loading: boolean;
@@ -116,25 +117,40 @@ export interface IWarehouse {
 }
 //
 
+// Product Order
 export interface IProductOrder {
-  product: string;
+  product: IProduct;
   quantity: number;
 }
+//
 
-export interface IOutletOrderModel {
+// Outlet Order
+export interface IOutletOrder {
   _id: string | null | undefined;
-  user: string;
+  user: IUser;
   description: string;
   status: "pending" | "accepted" | "processed" | "delivered" | "rejected";
   products: IProductOrder[];
   datetimecreated: Date;
 }
+//
 
-export type IUserModel = {
-  _id: string | null | undefined;
+// User
+export interface IUser {
+  _id: null;
   username: string;
   password: string;
   role: string;
   status: string;
   warehouses: string[];
 }
+//
+
+// Dashboard Data
+export interface IDashboardData {
+  numberOfProducts: number;
+  totalInventory: number;
+  lowQuantityStocks: number;
+  recentUpdateItem: [];
+}
+//
