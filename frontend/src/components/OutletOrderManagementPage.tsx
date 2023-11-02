@@ -1,14 +1,15 @@
 import {useState, useEffect, useMemo} from "react";
 import { Table, Button, Modal, Form, Input, Select, Tooltip, Divider } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { OutletOrderModel, OutletOrder, ProductOrder } from "../api";
+import { OutletOrder } from "../api";
+import { IOutletOrderModel, IProductOrder } from "../types";
 
 
 const { Option } = Select;
 
 const OutletOrderManagement = () => {
-  const [orders, setOrders] = useState<OutletOrderModel[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<OutletOrderModel | null>(null);
+  const [orders, setOrders] = useState<IOutletOrderModel[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<IOutletOrderModel | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>("");
@@ -75,8 +76,8 @@ const OutletOrderManagement = () => {
       title: 'No. Products',
       dataIndex: 'products.length',
       key: 'productsNo',
-      render: (text, record) => {
-        const tooltipContent = record.products.map((prod: ProductOrder) => 
+      render: (text: string, record: IOutletOrderModel) => {
+        const tooltipContent = record.products.map((prod: IProductOrder) => 
           `${prod.product.barcode}: ${prod.quantity}`
         ).join(', ');
   
@@ -140,7 +141,7 @@ const OutletOrderManagement = () => {
     setLoading(true);
     try {
       await form.validateFields();
-      const values = form.getFieldsValue() as OutletOrderModel;
+      const values = form.getFieldsValue() as IOutletOrderModel;
       console.log('Handle ok, values', values);
 
       if (isOrderSelected) {

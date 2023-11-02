@@ -1,4 +1,5 @@
 import axios from "axios";
+import {IOutletOrderModel , IUserModel} from '../types'
 
 const api = axios.create({
   baseURL: "http://localhost:8080/api/v1",
@@ -159,53 +160,46 @@ export const getInventoryStream = async (barcode: string) => {
   };
 }
 
-export type UserModel = {
-  _id: string | null | undefined;
-  username: string;
-  password: string;
-  role: string;
-  status: string;
-  warehouses: string[];
-}
+
 export class User {
 
-  static async getCurrent(): Promise<UserModel> {
+  static async getCurrent(): Promise<IUserModel> {
     try {
       const response = await api.get(`/users/profile`);
-      return response.data.user as UserModel;
+      return response.data.user as IUserModel;
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  static async get(id: string): Promise<UserModel> {
+  static async get(id: string): Promise<IUserModel> {
     if (!id) throw new Error("Invalid user id")
     try {
       const response = await api.get(`/users/${id}`);
-      return response.data as UserModel;
+      return response.data as IUserModel;
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  static async add(user: UserModel) {
+  static async add(user: IUserModel) {
     try {
       const response = await api.post(`/users`, user);
-      return response.data as UserModel;
+      return response.data as IUserModel;
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  static async update(user: UserModel) {
+  static async update(user: IUserModel) {
     if (!user._id) throw new Error("Invalid user id")
 
     try {
       const response = await api.post(`/users/${user._id}/update`, user);
-      return response.data as UserModel;
+      return response.data as IUserModel;
     } catch (error) {
       console.log(error);
       throw error;
@@ -217,7 +211,7 @@ export class User {
 
     try {
       const response = await api.post(`/users/${id}/delete`, {});
-      return response.data as UserModel;
+      return response.data as IUserModel;
     } catch (error) {
       console.log(error);
       throw error;
@@ -227,7 +221,7 @@ export class User {
   static async listUsers() {
     try {
       const response = await api.get(`/users`);
-      return response.data as UserModel[];
+      return response.data as IUserModel[];
     } catch (error) {
       console.log(error);
       throw error;
@@ -247,36 +241,23 @@ export class User {
 
 }
 
-export interface ProductOrder {
-  product: string;
-  quantity: number;
-}
-
-export interface OutletOrderModel {
-  _id: string | null | undefined;
-  user: string;
-  description: string;
-  status: "pending" | "accepted" | "processed" | "delivered" | "rejected";
-  products: ProductOrder[];
-  datetimecreated: Date;
-}
 
 export class OutletOrder {
   // Create new Outlet Order
   static async createOutletOrder(data: OutletOrder) {
     try {
       const response = await api.post("/outlet/order/create", data);
-      return response.data as OutletOrderModel;
+      return response.data as IOutletOrderModel;
     } catch (error) {
       throw error.response.data;
     }
   }
 
   // Update existing Outlet Order by ID
-  static async updateOutletOrder(id: string, data: OutletOrderModel) {
+  static async updateOutletOrder(id: string, data: IOutletOrderModel) {
     try {
       const response = await api.post(`/outlet/order/${id}/update`, data);
-      return response.data as OutletOrderModel;
+      return response.data as IOutletOrderModel;
     } catch (error) {
       throw error.response.data;
     }
@@ -286,7 +267,7 @@ export class OutletOrder {
   static async getSingleOutletOrder(id: string) {
     try {
       const response = await api.get(`/outlet/order/${id}`);
-      return response.data as OutletOrderModel;
+      return response.data as IOutletOrderModel;
     } catch (error) {
       throw error.response.data;
     }
@@ -296,7 +277,7 @@ export class OutletOrder {
   static async getManyOutletOrders() {
     try {
       const response = await api.get("/outlet/orders");
-      return response.data as OutletOrderModel[];
+      return response.data as IOutletOrderModel[];
     } catch (error) {
       throw error.response.data;
     }

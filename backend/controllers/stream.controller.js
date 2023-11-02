@@ -1,82 +1,90 @@
-const { errorLogger } = require('../debug/debug')
-const Inventory = require('../models/inventory.model')
-const jwt = require('jsonwebtoken')
+const { errorLogger } = require("../debug/debug");
+const Inventory = require("../models/inventory.model");
+const Product = require("../models/product.model");
+const jwt = require("jsonwebtoken");
 
-let dashboardClients = []
+let dashboardClients = [];
+
+const STREAM_TIME_INTERVAL = 5000; //IF DEV CHANGE TO 50000 for not continuing fetching data from database
 
 /**
  * Route: /stream/dashboard
- * 
+ *
  */
 const dashboardStream = async (req, res) => {
-  const { token } = req.query
+  const { token } = req.query;
 
   if (!token) {
-    return res.sendStatus(401)
+    return res.sendStatus(401);
   }
 
   jwt.verify(token, process.env.JWT_KEY, (err, user) => {
     if (err) {
-      return res.sendStatus(403)
+      return res.sendStatus(403);
     }
-    req.user = user
+    req.user = user;
 
     res.set({
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-store",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     });
 
-    dashboardClients.push({res});
+    dashboardClients.push({ res });
 
     res.flushHeaders();
-    req.on('close', () => {
-      console.log('Client disconnected');
-      dashboardClients = dashboardClients.filter(client => client.res !== res);
+    req.on("close", () => {
+      console.log("Client disconnected");
+      dashboardClients = dashboardClients.filter(
+        (client) => client.res !== res
+      );
     });
-  })
-}
+  });
+};
 
 // 5 seconds
 setInterval(async () => {
-  console.log('Stream Dashboard');
+  console.log("Stream Dashboard");
   dashboardClients.forEach(async (client) => {
     try {
-      const { res } = client
+      const { res } = client;
 
-      data = {}
-      data.totalProducts = await Inventory.countDocuments()
+      data = {};
+      data.totalProducts = await Inventory.countDocuments();
 
       const totalInventory = await Inventory.aggregate([
         {
           $group: {
             _id: null, // Grouping by null means to consider all documents as a single group
-            totalParcelQuantity: { $sum: '$parcel_quantity' }
-          }
-        }
+            totalParcelQuantity: { $sum: "$parcel_quantity" },
+          },
+        },
       ]);
-  
+
       if (totalInventory.length > 0) {
-        console.log('Total Parcel Quantity:', totalInventory[0].totalParcelQuantity);
-        data.totalInventory = totalInventory[0].totalParcelQuantity
+        console.log(
+          "Total Parcel Quantity:",
+          totalInventory[0].totalParcelQuantity
+        );
+        data.totalInventory = totalInventory[0].totalParcelQuantity;
       } else {
-        data.totalInventory = 0
+        data.totalInventory = 0;
       }
 
       const topFiveInventory = await Inventory.find()
-      .sort({ datetimeupdated: -1 }) // Sort in descending order by datetimeupdated
-      .limit(5) // Limit to the top 5 records
-      .populate('product') // Populate the product field
-      .exec();
-      
-      data.lastUpdatedInventories = topFiveInventory
+        .sort({ datetimeupdated: -1 }) // Sort in descending order by datetimeupdated
+        .limit(5) // Limit to the top 5 records
+        .populate("product") // Populate the product field
+        .exec();
+
+      data.lastUpdatedInventories = topFiveInventory;
 
       const lowInventory = await Inventory.find({ parcel_quantity: { $lt: 5 } })
-      .sort({ parcel_quantity: 1 })
-      .populate('product') // Populate the product field with the actual product object
-      .exec();
+        .sort({ parcel_quantity: 1 })
+        .populate("product") // Populate the product field with the actual product object
+        .exec();
 
-      data.lowInventories = lowInventory
+      data.lowInventories = lowInventory;
 
       /**
        * totalInventory: number
@@ -85,14 +93,11 @@ setInterval(async () => {
        * lowInventories: array of Inventory objects
        */
       res.write(`data: ${JSON.stringify(data)}\n\n`);
-  
     } catch (error) {
       console.error(error);
     }
-  }
-  );
-}, 300000) // Change to 5000 for production
-
+  });
+}, STREAM_TIME_INTERVAL);
 
 let inventoryStreamClients = [];
 /**
@@ -104,35 +109,35 @@ let inventoryStreamClients = [];
 const inventoryStream = async (req, res) => {
   const { id: barcode } = req.params;
 
-  const {token} = req.query
+  const { token } = req.query;
 
-  console.log('Token', token);
+  console.log("Token", token);
 
   if (!token) {
-    return res.sendStatus(401)
+    return res.sendStatus(401);
   }
 
   jwt.verify(token, process.env.JWT_KEY, (err, user) => {
     if (err) return res.sendStatus(403);
     req.user = user;
-    
+
     res.set({
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-store",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     });
 
-    inventoryStreamClients.push({res, barcode});
+    inventoryStreamClients.push({ res, barcode });
 
     res.flushHeaders();
-    req.on('close', () => {
-      console.log('Client disconnected');
-      inventoryStreamClients = inventoryStreamClients.filter(client => client.res !== res);
+    req.on("close", () => {
+      console.log("Client disconnected");
+      inventoryStreamClients = inventoryStreamClients.filter(
+        (client) => client.res !== res
+      );
     });
   });
-
-
-}
+};
 
 setInterval(async () => {
   console.log("Do send something");
@@ -146,11 +151,10 @@ setInterval(async () => {
     } catch (error) {
       console.error(error);
     }
-  }
-  );
-}, 60000) //Change to 6000 for production
+  });
+}, STREAM_TIME_INTERVAL);
 
 module.exports = {
   dashboardStream,
   inventoryStream,
-}
+};

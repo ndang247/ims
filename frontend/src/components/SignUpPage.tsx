@@ -91,9 +91,6 @@ const SignupPage = () => {
 
           <Form.Item name="role">
             <Select style={{ width: "100%" }} placeholder="Select role">
-              <Option value="owner">Owner</Option>
-              <Option value="manager">Manager</Option>
-              <Option value="worker">Worker</Option>
               <Option value="outlet">Outlet</Option>
               <Option value="supplier">Supplier</Option>
             </Select>
