@@ -59,7 +59,13 @@ const OutletOrderManagement = () => {
   const init = async () => {
     try {
       const fetchedOrders = await OutletOrder.getManyOutletOrders();
-      setOrders(fetchedOrders);
+      // For each order append the key property to the order i.e. key: 1 for the first order then so on
+      const ordersWithKey = fetchedOrders.map((order, key) => {
+        return { ...order, key };
+      });
+
+      setOrders(ordersWithKey);
+      console.log(orders);
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +76,7 @@ const OutletOrderManagement = () => {
       title: "User",
       dataIndex: "user.username",
       key: "user",
-      render: (record: IOutletOrder) => {
+      render: (text: string, record: IOutletOrder) => {
         return `${record.user.username ?? "N/A"} - ${record.user.role}`;
       },
     },
@@ -83,7 +89,7 @@ const OutletOrderManagement = () => {
       title: "No. Products",
       dataIndex: "products.length",
       key: "productsNo",
-      render: (record: IOutletOrder) => {
+      render: (text: string, record: IOutletOrder) => {
         const tooltipContent = record.products
           .map(
             (prod: IProductOrder) => `${prod.product.barcode}: ${prod.quantity}`
@@ -236,9 +242,9 @@ const OutletOrderManagement = () => {
 
           <div>
             <span className="fs-6">Products</span>
-            {selectedOrder?.products.map((product) => {
+            {selectedOrder?.products.map((product, key) => {
               return (
-                <div className="border rounded-1 p-1 m-2">
+                <div key={key} className="border rounded-1 p-1 m-2">
                   {product.product.upc_data.items[0].title} - Quantity:{" "}
                   {product.quantity}
                 </div>
