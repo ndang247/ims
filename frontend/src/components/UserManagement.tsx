@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Table, Modal, Button, Form, Input, Select } from "antd";
+import { Table, Modal, Button, Form, Input, Select, Breadcrumb } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { User, getWarehouses } from "../api";
 import { IUser, IWarehouse } from "@src/types";
@@ -35,7 +35,10 @@ const UserManagement: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const users = await User.listUsers();
-      setUsers(users);
+      const usersWithKey = users.map((user, key) => {
+        return { ...user, key };
+      });
+      setUsers(usersWithKey);
     } catch (error) {
       console.log(error);
     }
@@ -162,9 +165,21 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      <div className="d-flex flex-row justify-content-end my-2">
+      <div className="d-flex flex-row justify-content-between my-2">
+        <Breadcrumb
+          style={{ margin: "16px 0" }}
+          items={[
+            {
+              title: <a href="/">Dashboard</a>,
+            },
+            {
+              title: <a href="/users">User Management</a>,
+            },
+          ]}
+        />
         <Button
           type="primary"
+          style={{ margin: "16px 0" }}
           icon={<PlusCircleOutlined />}
           onClick={() => showModal({})}
         >
@@ -246,9 +261,9 @@ const UserManagement: React.FC = () => {
           </Form.Item>
           <Form.Item label="Warehouse" name="warehouse" required>
             <Select>
-              {warehouses.map((warehouse) => {
+              {warehouses.map((warehouse, key) => {
                 return (
-                  <Option value={warehouse._id}>
+                  <Option key={key} value={warehouse._id}>
                     {warehouse.name ?? "None"} - {warehouse.address ?? "None"}
                   </Option>
                 );

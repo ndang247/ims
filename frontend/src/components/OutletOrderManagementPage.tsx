@@ -8,6 +8,7 @@ import {
   Select,
   Tooltip,
   Divider,
+  Breadcrumb,
 } from "antd";
 import { OutletOrder } from "../api";
 import { IOutletOrder, IProductOrder } from "../types";
@@ -166,9 +167,20 @@ const OutletOrderManagement = () => {
 
   return (
     <>
-      <div className="d-flex flex-row justify-content-end mt-2">
+      <div className="d-flex flex-row justify-content-between mt-2">
+        <Breadcrumb
+          style={{ margin: "16px 0" }}
+          items={[
+            {
+              title: <a href="/">Dashboard</a>,
+            },
+            {
+              title: <a href="/outlet">Outlet Order Management</a>,
+            },
+          ]}
+        />
         <Select
-          style={{ width: 200, marginBottom: 20 }}
+          style={{ width: 200, margin: "16px 0" }}
           placeholder="Filter by Status"
           allowClear
           onChange={(value) => {
