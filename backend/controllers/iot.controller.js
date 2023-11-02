@@ -5,7 +5,6 @@ const Product = require("../models/product.model");
 const Inbound = require("../models/inbound.model");
 
 const { errorLogger } = require("../debug/debug");
-
 const { fetchUPCData } = require("../services/upc");
 
 const DEFAULT_WAREHOUSE_ID = "650041c789d9fbf5b33516ca";

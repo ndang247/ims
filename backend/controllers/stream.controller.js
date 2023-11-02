@@ -1,15 +1,14 @@
-const { errorLogger } = require("../debug/debug");
 const Inventory = require("../models/inventory.model");
 const Product = require("../models/product.model");
 const jwt = require("jsonwebtoken");
 
 let dashboardClients = [];
 
-const STREAM_TIME_INTERVAL = 5000; //IF DEV CHANGE TO 50000 for not continuing fetching data from database
+// IF DEV CHANGE TO 50000 for not continuing fetching data from database
+const STREAM_TIME_INTERVAL = 5000;
 
 /**
  * Route: /stream/dashboard
- *
  */
 const dashboardStream = async (req, res) => {
   const { token } = req.query;

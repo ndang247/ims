@@ -1,7 +1,5 @@
-const { errorLogger } = require('../debug/debug');
-const Inventory = require('../models/inventory.model');
-const Product = require('../models/product.model');
-const jwt = require('jsonwebtoken');
+const { errorLogger } = require("../debug/debug");
+const Inventory = require("../models/inventory.model");
 
 const getInventory = async (req, res) => {
   try {

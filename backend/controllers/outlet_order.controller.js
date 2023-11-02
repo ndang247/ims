@@ -1,6 +1,4 @@
 const OutletOrder = require("../models/outlet_order.model");
-const Inventory = require("../models/inventory.model");
-const mongoose = require("mongoose");
 
 const outletOrderController = {
   // Create new Outlet Order

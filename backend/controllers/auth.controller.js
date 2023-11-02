@@ -1,5 +1,4 @@
 const User = require("../models/user.model");
-const Warehouse = require("../models/warehouse.model");
 const jwt = require("jsonwebtoken");
 const { errorLogger } = require("../debug/debug");
 
@@ -15,12 +14,18 @@ const login = async (req, res) => {
         .json({ status: "Not Found", error: "User not found" });
     }
 
-    if (user.status === 'pending') {
-      return res.status(401).json({ status: "Not Found", error: "User is pending approval. Please contact admin." });
+    if (user.status === "pending") {
+      return res.status(401).json({
+        status: "Not Found",
+        error: "User is pending approval. Please contact admin.",
+      });
     }
 
-    if (user.status === 'rejected') {
-      return res.status(401).json({ status: "Not Found", error: "User is rejected. Please contact admin." });
+    if (user.status === "rejected") {
+      return res.status(401).json({
+        status: "Not Found",
+        error: "User is rejected. Please contact admin.",
+      });
     }
 
     // Convert incoming password to Base64
@@ -76,23 +81,6 @@ const signup = async (req, res) => {
         .json({ status: "Not Found", error: "Missing required fields" });
     }
 
-    // // Validate warehouse
-    // if (!Array.isArray(warehouses)) {
-    //   return res
-    //     .status(400)
-    //     .json({ status: "Not Found", error: "Invalid warehouses" });
-    // }
-
-    // const validWarehouses = await Warehouse.find({
-    //   _id: { $in: warehouses },
-    // });
-
-    // if (validWarehouses.length !== warehouses.length) {
-    //   return res
-    //     .status(400)
-    //     .json({ status: "Not Found", error: "Invalid warehouse IDs" });
-    // }
-
     // Convert password to Base64
     const base64Password = Buffer.from(password).toString("base64");
 
@@ -134,38 +122,49 @@ const signup = async (req, res) => {
 };
 
 const authenticateAdminOrOwnerMiddleware = (req, res, next) => {
-  console.log('Authenticate admin', req.user);
-  const user = req.user;  // Assuming req.user is populated by your auth middleware
-  if (user && (user.role === 'admin' || user.role === 'owner' || user.role === 'manager')) {
+  console.log("Authenticate admin", req.user);
+  const user = req.user; // Assuming req.user is populated by your auth middleware
+  if (
+    user &&
+    (user.role === "admin" || user.role === "owner" || user.role === "manager")
+  ) {
     next();
   } else {
-    res.status(403).json({ message: 'Forbidden: You do not have permission to perform this action.' });
+    res.status(403).json({
+      message: "Forbidden: You do not have permission to perform this action.",
+    });
   }
 };
 
 const addUser = async (req, res) => {
-  console.log('Add user', req.body);
+  console.log("Add user", req.body);
   const { username, password, role, status, warehouses } = req.body;
 
-  let warehousesData = warehouses
+  let warehousesData = warehouses;
 
   // Validation
-  if (!username || !password || !role ) {
+  if (!username || !password || !role) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  if (typeof warehouses === 'string') {
+  if (typeof warehouses === "string") {
     warehousesData = [warehouses];
   }
 
   if (!Array.isArray(warehousesData)) {
-    console.log('No warehouse', warehouses, typeof warehouses, typeof warehouses === 'string', typeof warehouses === 'object');
+    console.log(
+      "No warehouse",
+      warehouses,
+      typeof warehouses,
+      typeof warehouses === "string",
+      typeof warehouses === "object"
+    );
     return res.status(400).json({ message: "Invalid warehouses" });
   }
 
-
-
-  if (!['owner', 'manager', 'worker', 'outlet', 'supplier', ''].includes(role)) {
+  if (
+    !["owner", "manager", "worker", "outlet", "supplier", ""].includes(role)
+  ) {
     return res.status(400).json({ message: "Invalid role type" });
   }
 
@@ -174,8 +173,8 @@ const addUser = async (req, res) => {
     password,
     role,
     status,
-    warehouses: warehousesData
-  }
+    warehouses: warehousesData,
+  };
 
   try {
     const newUser = new User(userData);
@@ -190,21 +189,30 @@ const updateUser = async (req, res) => {
   const { username, role, warehouses } = req.body;
 
   // Validation
-  if (username === '' || role === '' || (warehouses && !Array.isArray(warehouses))) {
+  if (
+    username === "" ||
+    role === "" ||
+    (warehouses && !Array.isArray(warehouses))
+  ) {
     return res.status(400).json({ message: "Invalid input" });
   }
 
-  if (role && !['owner', 'manager', 'staff', 'outlet', 'supplier'].includes(role)) {
+  if (
+    role &&
+    !["owner", "manager", "staff", "outlet", "supplier"].includes(role)
+  ) {
     return res.status(400).json({ message: "Invalid role type" });
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     res.status(200).json(updatedUser);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-}
+};
 
 const removeUser = async (req, res) => {
   if (!req.params.id) {
@@ -213,11 +221,11 @@ const removeUser = async (req, res) => {
 
   try {
     await User.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'User deleted successfully' });
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-}
+};
 
 const verifyUser = async (req, res) => {
   // Again, validation is minimal since we're updating based on ID
@@ -225,12 +233,16 @@ const verifyUser = async (req, res) => {
     return res.status(400).json({ message: "Invalid User ID" });
   }
 
-  if (req.body.status !== 'accepted' || req.body.status !== 'rejected') {
+  if (req.body.status !== "accepted" || req.body.status !== "rejected") {
     return res.status(400).json({ message: "Invalid status" });
   }
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    );
     res.status(200).json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -246,18 +258,16 @@ const listUsers = async (req, res) => {
   }
 };
 
-
 const getSingleUser = async (req, res) => {
-
   // Validate the user ID
   if (!req.params.id) {
-    return res.status(400).json({ message: 'Invalid ID' });
+    return res.status(400).json({ message: "Invalid ID" });
   }
 
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json(user);
   } catch (err) {
@@ -267,8 +277,7 @@ const getSingleUser = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   res.json({ user: req.user });
-}
-
+};
 
 module.exports = {
   login,
@@ -281,5 +290,5 @@ module.exports = {
   verifyUser,
   listUsers,
   getSingleUser,
-  getCurrentUser
+  getCurrentUser,
 };
