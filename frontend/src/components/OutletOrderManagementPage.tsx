@@ -19,8 +19,6 @@ const OutletOrderManagement = () => {
   const [orders, setOrders] = useState<IOutletOrder[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<IOutletOrder | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorText, setErrorText] = useState<string | null>("");
 
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
@@ -77,7 +75,7 @@ const OutletOrderManagement = () => {
       title: "User",
       dataIndex: "user.username",
       key: "user",
-      render: (text: string, record: IOutletOrder) => {
+      render: (_text: string, record: IOutletOrder) => {
         return `${record.user.username ?? "N/A"} - ${record.user.role}`;
       },
     },
@@ -90,7 +88,7 @@ const OutletOrderManagement = () => {
       title: "No. Products",
       dataIndex: "products.length",
       key: "productsNo",
-      render: (text: string, record: IOutletOrder) => {
+      render: (_text: string, record: IOutletOrder) => {
         const tooltipContent = record.products
           .map(
             (prod: IProductOrder) => `${prod.product.barcode}: ${prod.quantity}`
@@ -139,7 +137,6 @@ const OutletOrderManagement = () => {
   };
 
   const handleOk = async () => {
-    setLoading(true);
     try {
       await form.validateFields();
       const values = form.getFieldsValue() as IOutletOrder;
@@ -159,9 +156,7 @@ const OutletOrderManagement = () => {
       await init();
       setIsModalVisible(false);
     } catch (error: any) {
-      setErrorText(error.message ?? "An error occurred!");
     } finally {
-      setLoading(false);
     }
   };
 
