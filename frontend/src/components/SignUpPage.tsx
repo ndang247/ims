@@ -28,14 +28,14 @@ const SignupPage: React.FC = () => {
     console.log("Received values of form:", values);
     // Perform your signup logic here
     try {
-      const { username, password, confirmPassword, role, warehouse } = values;
+      const { fullname, username, password, confirmPassword, role, abn, address, phone, email, warehouse } = values;
 
       if (password !== confirmPassword) {
         message.error("Passwords do not match");
         return;
       }
 
-      await postSignUp(username, password, role, [warehouse]);
+      await postSignUp(fullname, username, password, role, email, phone, abn, address, [warehouse]);
 
       message.success(
         "Successfully signed up! Please wait for admin to review your account."
@@ -63,11 +63,17 @@ const SignupPage: React.FC = () => {
           initialValues={{ remember: true }}
           onFinish={onFinish}
         >
+          <Form.Item name="fullname">
+            <Input placeholder="Full Name" />
+          </Form.Item>
           <Form.Item
             name="username"
             rules={[{ required: true, message: "Please input your Username!" }]}
           >
             <Input placeholder="Username" />
+          </Form.Item>
+          <Form.Item name="email">
+            <Input placeholder="Email" />
           </Form.Item>
 
           <Form.Item
@@ -92,6 +98,15 @@ const SignupPage: React.FC = () => {
               <Option value="supplier">Supplier</Option>
             </Select>
           </Form.Item>
+          <Form.Item name="address">
+            <Input placeholder="Address" />
+          </Form.Item>
+          <Form.Item name="phone">
+            <Input placeholder="Phone Number" />
+          </Form.Item>
+          <Form.Item name="abn">
+            <Input placeholder="ABN number" />
+          </Form.Item>
 
           {/* <Form.Item
             name="warehouse"
@@ -115,15 +130,6 @@ const SignupPage: React.FC = () => {
             >
               Sign up
             </Button>
-            {/* <Button
-              style={{ width: "100%", marginTop: 10 }}
-              type="default"
-              onClick={() => {
-                window.location.href = "/login";
-              }}
-            >
-              Login
-            </Button> */}
           </Form.Item>
         </Form>
       </Card>

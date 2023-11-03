@@ -101,10 +101,15 @@ export interface ILogin {
 
 // Sign Up
 export interface ISignUp {
+  fullname: string;
   username: string;
   password: string;
   confirmPassword: string;
   role: string;
+  abn: string;
+  address: string;
+  phone: string;
+  email: string;
   warehouse: string;
 }
 //
@@ -138,10 +143,15 @@ export interface IOutletOrder {
 // User
 export interface IUser {
   _id: null;
+  fullname: string;
   username: string;
   password: string;
   role: string;
   status: string;
+  abn: string;
+  address: string;
+  phone: string;
+  email: string;
   warehouses: string[];
 }
 //
