@@ -216,7 +216,7 @@ export class User {
   static async listUsers() {
     try {
       const response = await api.get(`/users`);
-      return response.data as IUser[];
+      return response.data.users as IUser[];
     } catch (error) {
       console.log(error);
       throw error;
@@ -270,7 +270,7 @@ export class OutletOrder {
   static async getManyOutletOrders() {
     try {
       const response = await api.get("/outlet/orders");
-      return response.data as IOutletOrder[];
+      return response.data.orders as IOutletOrder[];
     } catch (error: any) {
       throw error.response.data;
     }
