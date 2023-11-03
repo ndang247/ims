@@ -1,7 +1,7 @@
 .grid-container {
   display: grid;
   grid-template-columns: 1fr 1fr; /* Two columns */
-  gap: 16px;                      /* Gap between grid items */
+  gap: 16px; /* Gap between grid items */
 }
 
 .grid-item {

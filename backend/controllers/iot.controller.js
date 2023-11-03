@@ -5,7 +5,6 @@ const Product = require("../models/product.model");
 const Inbound = require("../models/inbound.model");
 
 const { errorLogger } = require("../debug/debug");
-
 const { fetchUPCData } = require("../services/upc");
 
 const DEFAULT_WAREHOUSE_ID = "650041c789d9fbf5b33516ca";
@@ -20,7 +19,7 @@ const updateInventory = async (req, res) => {
 
   const { tagID, status } = latestReceivedProduct.value;
 
-  console.log("Updating inventory: ", tagID, status);
+  console.log("Updating inventory:", tagID, status);
 
   // Get the tag
   const tag = await RFID.findOne({ id: tagID, ref_object: "Parcel" });
@@ -29,7 +28,7 @@ const updateInventory = async (req, res) => {
   if (!tag) {
     return res
       .status(404)
-      .send({ status: "Not Found", error: "Tag not found" });
+      .json({ status: "Not Found", error: "Tag not found" });
   }
 
   // Get the parcel using ref_id from the tag object
@@ -40,7 +39,7 @@ const updateInventory = async (req, res) => {
   parcel.status = status ?? "in_warehouse";
   parcel.warehouse = DEFAULT_WAREHOUSE_ID;
   await parcel.save();
-  console.log("Save parcel sucessfully: ", parcel);
+  console.log("Save parcel sucessfully:", parcel);
 
   // If status is turned into out_for_delivery or archived
   if (
@@ -53,7 +52,7 @@ const updateInventory = async (req, res) => {
     if (!inventory) {
       return res
         .status(404)
-        .send({ status: "Not Found", message: "Inventory not found" });
+        .json({ status: "Not Found", message: "Inventory not found" });
     }
 
     // Deduct parcel_quantity by 1
@@ -74,7 +73,7 @@ const postInboundProcess = async (req, res) => {
   let { sensor, role, value } = req.body;
   let { tagID } = value;
 
-  console.log("Perform post inbound: ", req.body);
+  console.log("Perform post inbound:", req.body);
 
   latestReceivedProduct = {
     ...req.body,
@@ -96,7 +95,7 @@ const postInboundProcess = async (req, res) => {
   if (!inbound) {
     return res
       .status(400)
-      .send({ status: "Not Found", error: "No inbound process found" });
+      .son({ status: "Not Found", error: "No inbound process found" });
   }
 
   const barcode = inbound.barcode_input;
@@ -104,23 +103,23 @@ const postInboundProcess = async (req, res) => {
   if (!barcode) {
     return res
       .status(400)
-      .send({ status: "Not Found", error: "Barcode inbound is required" });
+      .json({ status: "Not Found", error: "Barcode inbound is required" });
   }
 
   let product = await Product.findOne({ barcode: barcode });
 
   if (!product) {
     try {
-      console.log("Creating product. No product found with barcode: ", barcode);
+      console.log("Creating product. No product found with barcode:", barcode);
       // Get product from UPC database
       const upcData = await fetchUPCData(barcode);
       if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
         return res
           .status(400)
-          .send({ status: "Not Found", error: "Invalid barcode" });
+          .json({ status: "Not Found", error: "Invalid barcode" });
       }
       const upcItemData = upcData;
-      console.log(`Get barcode ${barcode} from UPC database: `, upcItemData);
+      console.log(`Get barcode ${barcode} from UPC database:`, upcItemData);
 
       // If product doesn't exist, create a new Product and Inventory
       product = new Product({
@@ -139,13 +138,13 @@ const postInboundProcess = async (req, res) => {
 
       await Promise.all([product.save(), inventory.save()]);
     } catch (error) {
-      console.log("Error when creating new product: ", error);
+      console.log("Error when creating new product:", error);
       errorLogger("iot.controller", "postInboundProcess").error({
         message: error,
       });
       return res
         .status(500)
-        .send({ status: "Error", error: "Error when creating new product" });
+        .json({ status: "Error", error: "Error when creating new product" });
     }
   }
 
@@ -160,7 +159,7 @@ const postInboundProcess = async (req, res) => {
   });
 
   // Create a new Tag
-  console.log(`Create a new tag: `, tagID);
+  console.log(`Create a new tag:`, tagID);
   const tag = new RFID({
     id: tagID,
     ref_id: parcel._id,
@@ -179,32 +178,32 @@ const postInboundProcess = async (req, res) => {
   await inventory.save();
 
   console.log(
-    "Sucessfully process inbound data from IoT: ",
+    "Sucessfully process inbound data from IoT:",
     latestReceivedProduct
   );
-  console.log("Parcel with Product: ", product.barcode);
+  console.log("Parcel with Product:", product.barcode);
 
   res
     .status(200)
-    .send({ status: "Success", message: "Data processed successfully" });
+    .json({ status: "Success", message: "Data processed successfully" });
 };
 
 const getIoTHome = (req, res) => {
-  res.sendFile(__dirname + "/iot.html");
+  res.jsonFile(__dirname + "/iot.html");
 };
 
 const getInboundStream = async (req, res) => {
-  console.log("Data stream running: ", latestReceivedProduct);
+  console.log("Data stream running:", latestReceivedProduct);
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
-  const sendUpdate = () => {
+  const jsonUpdate = () => {
     res.write(`data: ${JSON.stringify(latestReceivedProduct)}\n\n`);
   };
 
-  const intervalId = setInterval(sendUpdate, 3000); // Send updates every 3 seconds
+  const intervalId = setInterval(jsonUpdate, 3000); // json updates every 3 seconds
 
   req.on("close", () => {
     clearInterval(intervalId);

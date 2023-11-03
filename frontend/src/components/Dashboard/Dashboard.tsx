@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Breadcrumb, theme } from "antd";
-import './Dashboard.css'
-
-type DashboardData = {
-  numberOfProducts: number;
-  totalInventory: number;
-  lowQuantityStocks: number;
-  recentUpdateItem: [];
-}
+import { IDashboardData } from "@src/types";
+import "./Dashboard.css";
 
 const Dashboard: React.FC = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const [dashboardData, setDashboardData] = useState<DashboardData>({
+  const [dashboardData, setDashboardData] = useState<IDashboardData>({
     numberOfProducts: 0,
     totalInventory: 0,
     lowQuantityStocks: 0,
@@ -22,18 +16,22 @@ const Dashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    const eventSource = new EventSource(`http://localhost:8080/api/v1/stream/dashboard?token=${localStorage.getItem('token')}`);
+    const eventSource = new EventSource(
+      `https://ims-be.onrender.com/api/v1/stream/dashboard?token=${localStorage.getItem(
+        "token"
+      )}`
+    );
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data) {
-        console.log('Receive dashboard data', data);
+        console.log("Receive dashboard data", data);
         setDashboardData({
           numberOfProducts: data.totalProducts,
           totalInventory: data.totalInventory,
           lowQuantityStocks: data.lowQuantityStocks,
           recentUpdateItem: data.recentUpdateItem,
-        })
+        });
       }
       // Update your frontend state here
     };
@@ -42,7 +40,7 @@ const Dashboard: React.FC = () => {
       console.error("EventSource failed:", error);
       eventSource.close();
     };
-  }, [])
+  }, []);
 
   return (
     <>
@@ -69,9 +67,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="grid-item">Low Quantity Stocks:</div>
         </div>
-        <div>
-          Recent Update Item
-        </div>
+        <div>Recent Update Item</div>
       </div>
     </>
   );

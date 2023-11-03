@@ -1,6 +1,4 @@
 const OutletOrder = require("../models/outlet_order.model");
-const Inventory = require("../models/inventory.model");
-const mongoose = require("mongoose");
 
 const outletOrderController = {
   // Create new Outlet Order
@@ -18,9 +16,15 @@ const outletOrderController = {
       });
 
       const savedOrder = await newOrder.save();
-      res.status(201).json(savedOrder);
+      res.status(201).json({
+        status: "Success",
+        savedOrder,
+      });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({
+        status: "Error",
+        error: error.message,
+      });
     }
   },
 
@@ -38,12 +42,21 @@ const outletOrderController = {
       );
 
       if (!updatedOrder) {
-        return res.status(404).json({ error: "Order not found" });
+        return res.status(404).json({
+          status: "Not Found",
+          error: "Order not found",
+        });
       }
 
-      res.status(200).json(updatedOrder);
+      res.status(200).json({
+        status: "Success",
+        updatedOrder,
+      });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({
+        status: "Error",
+        error: error.message,
+      });
     }
   },
 
@@ -136,12 +149,21 @@ const outletOrderController = {
         .populate("products.product");
 
       if (!order) {
-        return res.status(404).json({ error: "Order not found" });
+        return res.status(404).json({
+          status: "Not Found",
+          error: "Order not found",
+        });
       }
 
-      res.status(200).json(order);
+      res.status(200).json({
+        status: "Success",
+        order,
+      });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({
+        status: "Error",
+        error: error.message,
+      });
     }
   },
 
@@ -170,9 +192,15 @@ const outletOrderController = {
         return orderObject;
       });
 
-      res.status(200).json(transformedOrders);
+      res.status(200).json({
+        status: "Success",
+        orders: transformedOrders,
+      });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({
+        status: "Error",
+        error: error.message,
+      });
     }
   },
 
@@ -183,12 +211,21 @@ const outletOrderController = {
       const deletedOrder = await OutletOrder.findByIdAndDelete(id);
 
       if (!deletedOrder) {
-        return res.status(404).json({ error: "Order not found" });
+        return res.status(404).json({
+          staus: "Not Found",
+          error: "Order not found",
+        });
       }
 
-      res.status(200).json({ message: "Order deleted successfully" });
+      res.status(200).json({
+        staus: "Success",
+        message: "Order deleted successfully",
+      });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({
+        staus: "Error",
+        error: error.message,
+      });
     }
   },
 };
