@@ -81,7 +81,7 @@ const getParcels = async (req, res) => {
       });
     }
 
-    console.log("Warehouse ID: ", warehouse_id);
+    console.log("Warehouse ID:", warehouse_id);
     console.log(new mongoose.Types.ObjectId(warehouse_id));
 
     // Construct the aggregation pipeline

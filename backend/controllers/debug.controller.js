@@ -9,7 +9,7 @@ const { generateValidUPC } = require("./debug.controller.helper");
 const DEFAULT_WAREHOUSE_ID = "650041c789d9fbf5b33516ca";
 
 async function addData() {
-  console.log("Add parcels: ", DEFAULT_WAREHOUSE_ID);
+  console.log("Add parcels:", DEFAULT_WAREHOUSE_ID);
 
   const NO_PRODUCTS = 5;
   const NO_PARCELS = 5;
@@ -20,7 +20,7 @@ async function addData() {
       // Create and save product
       let product = await Product.findOne({ barcode: upc.upc });
 
-      console.log("Product: ", product);
+      console.log("Product:", product);
       if (product) continue;
 
       product = new Product({

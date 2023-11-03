@@ -75,7 +75,7 @@ const InboundPage: React.FC = () => {
       await postInboundBarcode(inputValue);
 
       const response = await getCurrentInbound();
-      console.log("Get reponse input after: ", response);
+      console.log("Get reponse input after:", response);
       if (response.data && response.data.barcode_input) {
         console.log("Set input");
         setCurrentBarcode(response.data.barcode_input);

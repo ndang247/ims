@@ -65,7 +65,7 @@ const createProduct = async (req, res) => {
 const getProduct = async (req, res) => {
   const { id } = req.query;
 
-  console.log("Get product: ", id);
+  console.log("Get product:", id);
   let product = await Product.findById(id);
 
   if (!product) {

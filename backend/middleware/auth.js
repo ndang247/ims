@@ -12,7 +12,7 @@ function authenticateJWT(req, res, next) {
       error: "Unauthorized",
     });
 
-  console.log("JWT KW: ", process.env.JWT_KEY);
+  console.log("JWT KW:", process.env.JWT_KEY);
 
   jwt.verify(token, process.env.JWT_KEY, (err, user) => {
     if (err) return res.sendStatus(403);
