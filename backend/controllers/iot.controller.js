@@ -28,7 +28,7 @@ const updateInventory = async (req, res) => {
   if (!tag) {
     return res
       .status(404)
-      .send({ status: "Not Found", error: "Tag not found" });
+      .json({ status: "Not Found", error: "Tag not found" });
   }
 
   // Get the parcel using ref_id from the tag object
@@ -52,7 +52,7 @@ const updateInventory = async (req, res) => {
     if (!inventory) {
       return res
         .status(404)
-        .send({ status: "Not Found", message: "Inventory not found" });
+        .json({ status: "Not Found", message: "Inventory not found" });
     }
 
     // Deduct parcel_quantity by 1
@@ -95,7 +95,7 @@ const postInboundProcess = async (req, res) => {
   if (!inbound) {
     return res
       .status(400)
-      .send({ status: "Not Found", error: "No inbound process found" });
+      .son({ status: "Not Found", error: "No inbound process found" });
   }
 
   const barcode = inbound.barcode_input;
@@ -103,7 +103,7 @@ const postInboundProcess = async (req, res) => {
   if (!barcode) {
     return res
       .status(400)
-      .send({ status: "Not Found", error: "Barcode inbound is required" });
+      .json({ status: "Not Found", error: "Barcode inbound is required" });
   }
 
   let product = await Product.findOne({ barcode: barcode });
@@ -116,7 +116,7 @@ const postInboundProcess = async (req, res) => {
       if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
         return res
           .status(400)
-          .send({ status: "Not Found", error: "Invalid barcode" });
+          .json({ status: "Not Found", error: "Invalid barcode" });
       }
       const upcItemData = upcData;
       console.log(`Get barcode ${barcode} from UPC database: `, upcItemData);
@@ -144,7 +144,7 @@ const postInboundProcess = async (req, res) => {
       });
       return res
         .status(500)
-        .send({ status: "Error", error: "Error when creating new product" });
+        .json({ status: "Error", error: "Error when creating new product" });
     }
   }
 
@@ -185,11 +185,11 @@ const postInboundProcess = async (req, res) => {
 
   res
     .status(200)
-    .send({ status: "Success", message: "Data processed successfully" });
+    .json({ status: "Success", message: "Data processed successfully" });
 };
 
 const getIoTHome = (req, res) => {
-  res.sendFile(__dirname + "/iot.html");
+  res.jsonFile(__dirname + "/iot.html");
 };
 
 const getInboundStream = async (req, res) => {
@@ -199,11 +199,11 @@ const getInboundStream = async (req, res) => {
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
-  const sendUpdate = () => {
+  const jsonUpdate = () => {
     res.write(`data: ${JSON.stringify(latestReceivedProduct)}\n\n`);
   };
 
-  const intervalId = setInterval(sendUpdate, 3000); // Send updates every 3 seconds
+  const intervalId = setInterval(jsonUpdate, 3000); // json updates every 3 seconds
 
   req.on("close", () => {
     clearInterval(intervalId);

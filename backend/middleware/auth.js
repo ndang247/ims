@@ -7,7 +7,8 @@ function authenticateJWT(req, res, next) {
     req.header("x-access-token");
 
   if (!token)
-    return res.status(401).send({
+    return res.status(401).json({
+      status: "Error",
       error: "Unauthorized",
     });
 
@@ -16,7 +17,8 @@ function authenticateJWT(req, res, next) {
   jwt.verify(token, process.env.JWT_KEY, (err, user) => {
     if (err) return res.sendStatus(403);
     if (user.status === "pending") {
-      return res.status(401).send({
+      return res.status(401).json({
+        status: "Not Found",
         error: "User is pending. Please contact admin.",
       });
     }
@@ -31,7 +33,8 @@ function authenticateJWT(req, res, next) {
 function enableRoleAccess(roles) {
   return (req, res, next) => {
     if (!roles.includes(req.user.role))
-      return res.status(403).send({
+      return res.status(403).json({
+        staus: "Error",
         error: "Forbidden",
       });
     next();

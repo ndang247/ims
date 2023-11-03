@@ -20,7 +20,7 @@ const postInboundBarcode = async (req, res) => {
       if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
         return res
           .status(400)
-          .send({ status: "Not Found", error: "Invalid barcode" });
+          .json({ status: "Not Found", error: "Invalid barcode" });
       }
       const upcItemData = upcData;
       console.log(`Get barcode ${barcode} from UPC database: `, upcItemData);
@@ -46,7 +46,7 @@ const postInboundBarcode = async (req, res) => {
       errorLogger("inbound.controller", "postInboundBarcode").error({
         message: error,
       });
-      return res.status(500).send({
+      return res.status(500).json({
         status: "Error",
         error: "Error when creating new product",
       });
@@ -82,7 +82,7 @@ const getInbound = async (req, res) => {
   if (!warehouse_id) {
     return res
       .status(400)
-      .send({ status: "Not Found", error: "Warehouse is required" });
+      .json({ status: "Not Found", error: "Warehouse is required" });
   }
 
   let inbound = await Inbound.findOne({
@@ -90,14 +90,14 @@ const getInbound = async (req, res) => {
   });
 
   if (!inbound) {
-    return res.status(200).send({ status: "Success", data: null });
+    return res.status(200).json({ status: "Success", data: null });
   }
 
   const upcData = await fetchUPCData(inbound.barcode_input);
   if (upcData.code.toLowerCase() !== "ok" && upcData.total !== 0) {
     return res
       .status(400)
-      .send({ status: "Not Found", error: "Invalid barcode" });
+      .json({ status: "Not Found", error: "Invalid barcode" });
   }
 
   inbound = {

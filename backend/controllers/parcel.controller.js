@@ -75,7 +75,10 @@ const getParcels = async (req, res) => {
     const { warehouse_id, product_id } = req.query;
 
     if (!warehouse_id) {
-      return res.status(400).send({ message: "Warehouse ID is required" });
+      return res.status(400).json({
+        status: "Error",
+        message: "Warehouse ID is required",
+      });
     }
 
     console.log("Warehouse ID: ", warehouse_id);

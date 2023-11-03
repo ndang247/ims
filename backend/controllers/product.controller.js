@@ -25,7 +25,10 @@ const createProduct = async (req, res) => {
     // Get product data from UPC API
     const data = await fetchUPCData(barcode);
     if (data.code.toLowerCase() !== "ok" && data.total !== 0) {
-      return res.status(400).send({ message: "Invalid barcode" });
+      return res.status(400).json({
+        status: "Error",
+        message: "Invalid barcode",
+      });
     }
 
     const upc_data = JSON.stringify(data.items[0]);
@@ -68,7 +71,7 @@ const getProduct = async (req, res) => {
   if (!product) {
     product = await Product.findOne({ barcode: id });
     if (!product) {
-      res.status(400).send({
+      res.status(400).json({
         status: "Error",
         error: error.message,
         message: "Product not found",
@@ -130,7 +133,7 @@ const getProducts = async (req, res) => {
     if (!warehouseID) {
       return res
         .status(400)
-        .send({ status: "Error", message: "Warehouse ID is required" });
+        .json({ status: "Error", message: "Warehouse ID is required" });
     }
 
     const pipeline = [
@@ -195,14 +198,14 @@ const getProducts = async (req, res) => {
     } catch (error) {
       res
         .status(500)
-        .send({ status: "Error", message: "Unable to get products." });
+        .json({ status: "Error", message: "Unable to get products." });
     }
   } catch (error) {
     console.error("Error:", error);
     errorLogger("product.controller", "getProducts").error({
       message: error,
     });
-    res.status(500).send({
+    res.status(500).json({
       status: "Error",
       error: error.message,
       message: "Internal Server Error",

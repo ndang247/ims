@@ -121,7 +121,10 @@ const removeAllParcelsForAProduct = async (req, res) => {
     const { id: product_id } = req.params;
 
     if (!product_id) {
-      return res.status(400).send({ message: "Product ID is required" });
+      return res.status(400).json({
+        status: "Error",
+        message: "Product ID is required",
+      });
     }
     const parcels = await Parcel.find({ product: product_id });
 
@@ -144,8 +147,8 @@ const removeAllParcelsForAProduct = async (req, res) => {
       });
       res.status(500).json({
         status: "Error",
-        error: error.message,
         message: "Unable to delete parcels and RFIDs",
+        error: error.message,
       });
     }
 
@@ -170,7 +173,10 @@ const generateParcelsToProducts = async (req, res) => {
   const { no_parcels } = req.body;
 
   if (!product_id) {
-    res.status(400).send({ message: "Product ID is required" });
+    res.status(400).json({
+      status: "Error",
+      message: "Product ID is required",
+    });
   }
 
   let NO_PARCELS = no_parcels ?? 5;
