@@ -17,7 +17,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `http://localhost:8080/api/v1/stream/dashboard?token=${localStorage.getItem(
+      `https://ims-be.onrender.com/api/v1/stream/dashboard?token=${localStorage.getItem(
         "token"
       )}`
     );

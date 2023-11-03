@@ -29,7 +29,7 @@ const ProductDetails: React.FC = () => {
       return;
     }
     const eventSource = new EventSource(
-      `http://localhost:8080/api/v1/stream/inventory/${
+      `https://ims-be.onrender.com/api/v1/stream/inventory/${
         product.barcode
       }?token=${localStorage.getItem("token")}`
     );

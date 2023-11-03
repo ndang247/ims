@@ -25,7 +25,7 @@ const InboundPage: React.FC = () => {
       return;
     }
     const eventSource = new EventSource(
-      `http://localhost:8080/api/v1/stream/inventory/${currentBarcode}?token=${localStorage.getItem(
+      `https://ims-be.onrender.com/api/v1/stream/inventory/${currentBarcode}?token=${localStorage.getItem(
         "token"
       )}`
     );

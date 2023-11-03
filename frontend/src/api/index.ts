@@ -2,7 +2,7 @@ import axios from "axios";
 import { IOutletOrder, IUser } from "../types";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: "https://ims-be.onrender.com/api/v1",
   headers: {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
@@ -147,7 +147,7 @@ export const getWarehouses = async () => {
 
 export const getInventoryStream = async (barcode: string) => {
   const eventSource = new EventSource(
-    `http://localhost:8080/api/v1/inventory/${barcode}/stream`
+    `https://ims-be.onrender.com/api/v1/inventory/${barcode}/stream`
   );
 
   eventSource.onmessage = (event) => {
