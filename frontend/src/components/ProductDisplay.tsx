@@ -19,6 +19,13 @@ const ProductDisplay: React.FC<IProductDisplayProps> = ({
                 <img
                   alt={product.upc_data.items[0].title}
                   src={product.upc_data.items[0].images[0]}
+                  // make image align center
+                  style={{
+                    objectFit: "cover",
+                    height: "auto",
+                    width: "auto",
+                    margin: "auto",
+                  }}
                 />
               }
               bordered={false}
