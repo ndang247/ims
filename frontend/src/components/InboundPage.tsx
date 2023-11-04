@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Breadcrumb, Tooltip, Spin } from "antd";
+import { Button, Input, Breadcrumb, Tooltip, Spin, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { postInboundBarcode, getCurrentInbound } from "../api";
 import { ICurrentBarcodeData, IInventory } from "@src/types";
@@ -31,9 +31,11 @@ const InboundPage: React.FC = () => {
     );
 
     eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      let data = JSON.parse(event.data);
       if (data) {
         console.log("Receive inventory data", data);
+        const datetimeupdated = new Date(data.datetimeupdated).toLocaleString();
+        data = { ...data, datetimeupdated };
         setCurrentInventory(data);
         setLastFetched(new Date());
       }
@@ -69,6 +71,7 @@ const InboundPage: React.FC = () => {
       setLoading(true);
       setErrorText("");
       if (inputValue.toLocaleLowerCase().trim() === "") {
+        message.error("Please enter a barcode");
         return;
       }
       console.log(inputValue);
@@ -85,8 +88,8 @@ const InboundPage: React.FC = () => {
 
       setInputValue("");
     } catch (error: any) {
-      if (error?.response?.data?.message) {
-        setErrorText(error?.response?.data?.message);
+      if (error?.response?.data?.error) {
+        setErrorText(error?.response?.data?.error);
       }
     } finally {
       setLoading(false);
@@ -115,6 +118,7 @@ const InboundPage: React.FC = () => {
               border: "1px solid green",
               borderRadius: "5px",
               color: "green",
+              padding: "2px 5px",
             }}
           >
             Live
@@ -129,15 +133,14 @@ const InboundPage: React.FC = () => {
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "end",
+            alignItems: "flex-end",
             flexDirection: "column",
             color: "gray",
             fontSize: "12px",
           }}
         >
           <span>Last Updated: {currentInventory?.datetimeupdated}</span>
-          <span>Last Fetched: {lastFetched?.toISOString()} </span>
+          <span>Last Fetched: {lastFetched?.toLocaleString()} </span>
         </div>
       </div>
       <h5 className="mt-2">
@@ -168,7 +171,6 @@ const InboundPage: React.FC = () => {
         className="my-2"
         type="primary"
         onClick={handleButtonClick}
-        style={{}}
         disabled={loading}
       >
         {loading && <Spin />}
