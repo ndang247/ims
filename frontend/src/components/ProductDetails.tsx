@@ -58,34 +58,15 @@ const ProductDetails: React.FC = () => {
       const res = await getProductByID(id);
 
       // Format the date component as "dd/mm/yyyy"
-      const datetimecreated = new Date(res.product.datetimecreated);
-      const formattedDate = `${datetimecreated
-        .getDate()
-        .toString()
-        .padStart(2, "0")}/${(datetimecreated.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}/${datetimecreated.getFullYear()}`;
-
-      // Format the time component as "hh:mm:ss AM/PM"
-      const hours = datetimecreated.getHours() % 12 || 12; // Convert to 12-hour format
-      const amPm = datetimecreated.getHours() < 12 ? "AM" : "PM";
-      const formattedTime = `${hours
-        .toString()
-        .padStart(2, "0")}:${datetimecreated
-        .getMinutes()
-        .toString()
-        .padStart(2, "0")}:${datetimecreated
-        .getSeconds()
-        .toString()
-        .padStart(2, "0")} ${amPm}`;
-
-      // Combine the formatted date and time components
-      const formattedDateTime = `${formattedDate}, ${formattedTime}`;
+      const datetimecreated = new Date(
+        res.product.datetimecreated
+      ).toLocaleString();
 
       setProduct({
         ...res.product,
-        datetimecreated: formattedDateTime,
+        datetimecreated,
       });
+      console.log(product);
     } catch (error) {
       message.error("Failed to get product. Please try again!");
     } finally {
@@ -151,17 +132,11 @@ const ProductDetails: React.FC = () => {
             <Loading description="Please wait while we load the products." />
           )}
 
-        {Object.keys(product).length > 0 &&
-          Object.keys(groupedParcels).length > 0 &&
-          !loading && (
+        {Object.keys(product).length > 0 && !loading && (
+          <>
             <div>
               <h4>{product.upc_data.items[0].title}</h4>
             </div>
-          )}
-
-        {Object.keys(product).length > 0 &&
-          Object.keys(groupedParcels).length > 0 &&
-          !loading && (
             <Tabs
               defaultActiveKey="1"
               items={[
@@ -234,7 +209,6 @@ const ProductDetails: React.FC = () => {
                           </tbody>
                         </table>
                       </div>
-
                       <br />
                       <div>
                         <h5>Stock Locations</h5>
@@ -246,12 +220,13 @@ const ProductDetails: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {Object.keys(groupedParcels).map((key) => (
-                              <tr key={key}>
-                                <td>{key}</td>
-                                <td>{groupedParcels[key].length}</td>
-                              </tr>
-                            ))}
+                            {Object.keys(groupedParcels).length > 0 &&
+                              Object.keys(groupedParcels).map((key) => (
+                                <tr key={key}>
+                                  <td>{key}</td>
+                                  <td>{groupedParcels[key].length}</td>
+                                </tr>
+                              ))}
                           </tbody>
                         </table>
                       </div>
@@ -263,7 +238,7 @@ const ProductDetails: React.FC = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <div
+                      {/* <div
                         style={{
                           textAlign: "center",
                           background: `url(${product?.upc_data?.items[0]?.images[0]}) lightgray 50% / cover no-repeat`,
@@ -273,7 +248,18 @@ const ProductDetails: React.FC = () => {
                           height: "50%",
                           width: "80%",
                         }}
-                      ></div>
+                      ></div> */}
+                      <img
+                        src={product?.upc_data?.items[0]?.images[0]}
+                        alt={product?.upc_data?.items[0]?.title}
+                        style={{
+                          border: "2px dashed #9D9D9D",
+                          boxSizing: "border-box",
+                          padding: "30px",
+                          height: "auto",
+                          width: "auto",
+                        }}
+                      />
                     </div>
                   </div>
                 ),
@@ -289,19 +275,21 @@ const ProductDetails: React.FC = () => {
                           border: "1px solid green",
                           borderRadius: "5px",
                           color: "green",
+                          padding: "0.2rem 0.5rem",
                         }}
                       >
                         Live
                       </span>
                     </span>
                     <span>Inventory: {currentInventory?.parcel_quantity}</span>
-                    <span>{lastFetched?.toLocaleString()}</span>
+                    <span>Last Fetched: {lastFetched?.toLocaleString()}</span>
                   </div>
                 ),
               ]}
               onChange={onChange}
             />
-          )}
+          </>
+        )}
       </div>
     </>
   );
