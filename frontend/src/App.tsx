@@ -48,8 +48,7 @@ const App = () => {
   if (
     !currentUser ||
     accountStatus === "pending" ||
-    accountStatus === "rejected" ||
-    accountStatus === ""
+    accountStatus === "rejected"
   ) {
     return (
       <div className="container">
