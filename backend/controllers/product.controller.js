@@ -138,18 +138,6 @@ const getProducts = async (req, res) => {
 
     const pipeline = [
       {
-        $match: {
-          // Filter by warehouse id
-          warehouse: new mongoose.Types.ObjectId(warehouseID),
-        },
-      },
-      {
-        $group: {
-          // Group the results by product ID to give you distinct product IDs.
-          _id: "$product",
-        },
-      },
-      {
         $lookup: {
           from: "products",
           localField: "_id",
@@ -182,7 +170,7 @@ const getProducts = async (req, res) => {
     ];
 
     try {
-      let products = await Parcel.aggregate(pipeline);
+      let products = await Product.aggregate(pipeline);
       products = products.map((product) => {
         let upc_json = {};
         if (product.upc_data) {
