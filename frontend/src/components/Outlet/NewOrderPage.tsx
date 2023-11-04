@@ -75,7 +75,6 @@ const NewOrderPage = () => {
   const columns = [
     {
       title: "Product Name",
-      dataIndex: "upc_data.items[0].title",
       key: "title",
       render: (record: IProduct) => {
         return record.upc_data?.items[0]?.title || "-";
@@ -102,7 +101,12 @@ const NewOrderPage = () => {
   ];
 
   return (
-    <div>
+    <div
+      style={{
+        padding: 15,
+        height: "50%",
+      }}
+    >
       <h2>Create New Order</h2>
       <TextArea
         showCount
