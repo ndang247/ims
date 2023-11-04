@@ -9,6 +9,7 @@ const { Option } = Select;
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+  const [isOutlet, setIsOutlet] = useState(false);
   const [warehouses, setWarehouses] = useState<IWarehouse[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -69,6 +70,10 @@ const UserManagement: React.FC = () => {
     },
   ];
 
+  const handleRoleChanged = (value: string) => {
+    setIsOutlet(value === "outlet");
+  }
+
   const isUserSelected = useMemo(() => {
     console.log("User changed", !!selectedUser?._id);
     return !!selectedUser?._id;
@@ -80,9 +85,14 @@ const UserManagement: React.FC = () => {
 
     if (record._id) {
       form.setFieldsValue({
+        fullname: record.fullname ?? record.username,
         username: record.username,
         role: record.role,
         status: record.status,
+        abn: record.abn,
+        address: record.address,
+        email: record.email,
+        phone: record.phone,
         warehouse: record.warehouses[0],
       });
     }
@@ -108,7 +118,7 @@ const UserManagement: React.FC = () => {
 
   const handleOk = async () => {
     setLoading(true);
-    const { username, password, role, status, warehouse } =
+    const { fullname, username, password, role, status, warehouse, abn, address, email, phone } =
       form.getFieldsValue();
 
     console.log("Handle ok", form.getFieldsValue());
@@ -124,10 +134,15 @@ const UserManagement: React.FC = () => {
 
       const values = {
         _id: null,
+        fullname,
         username,
         role,
         password,
         status,
+        abn,
+        address,
+        email,
+        phone,
         warehouses: [warehouse],
       };
 
@@ -161,6 +176,7 @@ const UserManagement: React.FC = () => {
     setIsModalVisible(false);
     setLoading(false);
     setErrorText("");
+    setIsOutlet(false);
   };
 
   return (
@@ -234,6 +250,9 @@ const UserManagement: React.FC = () => {
           layout="vertical"
           initialValues={{ role: "manager", status: "pending" }}
         >
+          <Form.Item label="Full Name" name="fullname">
+            <Input />
+          </Form.Item>
           <Form.Item label="Username" name="username" required>
             <Input />
           </Form.Item>
@@ -244,7 +263,7 @@ const UserManagement: React.FC = () => {
           )}
 
           <Form.Item label="Role" name="role" required>
-            <Select>
+            <Select onChange={handleRoleChanged}>
               <Option value="manager">Manager</Option>
               <Option value="owner">Owner</Option>
               <Option value="staff">Staff</Option>
@@ -269,6 +288,22 @@ const UserManagement: React.FC = () => {
                 );
               })}
             </Select>
+          </Form.Item>
+          {isOutlet && (
+            <>
+              <Form.Item label="ABN" name="abn">
+                <Input />
+              </Form.Item>
+              <Form.Item label="Outlet Address" name="address" required>
+                <Input />
+              </Form.Item>
+            </>
+          )}
+          <Form.Item label="Email" name="email">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Phone Number" name="phone">
+            <Input />
           </Form.Item>
           {errorText && (
             <div style={{ color: "red", marginTop: "1rem" }}>{errorText}</div>

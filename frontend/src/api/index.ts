@@ -99,22 +99,32 @@ export const postLogin = async (username: string, password: string) => {
 };
 
 export const postSignUp = async (
+  fullname: string,
   username: string,
   password: string,
   role: string,
+  email: string,
+  phone: string,
+  abn: string,
+  address: string,
   warehouses: string[]
 ) => {
   try {
     const response = await api.post("/signup", {
+      fullname,
       username: username,
       password: password,
       role: role,
+      email,
+      phone,
+      abn,
+      address,
       warehouses: warehouses,
     });
 
     if (response.data && response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      return response.data.token;
+      // localStorage.setItem("token", response.data.token);
+      // return response.data.token;
     } else {
       // Handle login failure
       throw new Error("Sign up failed");

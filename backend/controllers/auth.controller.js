@@ -73,7 +73,17 @@ const login = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const { username, password, role, warehouses } = req.body;
+    const {
+      fullname,
+      username,
+      password,
+      role,
+      abn,
+      address,
+      phone,
+      email,
+      warehouses,
+    } = req.body;
 
     if (!username || !password || !role) {
       return res
@@ -86,9 +96,14 @@ const signup = async (req, res) => {
 
     // Create new user
     const newUser = new User({
+      fullname: fullname ?? username,
       username,
       password: base64Password,
       role: role,
+      abn: abn,
+      address: address,
+      phone: phone,
+      email: email,
       // warehouses: warehouses,
     });
 
@@ -139,7 +154,17 @@ const authenticateAdminOrOwnerMiddleware = (req, res, next) => {
 
 const addUser = async (req, res) => {
   console.log("Add user", req.body);
-  const { username, password, role, status, warehouses } = req.body;
+  const {
+    username,
+    password,
+    role,
+    status,
+    abn,
+    address,
+    phone,
+    email,
+    warehouses,
+  } = req.body;
 
   let warehousesData = warehouses;
 
@@ -179,10 +204,15 @@ const addUser = async (req, res) => {
   }
 
   let userData = {
+    fullname: fullname ?? username,
     username,
     password,
     role,
     status,
+    abn,
+    address,
+    phone,
+    email,
     warehouses: warehousesData,
   };
 
@@ -202,7 +232,7 @@ const addUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { username, role, warehouses } = req.body;
+  const { fullname, username, role, warehouses } = req.body;
 
   // Validation
   if (
@@ -225,6 +255,8 @@ const updateUser = async (req, res) => {
       message: "Invalid role type",
     });
   }
+
+  const updatedUserData = {};
 
   try {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
