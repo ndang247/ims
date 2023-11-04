@@ -106,8 +106,7 @@ export const postSignUp = async (
   email: string,
   phone: string,
   abn: string,
-  address: string,
-  warehouses: string[]
+  address: string
 ) => {
   try {
     const response = await api.post("/signup", {
@@ -119,12 +118,10 @@ export const postSignUp = async (
       phone,
       abn,
       address,
-      warehouses: warehouses,
     });
 
-    if (response.data && response.data.token) {
-      // localStorage.setItem("token", response.data.token);
-      // return response.data.token;
+    if (response.data && response.data.user) {
+      return response.data.user;
     } else {
       // Handle login failure
       throw new Error("Sign up failed");
