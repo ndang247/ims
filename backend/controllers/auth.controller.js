@@ -35,17 +35,18 @@ const login = async (req, res) => {
       const token = jwt.sign(
         {
           _id: user._id,
+          fullname: user.fullname,
           username: user.username,
           role: user.role,
-          warehouses: user.warehouses,
         },
         process.env.JWT_KEY
       );
 
       const resUser = {
+        _id: user._id,
+        fullname: user.fullname,
         username: user.username,
         role: user.role,
-        warehouses: user.warehouses,
       };
 
       return res.status(200).json({
@@ -73,17 +74,8 @@ const login = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const {
-      fullname,
-      username,
-      password,
-      role,
-      abn,
-      address,
-      phone,
-      email,
-      warehouses,
-    } = req.body;
+    const { fullname, username, password, role, abn, address, phone, email } =
+      req.body;
 
     if (!username || !password || !role) {
       return res
@@ -100,11 +92,13 @@ const signup = async (req, res) => {
       username,
       password: base64Password,
       role: role,
+      status: role === "manager" ? "accepted" : "pending",
       abn: abn,
       address: address,
       phone: phone,
       email: email,
-      // warehouses: warehouses,
+      datetimecreated: new Date(),
+      datetimeupdated: new Date(),
     });
 
     await newUser.save();
@@ -112,9 +106,9 @@ const signup = async (req, res) => {
     const token = jwt.sign(
       {
         _id: newUser._id,
+        fullname: newUser.fullname,
         username: newUser.username,
         role: newUser.role,
-        warehouses: newUser.warehouses,
       },
       process.env.JWT_KEY
     );
@@ -122,6 +116,7 @@ const signup = async (req, res) => {
     res.status(201).json({
       status: "Success",
       message: "User created successfully",
+      user: newUser,
       token: token,
     });
   } catch (error) {
@@ -136,13 +131,10 @@ const signup = async (req, res) => {
   }
 };
 
-const authenticateAdminOrOwnerMiddleware = (req, res, next) => {
-  console.log("Authenticate admin", req.user);
+const authenticateManagerMiddleware = (req, res, next) => {
+  console.log("Authenticate manager", req.user);
   const user = req.user; // Assuming req.user is populated by your auth middleware
-  if (
-    user &&
-    (user.role === "admin" || user.role === "owner" || user.role === "manager")
-  ) {
+  if (user && user.role === "manager") {
     next();
   } else {
     res.status(403).json({
@@ -381,7 +373,7 @@ const getCurrentUser = async (req, res) => {
 module.exports = {
   login,
   signup,
-  authenticateAdminOrOwnerMiddleware,
+  authenticateManagerMiddleware,
 
   addUser,
   updateUser,
