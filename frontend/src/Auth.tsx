@@ -13,10 +13,14 @@ interface AuthContextInterface {
   login: (username: string, password: string) => void;
 
   signup: (
+    fullname: string,
     username: string,
     password: string,
     role: string,
-    warehouses: string[]
+    email: string,
+    phone: string,
+    abn: string,
+    address: string
   ) => void;
 
   /**
@@ -38,8 +42,18 @@ const AuthContext = createContext<AuthContextInterface>({
   login(username, password) {
     console.log("nothing login", username, password);
   },
-  signup(username, password, role, warehouses) {
-    console.log("nothing signup", username, password, role, warehouses);
+  signup(fullname, username, password, role, email, phone, abn, address) {
+    console.log(
+      "nothing signup",
+      fullname,
+      username,
+      password,
+      role,
+      email,
+      phone,
+      abn,
+      address
+    );
   },
   logout() {
     console.log("nothin logout");
@@ -74,12 +88,25 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
   };
 
   const signup = async (
+    fullname: string,
     username: string,
     password: string,
     role: string,
-    warehouses: string[] = []
+    email: string,
+    phone: string,
+    abn: string,
+    address: string
   ) => {
-    const { user } = await postSignUp(username, password, role, warehouses);
+    const { user } = await postSignUp(
+      fullname,
+      username,
+      password,
+      role,
+      email,
+      phone,
+      abn,
+      address
+    );
     if (user) {
       setcurrentUser({ ...user });
     }
