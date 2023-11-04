@@ -5,7 +5,7 @@ const router = express.Router();
 const {
   login,
   signup,
-  authenticateAdminOrOwnerMiddleware: authenticateAdminOrOwner,
+  authenticateManagerMiddleware: authenticateManager,
   addUser,
   updateUser,
   removeUser,
@@ -25,32 +25,27 @@ router.post("/login", login);
  */
 router.post("/signup", signup);
 
-router.get("/users", authenticateJWT, authenticateAdminOrOwner, listUsers);
-router.post("/users", authenticateJWT, authenticateAdminOrOwner, addUser);
+router.get("/users", authenticateJWT, authenticateManager, listUsers);
+router.post("/users", authenticateJWT, authenticateManager, addUser);
 router.post(
   "/users/:id/update",
   authenticateJWT,
-  authenticateAdminOrOwner,
+  authenticateManager,
   updateUser
 );
 router.post(
   "/users/:id/delete",
   authenticateJWT,
-  authenticateAdminOrOwner,
+  authenticateManager,
   removeUser
 );
 router.post(
   "/users/:id/verify",
   authenticateJWT,
-  authenticateAdminOrOwner,
+  authenticateManager,
   verifyUser
 );
 router.get("/users/profile", authenticateJWT, getCurrentUser);
-router.get(
-  "/users/:id",
-  authenticateJWT,
-  authenticateAdminOrOwner,
-  getSingleUser
-);
+router.get("/users/:id", authenticateJWT, authenticateManager, getSingleUser);
 
 module.exports = router;
