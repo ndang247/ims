@@ -34,11 +34,23 @@ const App = () => {
     return "guest";
   }, [currentUser?.role]);
 
+  const accountStatus = useMemo(() => {
+    if (currentUser) {
+      return currentUser.status;
+    }
+    return "";
+  }, [currentUser?.status]);
+
   if (loading) {
     return <>Loading...</>;
   }
 
-  if (!currentUser) {
+  if (
+    !currentUser ||
+    accountStatus === "pending" ||
+    accountStatus === "rejected" ||
+    accountStatus === ""
+  ) {
     return (
       <div className="container">
         <div className="row">
@@ -55,9 +67,7 @@ const App = () => {
 
   return (
     <Routes>
-      {(routeType === "manager" ||
-        routeType === "owner" ||
-        routeType === "staff") && (
+      {(routeType === "manager" || routeType === "staff") && (
         <Route element={<ManagerRoute />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/parcels" element={<Parcels />} />
