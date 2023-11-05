@@ -22,12 +22,13 @@ const ProductDisplay: React.FC<IProductDisplayProps> = ({
                   // make image align center
                   style={{
                     objectFit: "cover",
-                    height: "auto",
+                    height: "250px",
                     width: "auto",
                     margin: "auto",
                   }}
                 />
               }
+              style={{ padding: "10px" }}
               bordered={false}
               onClick={() => {
                 window.location.href = `/items/${product._id}`;

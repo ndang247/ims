@@ -173,7 +173,7 @@ const InboundPage: React.FC = () => {
         onClick={handleButtonClick}
         disabled={loading}
       >
-        {loading && <Spin />}
+        {loading && <Spin className="me-2" />}
         Update Inbound Barcode
       </Button>
     </div>

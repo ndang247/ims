@@ -236,6 +236,7 @@ const ProductDetails: React.FC = () => {
                         flex: "30%",
                         display: "flex",
                         justifyContent: "center",
+                        alignItems: "center",
                       }}
                     >
                       {/* <div
@@ -256,7 +257,7 @@ const ProductDetails: React.FC = () => {
                           border: "2px dashed #9D9D9D",
                           boxSizing: "border-box",
                           padding: "30px",
-                          height: "auto",
+                          height: "300px",
                           width: "auto",
                         }}
                       />
