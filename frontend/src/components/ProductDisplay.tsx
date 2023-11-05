@@ -11,7 +11,7 @@ const ProductDisplay: React.FC<IProductDisplayProps> = ({
     <Row gutter={[16, 16]}>
       {products.map((product: IProduct, key: number) => {
         return (
-          <Col span={6} key={key}>
+          <Col xs={24} sm={12} md={8} lg={6} key={key}>
             <Card
               loading={loading}
               hoverable
@@ -19,11 +19,12 @@ const ProductDisplay: React.FC<IProductDisplayProps> = ({
                 <img
                   alt={product.upc_data.items[0].title}
                   src={product.upc_data.items[0].images[0]}
-                  // make image align center
+                  // make image align center and responsive
                   style={{
                     objectFit: "cover",
                     height: "250px",
                     width: "auto",
+                    maxWidth: "100%",
                     margin: "auto",
                   }}
                 />
