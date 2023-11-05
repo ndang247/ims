@@ -3,7 +3,6 @@ import { Breadcrumb, Alert, Select, Input } from "antd";
 import { getProducts, Product } from "../api";
 import { Loading, ProductDisplay } from ".";
 import { IProduct } from "@src/types";
-import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -44,12 +43,12 @@ const Items: React.FC = () => {
   };
 
   const handleFilterChange = (value: string) => {
-    if (value === "ascend") {
+    if (value === "A-Z") {
       const sortedProducts = [...products].sort((a, b) =>
         a.upc_data.items[0].title.localeCompare(b.upc_data.items[0].title)
       );
       setProducts(sortedProducts);
-    } else if (value === "descend") {
+    } else if (value === "Z-A") {
       const sortedProducts = [...products].sort((a, b) =>
         b.upc_data.items[0].title.localeCompare(a.upc_data.items[0].title)
       );
@@ -86,14 +85,8 @@ const Items: React.FC = () => {
             allowClear
             onChange={handleFilterChange}
           >
-            <Option value="ascend">
-              <ArrowUpOutlined />
-              &nbsp;A-Z
-            </Option>
-            <Option value="descend">
-              <ArrowDownOutlined />
-              &nbsp;Z-A
-            </Option>
+            <Option value="A-Z">A-Z</Option>
+            <Option value="Z-A">Z-A</Option>
           </Select>
         </div>
       </div>
