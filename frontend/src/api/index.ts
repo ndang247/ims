@@ -164,6 +164,18 @@ export const getInventoryStream = async (barcode: string) => {
   };
 };
 
+export class Product {
+  static async searchProducts(query: string) {
+    try {
+      const response = await api.get(`/product/search?q=${query}`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+}
+
 export class User {
   static async getCurrent(): Promise<IUser> {
     try {
