@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Alert, Select, Input } from "antd";
+import { Breadcrumb, Alert, Input } from "antd";
 import { getProducts, Product } from "../api";
 import { Loading, ProductDisplay } from ".";
 import { IProduct } from "@src/types";
 
-const { Option } = Select;
+// const { Option } = Select;
 const { Search } = Input;
 
 const Items: React.FC = () => {
@@ -65,7 +65,7 @@ const Items: React.FC = () => {
             allowClear
             onChange={handleSearch}
           />
-          <Select
+          {/* <Select
             style={{ width: 200, margin: "16px 0" }}
             placeholder="Filter by Status"
             allowClear
@@ -82,7 +82,7 @@ const Items: React.FC = () => {
             <Option value="delivered">Delivered</Option>
             <Option value="rejected">Rejected</Option>
             <Option value="">All</Option>
-          </Select>
+          </Select> */}
         </div>
       </div>
       <div
