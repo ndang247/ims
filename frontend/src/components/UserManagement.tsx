@@ -204,7 +204,7 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      <div className="d-flex flex-row justify-content-between my-2">
+      <div className="d-flex flex-row justify-content-between align-items-center my-2">
         <Breadcrumb
           style={{ margin: "16px 0" }}
           items={[

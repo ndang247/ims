@@ -162,7 +162,7 @@ const OutletOrderManagement = () => {
 
   return (
     <>
-      <div className="d-flex flex-row justify-content-between mt-2">
+      <div className="d-flex flex-row justify-content-between align-items-center mt-2">
         <Breadcrumb
           style={{ margin: "16px 0" }}
           items={[

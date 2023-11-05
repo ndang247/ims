@@ -97,7 +97,7 @@ const InboundPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <Breadcrumb
         style={{ margin: "16px 0" }}
         items={[
