@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Alert, Input } from "antd";
+import { Breadcrumb, Alert, Select, Input } from "antd";
 import { getProducts, Product } from "../api";
 import { Loading, ProductDisplay } from ".";
 import { IProduct } from "@src/types";
+import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 
-// const { Option } = Select;
+const { Option } = Select;
 const { Search } = Input;
 
 const Items: React.FC = () => {
@@ -42,6 +43,20 @@ const Items: React.FC = () => {
       });
   };
 
+  const handleFilterChange = (value: string) => {
+    if (value === "ascend") {
+      const sortedProducts = [...products].sort((a, b) =>
+        a.upc_data.items[0].title.localeCompare(b.upc_data.items[0].title)
+      );
+      setProducts(sortedProducts);
+    } else if (value === "descend") {
+      const sortedProducts = [...products].sort((a, b) =>
+        b.upc_data.items[0].title.localeCompare(a.upc_data.items[0].title)
+      );
+      setProducts(sortedProducts);
+    }
+  };
+
   return (
     <>
       <div className="d-flex flex-row justify-content-between mt-2">
@@ -65,24 +80,21 @@ const Items: React.FC = () => {
             allowClear
             onChange={handleSearch}
           />
-          {/* <Select
+          <Select
             style={{ width: 200, margin: "16px 0" }}
             placeholder="Filter by Status"
             allowClear
-            onChange={(value) => {
-              // setFilterStatus(value as string);
-            }}
-            onClear={() => {
-              // setFilterStatus(null);
-            }}
+            onChange={handleFilterChange}
           >
-            <Option value="pending">Pending</Option>
-            <Option value="accepted">Accepted</Option>
-            <Option value="processed">Processed</Option>
-            <Option value="delivered">Delivered</Option>
-            <Option value="rejected">Rejected</Option>
-            <Option value="">All</Option>
-          </Select> */}
+            <Option value="ascend">
+              <ArrowUpOutlined />
+              &nbsp;A-Z
+            </Option>
+            <Option value="descend">
+              <ArrowDownOutlined />
+              &nbsp;Z-A
+            </Option>
+          </Select>
         </div>
       </div>
       <div
