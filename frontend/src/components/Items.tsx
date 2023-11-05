@@ -43,16 +43,38 @@ const Items: React.FC = () => {
   };
 
   const handleFilterChange = (value: string) => {
-    if (value === "A-Z") {
-      const sortedProducts = [...products].sort((a, b) =>
-        a.upc_data.items[0].title.localeCompare(b.upc_data.items[0].title)
-      );
-      setProducts(sortedProducts);
-    } else if (value === "Z-A") {
-      const sortedProducts = [...products].sort((a, b) =>
-        b.upc_data.items[0].title.localeCompare(a.upc_data.items[0].title)
-      );
-      setProducts(sortedProducts);
+    let filteredProducts = [...products];
+    switch (value) {
+      case "a-z":
+        filteredProducts = filteredProducts.sort((a, b) =>
+          a.upc_data.items[0].title.localeCompare(b.upc_data.items[0].title)
+        );
+        setProducts(filteredProducts);
+        break;
+      case "z-a":
+        filteredProducts = filteredProducts.sort((a, b) =>
+          b.upc_data.items[0].title.localeCompare(a.upc_data.items[0].title)
+        );
+        setProducts(filteredProducts);
+        break;
+      case "recentlyAdded":
+        filteredProducts = filteredProducts.sort((a, b) =>
+          new Date(b.datetimecreated)
+            .toISOString()
+            .localeCompare(new Date(a.datetimecreated).toISOString())
+        );
+        setProducts(filteredProducts);
+        break;
+      case "recentlyUpdated":
+        filteredProducts = filteredProducts.sort((a, b) =>
+          new Date(b.datetimeupdated)
+            .toISOString()
+            .localeCompare(new Date(a.datetimeupdated).toISOString())
+        );
+        setProducts(filteredProducts);
+        break;
+      default:
+        break;
     }
   };
 
@@ -85,8 +107,10 @@ const Items: React.FC = () => {
             allowClear
             onChange={handleFilterChange}
           >
-            <Option value="A-Z">A-Z</Option>
-            <Option value="Z-A">Z-A</Option>
+            <Option value="a-z">A-Z</Option>
+            <Option value="z-a">Z-A</Option>
+            <Option value="recentlyAdded">Recently Added</Option>
+            <Option value="recentlyUpdated">Recently Updated</Option>
           </Select>
         </div>
       </div>
