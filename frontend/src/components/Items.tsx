@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Alert, Select, Input } from "antd";
+import { Breadcrumb, Alert, Select, Input, message } from "antd";
 import { getProducts, Product } from "../api";
 import { Loading, ProductDisplay } from ".";
 import { IProduct } from "@src/types";
@@ -35,7 +35,7 @@ const Items: React.FC = () => {
         setProducts(data.products);
       })
       .catch((error: any) => {
-        setError(error?.response?.data?.message);
+        message.error(error?.response?.data?.message);
       })
       .finally(() => {
         setLoadingSearch(false);
