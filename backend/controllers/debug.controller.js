@@ -2,6 +2,9 @@ const Parcel = require("../models/parcel.model");
 const Inventory = require("../models/inventory.model");
 const Product = require("../models/product.model");
 const RFID = require("../models/rfid.model");
+const Inbound = require("../models/inbound.model");
+const OutletOrder = require("../models/outlet_order.model");
+const User = require("../models/user.model");
 
 const { generateValidUPC } = require("./debug.controller.helper");
 
@@ -93,20 +96,23 @@ const generateParcels = async (req, res) => {
 
 /**
  * Remove all except warehouse and shelves
- * Remove all parcels with RFID, products with inventory
+ * Remove all parcels with RFID, products with inventory, inbound, outlet orders and users
  */
 const removeAll = async (req, res) => {
   try {
     await Promise.all([
-      Parcel.deleteMany({}),
-      Inventory.deleteMany({}),
-      Product.deleteMany({}),
-      RFID.deleteMany({}),
+      Inbound.deleteMany(),
+      OutletOrder.deleteMany(),
+      User.deleteMany(),
+      Parcel.deleteMany(),
+      Inventory.deleteMany(),
+      Product.deleteMany(),
+      RFID.deleteMany(),
     ]);
     res.status(200).json({
       status: "Success",
       message:
-        "All Parcels with RFID, Products with Inventory, and RFIDs have been removed successfully",
+        "All Parcels with RFID, Products with Inventory, Inbound, Outlet Orders and Users have been removed successfully",
     });
   } catch (error) {
     errorLogger("debug.controller", "generateParcels").error({

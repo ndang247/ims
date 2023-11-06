@@ -28,14 +28,33 @@ const SignupPage: React.FC = () => {
     console.log("Received values of form:", values);
     // Perform your signup logic here
     try {
-      const { fullname, username, password, confirmPassword, role, abn, address, phone, email, warehouse } = values;
+      const {
+        fullname,
+        username,
+        password,
+        confirmPassword,
+        role,
+        abn,
+        address,
+        phone,
+        email,
+      } = values;
 
       if (password !== confirmPassword) {
         message.error("Passwords do not match");
         return;
       }
 
-      await postSignUp(fullname, username, password, role, email, phone, abn, address, [warehouse]);
+      await postSignUp(
+        fullname,
+        username,
+        password,
+        role,
+        email,
+        phone,
+        abn,
+        address
+      );
 
       message.success(
         "Successfully signed up! Please wait for admin to review your account."
@@ -44,7 +63,7 @@ const SignupPage: React.FC = () => {
       setTimeout(() => {
         window.location.href = "/";
         form.resetFields();
-      }, 4000);
+      }, 3000);
     } catch (error) {
       console.log(error);
       message.error("Failed to sign up. Please try again!");

@@ -47,6 +47,16 @@ const UserManagement: React.FC = () => {
 
   const columns = [
     {
+      title: "ID",
+      dataIndex: "_id",
+      key: "_id",
+    },
+    {
+      title: "Full Name",
+      dataIndex: "fullname",
+      key: "fullname",
+    },
+    {
       title: "Username",
       dataIndex: "username",
       key: "username",
@@ -64,7 +74,7 @@ const UserManagement: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: any, record: IUser) => (
         <Button onClick={() => showModal(record)}>View</Button>
       ),
     },
@@ -72,18 +82,21 @@ const UserManagement: React.FC = () => {
 
   const handleRoleChanged = (value: string) => {
     setIsOutlet(value === "outlet");
-  }
+  };
 
   const isUserSelected = useMemo(() => {
     console.log("User changed", !!selectedUser?._id);
     return !!selectedUser?._id;
   }, [selectedUser]);
 
-  const showModal = (record: any) => {
+  const showModal = (record: IUser) => {
     console.log("Set user on show modal", record);
-    setSelectedUser(record);
+    // Check if record object is empty
+    if (Object.keys(record).length !== 0 && record.constructor === Object) {
+      setSelectedUser(record);
+    }
 
-    if (record._id) {
+    if (Object.keys(record).length !== 0 && record._id) {
       form.setFieldsValue({
         fullname: record.fullname ?? record.username,
         username: record.username,
@@ -118,8 +131,18 @@ const UserManagement: React.FC = () => {
 
   const handleOk = async () => {
     setLoading(true);
-    const { fullname, username, password, role, status, warehouse, abn, address, email, phone } =
-      form.getFieldsValue();
+    const {
+      fullname,
+      username,
+      password,
+      role,
+      status,
+      abn,
+      address,
+      email,
+      phone,
+      warehouse,
+    } = form.getFieldsValue();
 
     console.log("Handle ok", form.getFieldsValue());
 
@@ -136,13 +159,13 @@ const UserManagement: React.FC = () => {
         _id: null,
         fullname,
         username,
-        role,
         password,
+        role,
         status,
         abn,
         address,
-        email,
         phone,
+        email,
         warehouses: [warehouse],
       };
 
@@ -181,7 +204,7 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      <div className="d-flex flex-row justify-content-between my-2">
+      <div className="d-flex flex-row justify-content-between align-items-center my-2">
         <Breadcrumb
           style={{ margin: "16px 0" }}
           items={[
@@ -197,7 +220,7 @@ const UserManagement: React.FC = () => {
           type="primary"
           style={{ margin: "16px 0" }}
           icon={<PlusCircleOutlined />}
-          onClick={() => showModal({})}
+          onClick={() => showModal({} as IUser)}
         >
           Add User
         </Button>
@@ -215,6 +238,7 @@ const UserManagement: React.FC = () => {
                   Cancel
                 </Button>,
                 <Button
+                  key="delete"
                   className="text-bg-danger"
                   loading={loading}
                   onClick={deleteUser}

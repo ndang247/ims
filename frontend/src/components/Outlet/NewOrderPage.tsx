@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Table, InputNumber, Button, Input, message } from "antd";
-import { getProducts, OutletOrder } from "../../api";
+import { getProducts, OutletOrder, Product } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { IProduct } from "@src/types";
 
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 
 const NewOrderPage = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -13,6 +13,7 @@ const NewOrderPage = () => {
   }>({});
   const [descriptionText, setDescriptionText] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [loadingSearch, setLoadingSearch] = useState(false);
 
   const navigate = useNavigate();
 
@@ -72,10 +73,24 @@ const NewOrderPage = () => {
     }
   };
 
+  const handleSearch = (e: any) => {
+    const value = e.target.value;
+    setLoadingSearch(true);
+    Product.searchProducts(value)
+      .then((data) => {
+        setProducts(data.products);
+      })
+      .catch((error: any) => {
+        message.error(error?.response?.data?.message);
+      })
+      .finally(() => {
+        setLoadingSearch(false);
+      });
+  };
+
   const columns = [
     {
       title: "Product Name",
-      dataIndex: "upc_data.items[0].title",
       key: "title",
       render: (record: IProduct) => {
         return record.upc_data?.items[0]?.title || "-";
@@ -102,15 +117,28 @@ const NewOrderPage = () => {
   ];
 
   return (
-    <div>
+    <div
+      style={{
+        padding: 15,
+        height: "50%",
+      }}
+    >
       <h2>Create New Order</h2>
       <TextArea
         showCount
         maxLength={100}
         disabled={submitLoading}
-        style={{ height: 50, marginBottom: 24 }}
+        style={{ height: 50, marginBottom: 20 }}
         onChange={onDescriptionChange}
         placeholder="Order Description"
+      />
+      <Search
+        style={{ width: 200, marginBottom: 20 }}
+        placeholder="Search by barcode or name"
+        loading={loadingSearch}
+        enterButton
+        allowClear
+        onChange={handleSearch}
       />
       <Table dataSource={products} columns={columns} rowKey="_id" />
       <Button type="primary" loading={submitLoading} onClick={handleSubmit}>

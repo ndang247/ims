@@ -138,18 +138,6 @@ const getProducts = async (req, res) => {
 
     const pipeline = [
       {
-        $match: {
-          // Filter by warehouse id
-          warehouse: new mongoose.Types.ObjectId(warehouseID),
-        },
-      },
-      {
-        $group: {
-          // Group the results by product ID to give you distinct product IDs.
-          _id: "$product",
-        },
-      },
-      {
         $lookup: {
           from: "products",
           localField: "_id",
@@ -182,7 +170,7 @@ const getProducts = async (req, res) => {
     ];
 
     try {
-      let products = await Parcel.aggregate(pipeline);
+      let products = await Product.aggregate(pipeline);
       products = products.map((product) => {
         let upc_json = {};
         if (product.upc_data) {
@@ -213,4 +201,65 @@ const getProducts = async (req, res) => {
   }
 };
 
-module.exports = { createProduct, getProduct, getProducts };
+const searchProducts = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    const pipeline = [
+      {
+        $match: {
+          $or: [
+            { barcode: { $regex: q, $options: "i" } },
+            { upc_data: { $regex: q, $options: "i" } },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "inventories",
+          localField: "_id",
+          foreignField: "product",
+          as: "inventory",
+        },
+      },
+      {
+        $unwind: {
+          path: "$inventory",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ];
+
+    try {
+      let products = await Product.aggregate(pipeline);
+      products = products.map((product) => {
+        let upc_json = {};
+        if (product.upc_data) {
+          upc_json = JSON.parse(product.upc_data);
+        }
+        product.upc_data = upc_json;
+        return product;
+      });
+      res.status(200).json({
+        status: "Success",
+        products,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ status: "Error", message: "Unable to get products." });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    errorLogger("product.controller", "getProducts").error({
+      message: error,
+    });
+    res.status(500).json({
+      status: "Error",
+      error: error.message,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+module.exports = { createProduct, getProduct, getProducts, searchProducts };

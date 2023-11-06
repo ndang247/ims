@@ -106,8 +106,7 @@ export const postSignUp = async (
   email: string,
   phone: string,
   abn: string,
-  address: string,
-  warehouses: string[]
+  address: string
 ) => {
   try {
     const response = await api.post("/signup", {
@@ -119,12 +118,10 @@ export const postSignUp = async (
       phone,
       abn,
       address,
-      warehouses: warehouses,
     });
 
-    if (response.data && response.data.token) {
-      // localStorage.setItem("token", response.data.token);
-      // return response.data.token;
+    if (response.data && response.data.user) {
+      return response.data.user;
     } else {
       // Handle login failure
       throw new Error("Sign up failed");
@@ -166,6 +163,18 @@ export const getInventoryStream = async (barcode: string) => {
     // Update your frontend state here
   };
 };
+
+export class Product {
+  static async searchProducts(query: string) {
+    try {
+      const response = await api.get(`/product/search?q=${query}`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+}
 
 export class User {
   static async getCurrent(): Promise<IUser> {

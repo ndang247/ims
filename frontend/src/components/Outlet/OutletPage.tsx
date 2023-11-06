@@ -6,7 +6,12 @@ const OutletPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div
+      style={{
+        padding: 15,
+        height: "50%",
+      }}
+    >
       <h1>Outlet Page</h1>
       <Button
         onClick={() => {

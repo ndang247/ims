@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "ag-grid-community": "^30.2.0",
     "ag-grid-enterprise": "^30.2.0",
     "ag-grid-react": "^30.2.0",
