@@ -33,7 +33,6 @@ const outletOrderController = {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const user = req.user;
       const {
         description,
         status,
@@ -46,7 +45,6 @@ const outletOrderController = {
       const updatedOrder = await OutletOrder.findByIdAndUpdate(
         id,
         {
-          user,
           description,
           status,
           comment,
