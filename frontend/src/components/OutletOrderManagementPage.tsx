@@ -77,6 +77,14 @@ const OutletOrderManagement = () => {
 
   const columns = [
     {
+      title: "Full Name",
+      dataIndex: "user.fullname",
+      key: "user",
+      render: (_text: string, record: IOutletOrder) => {
+        return `${record.user.fullname ?? "N/A"}`;
+      },
+    },
+    {
       title: "User",
       dataIndex: "user.username",
       key: "user",
