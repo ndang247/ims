@@ -107,7 +107,7 @@ const NewOrderPage = () => {
       render: (record: IProduct) => (
         <InputNumber
           min={0}
-          max={record.inventory?.parcel_quantity || 1}
+          max={record.inventory?.parcel_quantity}
           disabled={submitLoading}
           defaultValue={0}
           onChange={(value) => handleQuantityChange(record, value)}
