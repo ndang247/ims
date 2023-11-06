@@ -90,6 +90,11 @@ const OutletOrderManagement = () => {
       key: "status",
     },
     {
+      title: "Comment",
+      dataIndex: "comment",
+      key: "comment",
+    },
+    {
       title: "No. Products",
       dataIndex: "products.length",
       key: "productsNo",
