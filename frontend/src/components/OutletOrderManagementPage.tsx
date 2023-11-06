@@ -9,6 +9,7 @@ import {
   Tooltip,
   Divider,
   Breadcrumb,
+  message,
 } from "antd";
 import { OutletOrder } from "../api";
 import { IOutletOrder, IProductOrder } from "../types";
@@ -35,6 +36,10 @@ const OutletOrderManagement = () => {
       case "processed":
         message =
           "The order will be seen as processed and is ready for delivery.";
+        break;
+      case "out_for_delivery":
+        message =
+          "The order will be seen as out for delivery and is with the truck driver or delivery person.";
         break;
       case "delivered":
         message =
@@ -156,7 +161,7 @@ const OutletOrderManagement = () => {
       await init();
       setIsModalVisible(false);
     } catch (error: any) {
-    } finally {
+      message.error(error.message);
     }
   };
 
@@ -188,6 +193,7 @@ const OutletOrderManagement = () => {
           <Option value="pending">Pending</Option>
           <Option value="accepted">Accepted</Option>
           <Option value="processed">Processed</Option>
+          <Option value="out_for_delivery">Out For Delivery</Option>
           <Option value="delivered">Delivered</Option>
           <Option value="rejected">Rejected</Option>
           <Option value="">All</Option>
@@ -239,6 +245,7 @@ const OutletOrderManagement = () => {
               <Option value="pending">Pending</Option>
               <Option value="accepted">Accepted & Processing</Option>
               <Option value="processed">Processed</Option>
+              <Option value="out_for_delivery">Out For Delivery</Option>
               <Option value="delivered">Delivered</Option>
               <Option value="rejected">Rejected</Option>
             </Select>

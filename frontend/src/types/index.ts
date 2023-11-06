@@ -134,7 +134,13 @@ export interface IOutletOrder {
   _id: string | null | undefined;
   user: IUser;
   description: string;
-  status: "pending" | "accepted" | "processed" | "delivered" | "rejected";
+  status:
+    | "pending"
+    | "accepted"
+    | "processed"
+    | "out_for_delivery"
+    | "delivered"
+    | "rejected";
   products: IProductOrder[];
   datetimecreated: Date;
 }

@@ -13,7 +13,14 @@ const outletOrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "processed", "delivered", "rejected"],
+      enum: [
+        "pending",
+        "accepted",
+        "processed",
+        "out_for_delivery",
+        "delivered",
+        "rejected",
+      ],
       default: "pending",
     },
     products: [
