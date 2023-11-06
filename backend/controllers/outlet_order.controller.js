@@ -13,6 +13,7 @@ const outletOrderController = {
         status: status ?? "pending",
         products,
         datetimecreated: datetimecreated ?? new Date(),
+        datetimeupdated: new Date(),
       });
 
       const savedOrder = await newOrder.save();
@@ -33,11 +34,26 @@ const outletOrderController = {
     try {
       const { id } = req.params;
       const user = req.user;
-      const { description, status, products, datetimecreated } = req.body;
+      const {
+        description,
+        status,
+        comment,
+        products,
+        datetimecreated,
+        datetimeupdated = new Date(),
+      } = req.body;
 
       const updatedOrder = await OutletOrder.findByIdAndUpdate(
         id,
-        { user, description, status, products, datetimecreated },
+        {
+          user,
+          description,
+          status,
+          comment,
+          products,
+          datetimecreated,
+          datetimeupdated,
+        },
         { new: true }
       );
 

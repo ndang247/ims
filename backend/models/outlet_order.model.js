@@ -22,6 +22,10 @@ const outletOrderSchema = new mongoose.Schema(
         "rejected",
       ],
       default: "pending",
+      required: true,
+    },
+    comment: {
+      type: String,
     },
     products: [
       {
@@ -40,10 +44,15 @@ const outletOrderSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    datetimeupdated: {
+      type: Date,
+      required: true,
+    },
   },
   {
     timestamps: {
       createdAt: "datetimecreated",
+      updatedAt: "datetimeupdated",
     },
   }
 );

@@ -141,8 +141,10 @@ export interface IOutletOrder {
     | "out_for_delivery"
     | "delivered"
     | "rejected";
+  comment: string;
   products: IProductOrder[];
   datetimecreated: Date;
+  datetimeupdated: Date;
 }
 //
 

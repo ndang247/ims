@@ -122,6 +122,15 @@ const OutletOrderManagement = () => {
       },
     },
     {
+      title: "Date Updated",
+      dataIndex: "datetimeupdated",
+      key: "datetimeupdated",
+      render: (text: Date) => {
+        const date = new Date(text);
+        return `${date.toLocaleString()}`;
+      },
+    },
+    {
       title: "View",
       key: "view",
       render: (_: any, record: any) => (
@@ -254,6 +263,12 @@ const OutletOrderManagement = () => {
             <span className="text-secondary py-2">{statusMessage}</span>
           )}
 
+          {/* Comment */}
+          <Form.Item label="Comment" name="comment">
+            <Input.TextArea />
+          </Form.Item>
+
+          {/* Products */}
           <div>
             <span className="fs-6">Products</span>
             {selectedOrder?.products.map((product, key) => {
