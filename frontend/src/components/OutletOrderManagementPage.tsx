@@ -96,6 +96,38 @@ const OutletOrderManagement = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      render: (text: string) => {
+        let color = "";
+        switch (text) {
+          case "pending":
+            color = "blue";
+            text = "Pending";
+            break;
+          case "accepted":
+            color = "darkblue";
+            text = "Accepted & Processing";
+            break;
+          case "processed":
+            color = "purple";
+            text = "Processed";
+            break;
+          case "out_for_delivery":
+            color = "orange";
+            text = "Out For Delivery";
+            break;
+          case "delivered":
+            color = "green";
+            text = "Delivered";
+            break;
+          case "rejected":
+            color = "red";
+            text = "Rejected";
+            break;
+          default:
+            color = "black";
+        }
+        return <span style={{ color: color, fontWeight: "bold" }}>{text}</span>;
+      },
     },
     {
       title: "Comment",
@@ -213,7 +245,7 @@ const OutletOrderManagement = () => {
           }}
         >
           <Option value="pending">Pending</Option>
-          <Option value="accepted">Accepted</Option>
+          <Option value="accepted">Accepted & Processing</Option>
           <Option value="processed">Processed</Option>
           <Option value="out_for_delivery">Out For Delivery</Option>
           <Option value="delivered">Delivered</Option>
