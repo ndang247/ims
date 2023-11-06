@@ -162,5 +162,7 @@ export interface IDashboardData {
   totalInventory: number;
   lowQuantityStocks: number;
   recentUpdateItem: [];
+  lastUpdatedInventories: [];
+  lowInventories: [];
 }
 //

@@ -5,8 +5,10 @@
 }
 
 .grid-item {
-  background-color: lightgray;
+  background-color: rgb(244, 244, 244);
   padding: 20px;
+
+  height: 100%;
 
   border-radius: 10px;
 
