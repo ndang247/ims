@@ -4,6 +4,7 @@ import type { MenuProps, TabsProps } from "antd";
 export type MenuItem = Required<MenuProps>["items"][number];
 export type TabItem = Required<TabsProps>["items"][number];
 
+// Sidebar
 export function getMenuItem(
   label: React.ReactNode,
   key: React.Key,
@@ -17,6 +18,10 @@ export function getMenuItem(
     children,
   } as MenuItem;
 }
+export interface ISidebarProps {
+  role: string;
+}
+//
 
 export function getTabItem(
   key: React.Key,
@@ -41,7 +46,6 @@ export interface IParcel {
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
 }
-
 export interface IGroupedParcels {
   [key: string]: IParcel[];
 }

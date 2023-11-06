@@ -9,13 +9,14 @@ import {
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
+import { ISidebarProps } from "../types";
 
 const { Sider } = Layout;
 
 import { MenuItem, getMenuItem } from "../types";
 import Logo from "../assets/logo.svg";
 
-const items: MenuItem[] = [
+const managerItems: MenuItem[] = [
   getMenuItem(<Link to="/">Dashboard</Link>, "dashboard", <HomeOutlined />),
   getMenuItem(
     <Link to="/parcels">All Parcels</Link>,
@@ -45,7 +46,20 @@ const items: MenuItem[] = [
   // ]),
 ];
 
-const Sidebar: React.FC = () => {
+const outletItems: MenuItem[] = [
+  getMenuItem(
+    <Link to="/new-order">New Order</Link>,
+    "new_order",
+    <DropboxOutlined />
+  ),
+  // getMenuItem(
+  //   <Link to="/orders">All Orders</Link>,
+  //   "orders",
+  //   <BarcodeOutlined />
+  // ),
+];
+
+const Sidebar: React.FC<ISidebarProps> = ({ role }) => {
   return (
     <Sider
       breakpoint="lg"
@@ -62,9 +76,11 @@ const Sidebar: React.FC = () => {
       </div>
       <Menu
         theme="dark"
-        defaultSelectedKeys={["1"]}
+        defaultSelectedKeys={[
+          `${role === "manager" ? "dashboard" : "new_order"}`,
+        ]}
         mode="inline"
-        items={items}
+        items={role === "manager" ? managerItems : outletItems}
       />
     </Sider>
   );
