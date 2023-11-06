@@ -18,6 +18,13 @@ const parcelSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: [
+        "in_warehouse",
+        "on_shelf",
+        "out_for_delivery",
+        "delivered",
+        "archived",
+      ],
       required: true,
       default: "in_warehouse",
     },

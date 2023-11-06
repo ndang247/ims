@@ -21,6 +21,8 @@ const rfidSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["activated", "deactivated"],
+      default: "deactivated",
       required: true,
     },
     datetimecreated: {
