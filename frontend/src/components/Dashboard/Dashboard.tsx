@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, theme, Typography, Tooltip, Statistic } from "antd";
+import { Breadcrumb, theme, Typography, Statistic, Popover } from "antd";
 import {
   DatabaseOutlined,
   ExclamationCircleOutlined,
@@ -71,6 +71,8 @@ const Dashboard: React.FC = () => {
         return order.status === "pending";
       });
 
+      console.log('ordersWithKey', ordersWithKey);
+
       setOrders(ordersWithKey);
       console.log(orders);
     } catch (error) {
@@ -112,18 +114,46 @@ const Dashboard: React.FC = () => {
                 <div>
                   {orders.map((order) => (
                     <div className="border p-2 rounded-2 d-flex flex-column" key={order._id}>
+                      <span style={{color: 'gray', fontSize: '12px', fontStyle: 'italic'}}>
+                        {new Date(order.datetimecreated).toLocaleString()}
+                      </span>
                       <span >
                         Order for {order.user.fullname}
                       </span>
                       <span style={{color: 'gray', fontSize: '12px'}}>
                         {order.description}
                       </span>
-                      <span>
-                        {order.products.length} products ordered
-                      </span>
-                      <span>
-                        {order.products.reduce((acc, curr) => acc + curr.quantity, 0)} parcels ordered
-                      </span>
+                      <Popover placement="right" content={
+                        <div style={{width: '300px'}}>
+                          {order.products.map((product) => (
+                            <div className="d-flex flex-column" key={product._id}>
+                              <span>{product.product.barcode}</span>
+                              <span style={{fontSize: '5px'}}>{product.product.upc_data.items[0].title}</span> 
+                              <hr />
+                            </div>
+                          ))}
+                        </div>
+                      }>
+                        <span>
+                          {order.products.length} products ordered
+                        </span>
+                      </Popover>
+                      <Popover placement="right" content={
+                        <div style={{width: '300px'}}>
+                          {order.products.map((product) => (
+                            <div className="d-flex flex-column" key={product._id}>
+                              <span>{product.product.barcode}</span>
+                              <span style={{fontSize: '5px'}}>{product.product.upc_data.items[0].title}</span> 
+                              <span style={{width: 'fit-content'}} className="border p-1 rounded-2">{product.quantity} parcels</span>
+                              <hr />
+                            </div>
+                          ))}
+                        </div>
+                      }>
+                        <span>
+                          {order.products.reduce((acc, curr) => acc + curr.quantity, 0)} parcels ordered
+                        </span>
+                      </Popover>
                       
                     </div>
                   ))}
