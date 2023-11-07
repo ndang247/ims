@@ -3,16 +3,14 @@ import { Breadcrumb, theme, Typography, Statistic, Popover } from "antd";
 import {
   DatabaseOutlined,
   ExclamationCircleOutlined,
-  BorderOutlined
-} from '@ant-design/icons';
+  BorderOutlined,
+} from "@ant-design/icons";
 import { OutletOrder } from "../../api";
-import { IDashboardData,  IOutletOrder } from "@src/types";
+import { IDashboardData, IOutletOrder } from "@src/types";
+import { Loading, LowInventoryBarChart } from "../../components";
 import "./Dashboard.css";
 
-import { Bar } from 'react-chartjs-2';
-import 'chart.js/auto';
-
-const  { Title } = Typography
+const { Title } = Typography;
 
 const Dashboard: React.FC = () => {
   const {
@@ -58,20 +56,22 @@ const Dashboard: React.FC = () => {
       eventSource.close();
     };
 
-    init()
+    init();
   }, []);
 
   const init = async () => {
     try {
       const fetchedOrders = await OutletOrder.getManyOutletOrders();
       // For each order append the key property to the order i.e. key: 1 for the first order then so on
-      const ordersWithKey = fetchedOrders.map((order, key) => {
-        return { ...order, key };
-      }).filter((order) => {
-        return order.status === "pending";
-      });
+      const ordersWithKey = fetchedOrders
+        .map((order, key) => {
+          return { ...order, key };
+        })
+        .filter((order) => {
+          return order.status === "pending";
+        });
 
-      console.log('ordersWithKey', ordersWithKey);
+      console.log("ordersWithKey", ordersWithKey);
 
       setOrders(ordersWithKey);
       console.log(orders);
@@ -99,121 +99,143 @@ const Dashboard: React.FC = () => {
       >
         <div className="row">
           <div className="col-6 p-2">
-            <div className="grid-item">
-                <Statistic title="Total Products" value={dashboardData.numberOfProducts} prefix={<BorderOutlined />} />
-                <Statistic title="Quantity in Hand" value={dashboardData.totalInventory} prefix={<DatabaseOutlined />}/>
-                
-                <Statistic title="Low Quantity Stocks" value={dashboardData.lowInventories.length} prefix={<ExclamationCircleOutlined />}/>
-              
-            </div>
+            {dashboardData.numberOfProducts === 0 && (
+              <Loading description="Please wait while we load statistics." />
+            )}
+
+            {dashboardData.numberOfProducts > 0 && (
+              <div className="grid-item">
+                <Statistic
+                  title="Total Products"
+                  value={dashboardData.numberOfProducts}
+                  prefix={<BorderOutlined />}
+                />
+                <Statistic
+                  title="Quantity in Hand"
+                  value={dashboardData.totalInventory}
+                  prefix={<DatabaseOutlined />}
+                />
+
+                <Statistic
+                  title="Low Quantity Stocks"
+                  value={dashboardData.lowInventories.length}
+                  prefix={<ExclamationCircleOutlined />}
+                />
+              </div>
+            )}
           </div>
           <div className="col-6">
-            <div className="p-2" style={{ height: '200px', overflowY: 'auto' }}>
-              <div className="d-flex flex-column">
-                <Title level={5}>Pending Outlet Orders</Title>
-                <div>
-                  {orders.map((order) => (
-                    <div className="border p-2 rounded-2 d-flex flex-column" key={order._id}>
-                      <span style={{color: 'gray', fontSize: '12px', fontStyle: 'italic'}}>
-                        {new Date(order.datetimecreated).toLocaleString()}
-                      </span>
-                      <span >
-                        Order for {order.user.fullname}
-                      </span>
-                      <span style={{color: 'gray', fontSize: '12px'}}>
-                        {order.description}
-                      </span>
-                      <Popover placement="right" content={
-                        <div style={{width: '300px'}}>
-                          {order.products.map((product) => (
-                            <div className="d-flex flex-column" key={product._id}>
-                              <span>{product.product.barcode}</span>
-                              <span style={{fontSize: '5px'}}>{product.product.upc_data.items[0].title}</span> 
-                              <hr />
-                            </div>
-                          ))}
-                        </div>
-                      }>
-                        <span>
-                          {order.products.length} products ordered
+            <div className="p-2" style={{ height: "200px", overflowY: "auto" }}>
+              {!orders.length && (
+                <Loading description="Please wait while we load outlet orders." />
+              )}
+
+              {orders.length > 0 && (
+                <div className="d-flex flex-column">
+                  <Title level={5}>Pending Outlet Orders</Title>
+                  <div>
+                    {orders.map((order) => (
+                      <div
+                        className="border p-2 rounded-2 d-flex flex-column"
+                        key={order._id}
+                      >
+                        <span
+                          style={{
+                            color: "gray",
+                            fontSize: "12px",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          {new Date(order.datetimecreated).toLocaleString()}
                         </span>
-                      </Popover>
-                      <Popover placement="right" content={
-                        <div style={{width: '300px'}}>
-                          {order.products.map((product) => (
-                            <div className="d-flex flex-column" key={product._id}>
-                              <span>{product.product.barcode}</span>
-                              <span style={{fontSize: '5px'}}>{product.product.upc_data.items[0].title}</span> 
-                              <span style={{width: 'fit-content'}} className="border p-1 rounded-2">{product.quantity} parcels</span>
-                              <hr />
-                            </div>
-                          ))}
-                        </div>
-                      }>
-                        <span>
-                          {order.products.reduce((acc, curr) => acc + curr.quantity, 0)} parcels ordered
+                        <span>Order for {order.user.fullname}</span>
+                        <span style={{ color: "gray", fontSize: "12px" }}>
+                          {order.description}
                         </span>
-                      </Popover>
-                      
-                    </div>
-                  ))}
+                        <Popover
+                          placement="right"
+                          content={
+                            <div style={{ width: "300px" }}>
+                              {order.products.map((productOrder) => (
+                                <div
+                                  className="d-flex flex-column"
+                                  key={productOrder.product._id}
+                                >
+                                  <span style={{ fontSize: "14px" }}>
+                                    {productOrder.product.barcode}
+                                  </span>
+                                  <span style={{ fontSize: "14px" }}>
+                                    {
+                                      productOrder.product.upc_data.items[0]
+                                        .title
+                                    }
+                                  </span>
+                                  <hr />
+                                </div>
+                              ))}
+                            </div>
+                          }
+                        >
+                          <span>{order.products.length} products ordered</span>
+                        </Popover>
+                        <Popover
+                          placement="right"
+                          content={
+                            <div style={{ width: "300px" }}>
+                              {order.products.map((productOrder) => (
+                                <div
+                                  className="d-flex flex-column"
+                                  key={productOrder.product._id}
+                                >
+                                  <span style={{ fontSize: "14px" }}>
+                                    {productOrder.product.barcode}
+                                  </span>
+                                  <span style={{ fontSize: "14px" }}>
+                                    {
+                                      productOrder.product.upc_data.items[0]
+                                        .title
+                                    }
+                                  </span>
+                                  <span
+                                    style={{
+                                      width: "fit-content",
+                                      fontSize: "14px",
+                                    }}
+                                    className="border p-1 rounded-2"
+                                  >
+                                    {productOrder.quantity} parcels
+                                  </span>
+                                  <hr />
+                                </div>
+                              ))}
+                            </div>
+                          }
+                        >
+                          <span>
+                            {order.products.reduce(
+                              (acc, curr) => acc + curr.quantity,
+                              0
+                            )}{" "}
+                            parcels ordered
+                          </span>
+                        </Popover>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
         <hr />
         <div className="row">
-          <LowInventoryBarChart lowInventoryItems={dashboardData.lowInventories} />
+          <LowInventoryBarChart
+            lowInventoryItems={dashboardData.lowInventories}
+          />
         </div>
       </div>
     </div>
   );
 };
-
-const LowInventoryBarChart = ({ lowInventoryItems }) => {
-  const productNames = lowInventoryItems.slice(0,8).map(item => item.product.barcode);
-  const productQuantities = lowInventoryItems.slice(0,8).map(item => item.parcel_quantity);
-
-  useEffect(() => {
-    console.log(productNames);
-    console.log(productQuantities);
-  }, [])
-
-  const data = {
-    labels: productNames,
-    datasets: [
-      {
-        label: 'Number of Parcels',
-        data: productQuantities,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    indexAxis: 'x', // Horizontal bar chart
-    elements: {
-      bar: {
-        borderWidth: 2,
-      },
-    },
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'right',
-      },
-      title: {
-        display: true,
-        text: 'Low Inventory Items',
-      },
-    },
-  };
-
-  return <Bar data={data} options={options} />;
-};
-
 
 export default Dashboard;
