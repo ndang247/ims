@@ -8,6 +8,7 @@ import LoginPage from "./LoginPage";
 import SignupPage from "./SignUpPage";
 import OutletPage from "./Outlet/OutletPage";
 import NewOrderPage from "./Outlet/NewOrderPage";
+import ViewOrders from "./Outlet/ViewOrders";
 import ProductDetails from "./ProductDetails";
 import UserManagement from "./UserManagement";
 import OutletOrderManagement from "./OutletOrderManagementPage";
@@ -23,6 +24,7 @@ export {
   LoginPage,
   SignupPage,
   OutletPage,
+  ViewOrders,
   NewOrderPage,
   ProductDetails,
   Loading,

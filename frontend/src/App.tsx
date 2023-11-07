@@ -8,6 +8,7 @@ import {
   SignupPage,
   OutletPage,
   NewOrderPage,
+  ViewOrders,
   ProductDetails,
   UserManagement,
   OutletOrderManagement,
@@ -84,6 +85,10 @@ const App = () => {
         <Route element={<OutletRoute role={routeType} />}>
           <Route path="/" element={<OutletPage />} />
           <Route path="/new-order" element={<NewOrderPage />} />
+          <Route
+            path="/orders"
+            element={<ViewOrders outletID={currentUser._id || ""} />}
+          />
         </Route>
       )}
     </Routes>

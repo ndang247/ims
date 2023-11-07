@@ -150,11 +150,14 @@ export interface IOutletOrder {
   datetimecreated: Date;
   datetimeupdated: Date;
 }
+export interface IViewOrdersProps {
+  outletID: string;
+}
 //
 
 // User
 export interface IUser {
-  _id: null;
+  _id: string;
   fullname: string;
   username: string;
   password: string;

@@ -52,11 +52,11 @@ const outletItems: MenuItem[] = [
     "new_order",
     <DropboxOutlined />
   ),
-  // getMenuItem(
-  //   <Link to="/orders">All Orders</Link>,
-  //   "orders",
-  //   <BarcodeOutlined />
-  // ),
+  getMenuItem(
+    <Link to="/orders">All Orders</Link>,
+    "orders",
+    <BarcodeOutlined />
+  ),
 ];
 
 const Sidebar: React.FC<ISidebarProps> = ({ role }) => {
