@@ -125,7 +125,10 @@ const Dashboard: React.FC = () => {
             )}
           </div>
           <div className="col-6">
-            <div className="p-2" style={{ height: "200px", overflowY: "auto" }}>
+            <div
+              className="p-2"
+              style={{ height: "200px", overflowY: "auto", resize: "vertical" }}
+            >
               {!orders.length && (
                 <Loading description="Please wait while we load outlet orders." />
               )}
@@ -136,7 +139,7 @@ const Dashboard: React.FC = () => {
                   <div>
                     {orders.map((order) => (
                       <div
-                        className="border p-2 rounded-2 d-flex flex-column"
+                        className="border p-2 rounded-2 d-flex flex-column mb-2"
                         key={order._id}
                       >
                         <span
