@@ -95,7 +95,7 @@ const postInboundProcess = async (req, res) => {
   if (!inbound) {
     return res
       .status(400)
-      .son({ status: "Not Found", error: "No inbound process found" });
+      .json({ status: "Not Found", error: "No inbound process found" });
   }
 
   const barcode = inbound.barcode_input;
@@ -165,27 +165,36 @@ const postInboundProcess = async (req, res) => {
     ref_id: parcel._id,
     ref_object: "Parcel",
     tag_data: "",
-    status: "activate",
+    status: "activated",
     datetimecreated: new Date(),
     datetimeupdated: new Date(),
   });
+  try {
+    await Promise.all([parcel.save(), tag.save()]);
 
-  await Promise.all([parcel.save(), tag.save()]);
+    // Get the inventory for the product and increment parcel_quantity by 1
+    const inventory = await Inventory.findOne({ product: product._id });
+    inventory.parcel_quantity += 1;
+    await inventory.save();
 
-  // Get the inventory for the product and increment parcel_quantity by 1
-  const inventory = await Inventory.findOne({ product: product._id });
-  inventory.parcel_quantity += 1;
-  await inventory.save();
+    console.log(
+      "Sucessfully process inbound data from IoT:",
+      latestReceivedProduct
+    );
+    console.log("Parcel with Product:", product.barcode);
 
-  console.log(
-    "Sucessfully process inbound data from IoT:",
-    latestReceivedProduct
-  );
-  console.log("Parcel with Product:", product.barcode);
-
-  res
-    .status(200)
-    .json({ status: "Success", message: "Data processed successfully" });
+    res
+      .status(200)
+      .json({ status: "Success", message: "Data processed successfully" });
+  } catch (error) {
+    console.log("Error when processing inbound data:", error);
+    errorLogger("iot.controller", "postInboundProcess").error({
+      message: error,
+    });
+    return res
+      .status(500)
+      .json({ status: "Error", error: "Error when processing inbound data" });
+  }
 };
 
 const getIoTHome = (req, res) => {

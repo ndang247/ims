@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 let dashboardClients = [];
 
 // IF DEV CHANGE TO 50000 for not continuing fetching data from database
-const STREAM_TIME_INTERVAL = 50000;
+const STREAM_TIME_INTERVAL = 5000;
 
 /**
  * Route: /stream/dashboard
