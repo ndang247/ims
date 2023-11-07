@@ -83,7 +83,7 @@ export interface IProductDisplayProps {
 // Inventory
 export interface IInventory {
   _id: string;
-  product: string;
+  product: IProduct;
   parcel_quantity: number;
   datetimecreated: string;
   datetimeupdated: string;
@@ -177,7 +177,10 @@ export interface IDashboardData {
   totalInventory: number;
   lowQuantityStocks: number;
   recentUpdateItem: [];
-  lastUpdatedInventories: [];
-  lowInventories: [];
+  lastUpdatedInventories: IInventory[];
+  lowInventories: IInventory[];
+}
+export interface ILowInventoryBarChartProps {
+  lowInventoryItems: IInventory[];
 }
 //

@@ -1,4 +1,5 @@
 import Dashboard from "./Dashboard/Dashboard";
+import LowInventoryBarChart from "./Charts/LowInventoryBarChart";
 import Sidebar from "./Sidebar";
 import Items from "./Items";
 import Parcels from "./Parcels";
@@ -16,6 +17,7 @@ import Loading from "./Loading";
 
 export {
   Dashboard,
+  LowInventoryBarChart,
   Sidebar,
   Items,
   Parcels,
