@@ -45,6 +45,19 @@ export const postInboundBarcode = async (barcode: string) => {
   }
 };
 
+export const clearInboundBarcode = async () => {
+  try {
+    const response = await api.post("/inbound/clear", {
+      warehouse_id: DEFAULT_WAREHOUSE_ID
+  })
+  return response;
+  } catch (error) {
+    console.log("Error clear inbound barcode");
+    console.log(error);
+    throw error;
+  }
+}
+
 export const getCurrentInbound = async () => {
   const response = await api.get("/inbound/get", {
     params: {
