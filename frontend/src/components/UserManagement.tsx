@@ -156,7 +156,7 @@ const UserManagement: React.FC = () => {
       }
 
       const values = {
-        _id: null,
+        _id: "",
         fullname,
         username,
         password,
@@ -175,7 +175,7 @@ const UserManagement: React.FC = () => {
         console.log("Add user", values);
         await User.add(values);
       } else {
-        values._id = selectedUser?._id ?? null;
+        values._id = selectedUser?._id ?? "";
         await User.update(values);
       }
 

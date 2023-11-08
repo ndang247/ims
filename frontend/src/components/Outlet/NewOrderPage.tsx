@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, InputNumber, Button, Input, message } from "antd";
+import { Table, InputNumber, Button, Input, message, Breadcrumb } from "antd";
 import { getProducts, OutletOrder, Product } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { IProduct } from "@src/types";
@@ -107,7 +107,7 @@ const NewOrderPage = () => {
       render: (record: IProduct) => (
         <InputNumber
           min={0}
-          max={record.inventory?.parcel_quantity || 1}
+          max={record.inventory?.parcel_quantity}
           disabled={submitLoading}
           defaultValue={0}
           onChange={(value) => handleQuantityChange(record, value)}
@@ -123,6 +123,14 @@ const NewOrderPage = () => {
         height: "50%",
       }}
     >
+      <Breadcrumb
+        style={{ margin: "16px 0" }}
+        items={[
+          {
+            title: <a href="/new-order">Create New Order</a>,
+          },
+        ]}
+      />
       <h2>Create New Order</h2>
       <TextArea
         showCount

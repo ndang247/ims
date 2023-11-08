@@ -8,6 +8,7 @@ import {
   SignupPage,
   OutletPage,
   NewOrderPage,
+  ViewOrders,
   ProductDetails,
   UserManagement,
   OutletOrderManagement,
@@ -20,6 +21,7 @@ import { useEffect, useMemo } from "react";
 import type { MenuProps } from "antd";
 
 import { useAuth } from "./Auth";
+import { ISidebarProps } from "./types";
 
 const { Header, Content, Footer } = Layout;
 
@@ -67,7 +69,7 @@ const App = () => {
   return (
     <Routes>
       {(routeType === "manager" || routeType === "staff") && (
-        <Route element={<ManagerRoute />}>
+        <Route element={<ManagerRoute role={routeType} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/parcels" element={<Parcels />} />
           <Route path="/items" element={<Items />} />
@@ -80,16 +82,20 @@ const App = () => {
         </Route>
       )}
       {routeType === "outlet" && (
-        <Route element={<OutletRoute />}>
+        <Route element={<OutletRoute role={routeType} />}>
           <Route path="/" element={<OutletPage />} />
           <Route path="/new-order" element={<NewOrderPage />} />
+          <Route
+            path="/orders"
+            element={<ViewOrders outletID={currentUser._id || ""} />}
+          />
         </Route>
       )}
     </Routes>
   );
 };
 
-export function OutletRoute() {
+export function OutletRoute({ role }: ISidebarProps) {
   const { currentUser, logout } = useAuth();
 
   const items: MenuProps["items"] = [
@@ -113,6 +119,7 @@ export function OutletRoute() {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
+      <Sidebar role={role} />
       <Layout>
         <Header style={{ background: "#4796bd", padding: "0 50px" }}>
           <div
@@ -152,7 +159,7 @@ export function OutletRoute() {
   );
 }
 
-export function ManagerRoute() {
+export function ManagerRoute({ role }: ISidebarProps) {
   const location = useLocation();
 
   const { currentUser, logout } = useAuth();
@@ -184,7 +191,7 @@ export function ManagerRoute() {
   if (currentUser) {
     return (
       <Layout style={{ minHeight: "100vh" }}>
-        <Sidebar />
+        <Sidebar role={role} />
         <Layout>
           <Header style={{ background: "#4796bd", padding: "0 50px" }}>
             <div

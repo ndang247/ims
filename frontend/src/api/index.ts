@@ -295,6 +295,16 @@ export class OutletOrder {
     }
   }
 
+  // Get all Outlet Orders by Outlet ID
+  static async getManyOutletOrdersByOutletID(outletID: string) {
+    try {
+      const response = await api.get(`/outlet/orders/user/${outletID}`);
+      return response.data.orders as IOutletOrder[];
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+
   // Delete Outlet Order by ID
   static async deleteOutletOrder(id: string) {
     try {

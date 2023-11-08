@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/outlet/order/create", outletOrderController.create);
 router.get("/outlet/orders", outletOrderController.getMany);
+router.get("/outlet/orders/user/:id", outletOrderController.getByUserID);
 router.post("/outlet/order/:id/update", outletOrderController.update);
 router.post("/outlet/order/:id/delete", outletOrderController.delete);
 router.get("/outlet/order/:id", outletOrderController.getSingle);

@@ -9,6 +9,7 @@ import {
   Tooltip,
   Divider,
   Breadcrumb,
+  message,
 } from "antd";
 import { OutletOrder } from "../api";
 import { IOutletOrder, IProductOrder } from "../types";
@@ -35,6 +36,10 @@ const OutletOrderManagement = () => {
       case "processed":
         message =
           "The order will be seen as processed and is ready for delivery.";
+        break;
+      case "out_for_delivery":
+        message =
+          "The order will be seen as out for delivery and is with the truck driver or delivery person.";
         break;
       case "delivered":
         message =
@@ -72,6 +77,14 @@ const OutletOrderManagement = () => {
 
   const columns = [
     {
+      title: "Full Name",
+      dataIndex: "user.fullname",
+      key: "user",
+      render: (_text: string, record: IOutletOrder) => {
+        return `${record.user.fullname ?? "N/A"}`;
+      },
+    },
+    {
       title: "User",
       dataIndex: "user.username",
       key: "user",
@@ -83,6 +96,43 @@ const OutletOrderManagement = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      render: (text: string) => {
+        let color = "";
+        switch (text) {
+          case "pending":
+            color = "blue";
+            text = "Pending";
+            break;
+          case "accepted":
+            color = "darkblue";
+            text = "Accepted & Processing";
+            break;
+          case "processed":
+            color = "purple";
+            text = "Processed";
+            break;
+          case "out_for_delivery":
+            color = "orange";
+            text = "Out For Delivery";
+            break;
+          case "delivered":
+            color = "green";
+            text = "Delivered";
+            break;
+          case "rejected":
+            color = "red";
+            text = "Rejected";
+            break;
+          default:
+            color = "black";
+        }
+        return <span style={{ color: color, fontWeight: "bold" }}>{text}</span>;
+      },
+    },
+    {
+      title: "Comment",
+      dataIndex: "comment",
+      key: "comment",
     },
     {
       title: "No. Products",
@@ -111,6 +161,15 @@ const OutletOrderManagement = () => {
       title: "Date Created",
       dataIndex: "datetimecreated",
       key: "datetimecreated",
+      render: (text: Date) => {
+        const date = new Date(text);
+        return `${date.toLocaleString()}`;
+      },
+    },
+    {
+      title: "Date Updated",
+      dataIndex: "datetimeupdated",
+      key: "datetimeupdated",
       render: (text: Date) => {
         const date = new Date(text);
         return `${date.toLocaleString()}`;
@@ -156,7 +215,7 @@ const OutletOrderManagement = () => {
       await init();
       setIsModalVisible(false);
     } catch (error: any) {
-    } finally {
+      message.error(error.message);
     }
   };
 
@@ -186,8 +245,9 @@ const OutletOrderManagement = () => {
           }}
         >
           <Option value="pending">Pending</Option>
-          <Option value="accepted">Accepted</Option>
+          <Option value="accepted">Accepted & Processing</Option>
           <Option value="processed">Processed</Option>
+          <Option value="out_for_delivery">Out For Delivery</Option>
           <Option value="delivered">Delivered</Option>
           <Option value="rejected">Rejected</Option>
           <Option value="">All</Option>
@@ -239,6 +299,7 @@ const OutletOrderManagement = () => {
               <Option value="pending">Pending</Option>
               <Option value="accepted">Accepted & Processing</Option>
               <Option value="processed">Processed</Option>
+              <Option value="out_for_delivery">Out For Delivery</Option>
               <Option value="delivered">Delivered</Option>
               <Option value="rejected">Rejected</Option>
             </Select>
@@ -247,6 +308,12 @@ const OutletOrderManagement = () => {
             <span className="text-secondary py-2">{statusMessage}</span>
           )}
 
+          {/* Comment */}
+          <Form.Item label="Comment" name="comment">
+            <Input.TextArea />
+          </Form.Item>
+
+          {/* Products */}
           <div>
             <span className="fs-6">Products</span>
             {selectedOrder?.products.map((product, key) => {

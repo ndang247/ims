@@ -224,7 +224,7 @@ const addUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { fullname, username, role, warehouses } = req.body;
+  const { username, role, warehouses } = req.body;
 
   // Validation
   if (
@@ -238,17 +238,12 @@ const updateUser = async (req, res) => {
     });
   }
 
-  if (
-    role &&
-    !["owner", "manager", "staff", "outlet", "supplier"].includes(role)
-  ) {
+  if (role && !["manager", "staff", "outlet", "supplier"].includes(role)) {
     return res.status(400).json({
       status: "Not Found",
       message: "Invalid role type",
     });
   }
-
-  const updatedUserData = {};
 
   try {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {

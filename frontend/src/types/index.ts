@@ -4,6 +4,7 @@ import type { MenuProps, TabsProps } from "antd";
 export type MenuItem = Required<MenuProps>["items"][number];
 export type TabItem = Required<TabsProps>["items"][number];
 
+// Sidebar
 export function getMenuItem(
   label: React.ReactNode,
   key: React.Key,
@@ -17,6 +18,10 @@ export function getMenuItem(
     children,
   } as MenuItem;
 }
+export interface ISidebarProps {
+  role: string;
+}
+//
 
 export function getTabItem(
   key: React.Key,
@@ -41,7 +46,6 @@ export interface IParcel {
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
 }
-
 export interface IGroupedParcels {
   [key: string]: IParcel[];
 }
@@ -79,7 +83,7 @@ export interface IProductDisplayProps {
 // Inventory
 export interface IInventory {
   _id: string;
-  product: string;
+  product: IProduct;
   parcel_quantity: number;
   datetimecreated: string;
   datetimeupdated: string;
@@ -134,15 +138,26 @@ export interface IOutletOrder {
   _id: string | null | undefined;
   user: IUser;
   description: string;
-  status: "pending" | "accepted" | "processed" | "delivered" | "rejected";
+  status:
+    | "pending"
+    | "accepted"
+    | "processed"
+    | "out_for_delivery"
+    | "delivered"
+    | "rejected";
+  comment: string;
   products: IProductOrder[];
   datetimecreated: Date;
+  datetimeupdated: Date;
+}
+export interface IViewOrdersProps {
+  outletID: string;
 }
 //
 
 // User
 export interface IUser {
-  _id: null;
+  _id: string;
   fullname: string;
   username: string;
   password: string;
@@ -162,7 +177,10 @@ export interface IDashboardData {
   totalInventory: number;
   lowQuantityStocks: number;
   recentUpdateItem: [];
-  lastUpdatedInventories: [];
-  lowInventories: [];
+  lastUpdatedInventories: IInventory[];
+  lowInventories: IInventory[];
+}
+export interface ILowInventoryBarChartProps {
+  lowInventoryItems: IInventory[];
 }
 //

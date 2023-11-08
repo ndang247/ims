@@ -13,8 +13,19 @@ const outletOrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "processed", "delivered", "rejected"],
+      enum: [
+        "pending",
+        "accepted",
+        "processed",
+        "out_for_delivery",
+        "delivered",
+        "rejected",
+      ],
       default: "pending",
+      required: true,
+    },
+    comment: {
+      type: String,
     },
     products: [
       {
@@ -33,10 +44,15 @@ const outletOrderSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    datetimeupdated: {
+      type: Date,
+      required: true,
+    },
   },
   {
     timestamps: {
       createdAt: "datetimecreated",
+      updatedAt: "datetimeupdated",
     },
   }
 );
