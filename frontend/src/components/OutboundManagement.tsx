@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Breadcrumb,
@@ -8,123 +8,182 @@ import {
   Modal,
   Form,
   Input,
+  message,
 } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
+import { IPallet } from "@src/types";
+import { Pallet } from "../api";
 
 const OutboundManagement: React.FC = () => {
+  const [pallets, setPallets] = useState<IPallet[]>([]);
+  const [selectedPallet, setSelectedPallet] = useState<IPallet | null>(null);
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [errorText, setErrorText] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [outboundLoading, setOutboundLoading] = useState(false);
 
+  const [isStarted, setIsStarted] = useState(false);
+
   const [form] = Form.useForm();
 
-  //   const columns = [
-  //     {
-  //       title: "ID",
-  //     },
-  //     {
-  //       title: "Name",
-  //     },
-  //     {
-  //       title: "Status",
-  //     },
-  //     {
-  //       title: "Date Created",
-  //     },
-  //     {
-  //       title: "Date Updated",
-  //     },
-  //     {
-  //       title: "Action",
-  //       key: "action",
-  //       render: () => <Button>START</Button>,
-  //     },
-  //   ];
+  useEffect(() => {
+    init();
+  }, []);
 
-  const showModal = (record: any) => {
-    setIsModalVisible(true);
-  };
+  async function init() {
+    try {
+      const fetchedPallets = await Pallet.getPallets();
+      console.log("Pallets:", fetchedPallets);
 
-  interface DataType {
-    key: React.Key;
-    name: string;
-    age: number;
-    address: string;
-    description: string;
+      // For each pallet append the key property to the pallet i.e. key: 0 for the first pallet then so on
+      const palletsWithKey = fetchedPallets.map((pallet, key) => {
+        return { ...pallet, key };
+      });
+
+      console.log("Pallets with key:", palletsWithKey);
+
+      setPallets(palletsWithKey);
+    } catch (err: any) {
+      console.log("Failed:", err);
+      message.error(err.error);
+    }
   }
 
-  const columns: ColumnsType<DataType> = [
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Age", dataIndex: "age", key: "age" },
-    { title: "Address", dataIndex: "address", key: "address" },
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "_id",
+      key: "_id",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text: string) => {
+        let color = "";
+        switch (text) {
+          case "activated":
+            color = "green";
+            text = "Activated";
+            break;
+          case "out_for_delivery":
+            color = "blue";
+            text = "Out for Delivery";
+            break;
+          case "deactivated":
+            color = "red";
+            text = "Deactivated";
+            break;
+          default:
+            color = "black";
+        }
+        return <span style={{ color: color, fontWeight: "bold" }}>{text}</span>;
+      },
+    },
+    {
+      title: "Date Created",
+      dataIndex: "datetimecreated",
+      key: "datetimecreated",
+      render: (text: Date) => {
+        const date = new Date(text);
+        return `${date.toLocaleString()}`;
+      },
+    },
+    {
+      title: "Date Updated",
+      dataIndex: "datetimeupdated",
+      key: "datetimeupdated",
+      render: (text: Date) => {
+        const date = new Date(text);
+        return `${date.toLocaleString()}`;
+      },
+    },
     {
       title: "Action",
       dataIndex: "",
       key: "x",
-      render: () => {
+      render: (_: any, record: IPallet) => {
         return (
           <>
-            <Button
-              style={{
-                backgroundColor: "rgb(103 233 40)",
-                borderColor: "rgb(103 233 40)",
-                color: "white",
-              }}
-            >
-              START
-            </Button>
-            &nbsp;
-            <Button
-              style={{
-                backgroundColor: "#fd1d32",
-                borderColor: "#fd1d32",
-                color: "white",
-              }}
-            >
-              STOP
-            </Button>
+            {isStarted ? (
+              <Button
+                style={{
+                  backgroundColor: `${
+                    record._id !== selectedPallet?._id ? "" : "#fd1d32"
+                  }`,
+                  borderColor: `${
+                    record._id !== selectedPallet?._id ? "" : "#fd1d32"
+                  }`,
+                  color: "white",
+                }}
+                onClick={() => {
+                  setIsStarted(false);
+                }}
+                disabled={record._id !== selectedPallet?._id}
+              >
+                STOP
+              </Button>
+            ) : (
+              <Button
+                style={{
+                  backgroundColor: "rgb(103 233 40)",
+                  borderColor: "rgb(103 233 40)",
+                  color: "white",
+                }}
+                disabled={isStarted}
+                onClick={() => {
+                  setIsStarted(true);
+                  setSelectedPallet(record);
+                }}
+              >
+                START
+              </Button>
+            )}
           </>
         );
       },
     },
   ];
 
-  const data: DataType[] = [
-    {
-      key: 1,
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      description:
-        "My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.",
-    },
-    {
-      key: 2,
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      description:
-        "My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.",
-    },
-    {
-      key: 3,
-      name: "Not Expandable",
-      age: 29,
-      address: "Jiangsu No. 1 Lake Park",
-      description: "This not expandable",
-    },
-    {
-      key: 4,
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      description:
-        "My name is Joe Black, I am 32 years old, living in Sydney No. 1 Lake Park.",
-    },
-  ];
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      let values: IPallet = await form.validateFields();
+      values = {
+        ...values,
+        capacity: 20,
+      };
+
+      console.log("Values:", values);
+      const res = await Pallet.createPallet(values);
+      console.log("Pallet:", res);
+
+      form.resetFields();
+      setIsModalVisible(false);
+      setLoading(true);
+
+      setTimeout(() => {
+        if (res.pallet) {
+          message.success(`Pallet ${res.pallet.name} created successfully`);
+        }
+        setLoading(false);
+      }, 3000);
+    } catch (err: any) {
+      console.log("Failed:", err);
+      setErrorText(err.error);
+    }
+  };
 
   return (
     <div>
@@ -185,17 +244,11 @@ const OutboundManagement: React.FC = () => {
       </h5>
       <span style={{ color: "grey" }}></span>
 
-      {errorText !== "" && (
-        <div className="alert alert-danger my-2" role="alert">
-          {errorText}
-        </div>
-      )}
-
       <Button
         className="my-2 me-2"
         type="primary"
         onClick={showModal}
-        disabled={loading}
+        disabled={loading || isStarted}
       >
         {loading && <Spin className="me-2" />}
         Create a Pallet
@@ -205,7 +258,9 @@ const OutboundManagement: React.FC = () => {
         title={"Set Pallet Name"}
         open={isModalVisible}
         okText="Submit"
+        onOk={handleSubmit}
         onCancel={() => {
+          form.resetFields();
           setIsModalVisible(false);
         }}
       >
@@ -214,22 +269,27 @@ const OutboundManagement: React.FC = () => {
             <Input />
           </Form.Item>
         </Form>
+        {errorText !== "" && (
+          <div className="alert alert-danger my-2" role="alert">
+            {errorText}
+          </div>
+        )}
       </Modal>
 
       <Table
-        dataSource={data}
+        dataSource={pallets}
         columns={columns}
-        expandable={{
-          expandedRowRender: (record) => {
-            return (
-              <>
-                <p style={{ margin: 0 }}>{record.description}</p>
-                <p style={{ margin: 0 }}>{record.description}</p>
-              </>
-            );
-          },
-          rowExpandable: (record) => record.name !== "Not Expandable",
-        }}
+        // expandable={{
+        //   expandedRowRender: (record) => {
+        //     return (
+        //       <>
+        //         <p style={{ margin: 0 }}>{record.description}</p>
+        //         <p style={{ margin: 0 }}>{record.description}</p>
+        //       </>
+        //     );
+        //   },
+        //   rowExpandable: (record) => record.name !== "Not Expandable",
+        // }}
       />
     </div>
   );

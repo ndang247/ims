@@ -5,20 +5,42 @@ const createPallet = async (req, res) => {
   try {
     const {
       order,
+      name,
       capacity,
       datetimecreated = new Date(),
       datetimeupdated = new Date(),
     } = req.body;
 
+    if (!name) {
+      return res.status(400).json({
+        status: "Error",
+        error: "Please provide a pallet name",
+      });
+    }
+
+    // Check if there is already a pallet with the same name
+    const palletExist = await Pallet.findOne({ name });
+
+    if (palletExist) {
+      return res.status(400).json({
+        status: "Error",
+        error: "There is already a pallet with that name",
+      });
+    }
+
     const pallet = new Pallet({
       order: order ?? null,
+      name,
       capacity,
       datetimecreated,
       datetimeupdated,
     });
 
     const newPallet = await pallet.save();
-    res.status(200).json(newPallet);
+    res.status(200).json({
+      status: "Success",
+      pallet: newPallet,
+    });
   } catch (error) {
     errorLogger("pallet.controller", "createPallet").error({
       message: error,
@@ -38,7 +60,10 @@ const getOnePallet = async (req, res) => {
         .json({ status: "Error", error: "Pallet not found" });
     }
 
-    res.status(200).json(pallet);
+    res.status(200).json({
+      status: "Success",
+      pallet,
+    });
   } catch (error) {
     errorLogger("pallet.controller", "getOnePallet").error({
       message: error,
@@ -49,8 +74,11 @@ const getOnePallet = async (req, res) => {
 
 const getAllPallets = async (req, res) => {
   try {
-    const pallets = await Pallet.find({}).populate("order");
-    res.status(200).json(pallets);
+    const pallets = await Pallet.find().populate("order");
+    res.status(200).json({
+      status: "Success",
+      pallets,
+    });
   } catch (error) {
     errorLogger("pallet.controller", "getAllPallets").error({
       message: error,
@@ -87,7 +115,10 @@ const updatePallet = async (req, res) => {
     pallet.datetimeupdated = datetimeupdated ?? pallet.datetimeupdated;
 
     const updatedPallet = await pallet.save();
-    res.status(200).json(updatedPallet);
+    res.status(200).json({
+      status: "Success",
+      pallet: updatedPallet,
+    });
   } catch (error) {
     errorLogger("pallet.controller", "updatePallet").error({
       message: error,

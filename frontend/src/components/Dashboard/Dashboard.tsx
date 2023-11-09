@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `https://ims-be.onrender.com/api/v1/stream/dashboard?token=${localStorage.getItem(
+      `http://localhost:8080/api/v1/stream/dashboard?token=${localStorage.getItem(
         "token"
       )}`
     );
