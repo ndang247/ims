@@ -5,6 +5,9 @@ const palletSchema = new mongoose.Schema(
     order: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "OutletOrder",
+    },
+    name: {
+      type: String,
       required: true,
     },
     capacity: {
