@@ -219,9 +219,53 @@ const getInboundStream = async (req, res) => {
   });
 };
 
+const postOutboundProcess = async (req, res) => {
+  let { sensor, role, value } = req.body;
+  let { tagID } = value;
+
+  console.log("Perform post outbound", req.body);
+
+  const existingTag = await RFID.findOne({ id: tagID });
+
+  if (!existingTag) {
+    return res
+      .status(404)
+      .json({ status: "Not Found", error: "Tag not found" });
+  }
+
+  if (existingTag.ref_object !== "Parcel") {
+    return res
+      .status(404)
+      .json({ status: "Error", error: "Tag is not a parcel" });
+  }
+
+  const currentParcel = await Parcel.findById(existingTag.ref_id);
+
+  if (!currentParcel) {
+    return res
+      .status(404)
+      .json({ status: "Not Found", error: "Parcel not found" });
+  }
+
+  const activatedPallet = await Pallet.findOne({ status: "activated" });
+
+  if (!activatedPallet) {
+    return res
+      .status(404)
+      .json({ status: "Not Found", error: "No activated pallet found" });
+  }
+
+  // Update parcel pallet
+  currentParcel.pallet = activatedPallet._id;
+  currentParcel.status = "loaded_on_pallet";
+
+  await currentParcel.save();
+};
+
 module.exports = {
   updateInventory,
   postInboundProcess,
   getInboundStream,
   getIoTHome,
+  postOutboundProcess,
 };
