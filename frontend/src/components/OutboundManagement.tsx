@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Breadcrumb,
@@ -9,6 +9,7 @@ import {
   Form,
   Input,
   message,
+  Popconfirm,
 } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
@@ -51,6 +52,19 @@ const OutboundManagement: React.FC = () => {
       message.error(err.error);
     }
   }
+
+  const confirm = (
+    _: React.MouseEvent<HTMLElement> | undefined,
+    record: IPallet
+  ) => {
+    setIsStarted(true);
+    setSelectedPallet(record);
+  };
+
+  const cancel = (_: React.MouseEvent<HTMLElement> | undefined) => {
+    setIsStarted(false);
+    setSelectedPallet(null);
+  };
 
   const columns = [
     {
@@ -132,20 +146,29 @@ const OutboundManagement: React.FC = () => {
                 STOP
               </Button>
             ) : (
-              <Button
-                style={{
-                  backgroundColor: "rgb(103 233 40)",
-                  borderColor: "rgb(103 233 40)",
-                  color: "white",
-                }}
-                disabled={isStarted}
-                onClick={() => {
-                  setIsStarted(true);
-                  setSelectedPallet(record);
-                }}
+              <Popconfirm
+                title="Start outbound with this pallet?"
+                description="Are you sure to start loading parcels onto this pallet?"
+                onConfirm={(e: React.MouseEvent<HTMLElement> | undefined) =>
+                  confirm(e, record)
+                }
+                onCancel={(e: React.MouseEvent<HTMLElement> | undefined) =>
+                  cancel(e)
+                }
+                okText="Yes"
+                cancelText="No"
               >
-                START
-              </Button>
+                <Button
+                  style={{
+                    backgroundColor: "rgb(103 233 40)",
+                    borderColor: "rgb(103 233 40)",
+                    color: "white",
+                  }}
+                  disabled={isStarted}
+                >
+                  START
+                </Button>
+              </Popconfirm>
             )}
           </>
         );
