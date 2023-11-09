@@ -1,4 +1,5 @@
 const Pallet = require("../models/pallet.model");
+const Parcel = require("../models/parcel.model");
 const { errorLogger } = require("../debug/debug");
 
 const createPallet = async (req, res) => {
@@ -74,10 +75,23 @@ const getOnePallet = async (req, res) => {
 
 const getAllPallets = async (req, res) => {
   try {
-    const pallets = await Pallet.find().populate("order");
+    let queryObj = {};
+    if (req.query.order) {
+      queryObj.order = req.query.order;
+    }
+
+    const pallets = await Pallet.find(queryObj).populate("order");
+
+    const palletsWithParcelsPromises = pallets.map(async (pallet) => {
+      const parcels = await Parcel.find({ pallet: pallet._id });
+      return { ...pallet.toObject(), parcels };
+    });
+
+    const palletsWithParcels = await Promise.all(palletsWithParcelsPromises);
+
     res.status(200).json({
       status: "Success",
-      pallets,
+      pallets: palletsWithParcels
     });
   } catch (error) {
     errorLogger("pallet.controller", "getAllPallets").error({
