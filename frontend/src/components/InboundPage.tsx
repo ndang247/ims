@@ -154,7 +154,6 @@ const InboundPage: React.FC = () => {
         <span>{currentBarcode}</span>
         <span>{currentBarcodeData?.title ?? ""}</span>
         {inboundLoading ? <Spin /> : <span>Inventory: {currentInventory?.parcel_quantity}</span>}
-        
         <div
           style={{
             display: "flex",
