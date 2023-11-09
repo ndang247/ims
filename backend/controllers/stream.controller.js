@@ -1,11 +1,13 @@
 const Inventory = require("../models/inventory.model");
 const Product = require("../models/product.model");
+const Pallet = require("../models/pallet.model");
+const Parcel = require("../models/parcel.model");
 const jwt = require("jsonwebtoken");
 
 let dashboardClients = [];
 
 // IF DEV CHANGE TO 50000 for not continuing fetching data from database
-const STREAM_TIME_INTERVAL = 5000;
+const STREAM_TIME_INTERVAL = 50000;
 
 /**
  * Route: /stream/dashboard
@@ -153,7 +155,69 @@ setInterval(async () => {
   });
 }, STREAM_TIME_INTERVAL);
 
+let outboundStreamClients = [];
+
+/**
+ *  Route: /stream/outbound
+ *  Method: GET
+ */
+const outboundStream = async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  jwt.verify(token, process.env.JWT_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+
+    res.set({
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-store",
+      Connection: "keep-alive",
+    });
+
+    outboundStreamClients.push({ res });
+
+    res.flushHeaders();
+    req.on("close", () => {
+      console.log("Client disconnected");
+      outboundStreamClients = outboundStreamClients.filter(
+        (client) => client.res !== res
+      );
+    });
+  });
+};
+
+setInterval(async () => {
+  outboundStreamClients.forEach(async (client) => {
+    try {
+      const { res } = client;
+
+      let data = {};
+
+      const activatedPallet = await Pallet.findOne({ status: "activated" });
+
+      data.pallet = activatedPallet ?? null;
+
+      const palletParcels = await Parcel.find({ pallet: activatedPallet.id });
+
+      data.parcels = palletParcels ?? [];
+
+      /**
+       * pallet: Pallet object
+       * parcels: array of Parcel object
+       */
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+}, STREAM_TIME_INTERVAL);
+
 module.exports = {
   dashboardStream,
   inventoryStream,
+  outboundStream,
 };
