@@ -7,55 +7,97 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 
-constexpr uint8_t RST_PIN = 22;        // Configurable, see typical pin layout above
-constexpr uint8_t SS_PIN = 5;         // Configurable, see typical pin layout above
+constexpr uint8_t RST_INBOUND_PIN = 22; // Configurable, see typical pin layout above
+constexpr uint8_t SS_INBOUND_PIN = 5;   // Configurable, see typical pin layout above
 
-MFRC522 mfrc522(SS_PIN, RST_PIN);
+constexpr uint8_t RST_OUTBOUND_PIN = 21; // Configurable, see typical pin layout above
+constexpr uint8_t SS_OUTBOUND_PIN = 4;   // Configurable, see typical pin layout above
+
+MFRC522 inboundMrfc522(SS_INBOUND_PIN, RST_INBOUND_PIN);
+MFRC522 outboundMfrc522(SS_OUTBOUND_PIN, RST_OUTBOUND_PIN);
 
 String tagID = "";
 
-boolean getUID() {
-  Serial.println("Getting UID");
+boolean getUIDInbound()
+{
+  Serial.println("Getting UID Inbound");
   // Getting ready for reading Tags
-  if (!mfrc522.PICC_IsNewCardPresent()) {   //If a new tag is placed close to the RFID reader, continue
+  if (!inboundMrfc522.PICC_IsNewCardPresent())
+  { // If a new tag is placed close to the RFID reader, continue
     // delay(2000);
     // Serial.println("No new card");
     return false;
   }
-  if (!mfrc522.PICC_ReadCardSerial()) {     //When a tag is placed, get UID and continue
+  if (!inboundMrfc522.PICC_ReadCardSerial())
+  { // When a tag is placed, get UID and continue
     // delay(2000);
-    // Serial.println("No card serial");
+    Serial.println("No card serial");
     return false;
   }
 
   tagID = "";
-  for ( uint8_t i = 0; i < 4; i++) {                  // The MIFARE tag in use has a 4 byte UID
-    tagID.concat(String(mfrc522.uid.uidByte[i], HEX));  // Adds the 4 bytes in a single string variable
+  for (uint8_t i = 0; i < 4; i++)
+  {                                                           // The MIFARE tag in use has a 4 byte UID
+    tagID.concat(String(inboundMrfc522.uid.uidByte[i], HEX)); // Adds the 4 bytes in a single string variable
   }
   tagID.toUpperCase();
 
   // Serial.println("Tag ID: " + tagID);
 
-  mfrc522.PICC_HaltA(); // Stop reading
+  inboundMrfc522.PICC_HaltA(); // Stop reading
   return true;
 }
 
-const char * SERVER_ADDRESS = "172.20.10.9";
+boolean getUIDOutbound()
+{
+  Serial.println("Getting UID 2");
+  // Getting ready for reading Tags
+  if (!outboundMfrc522.PICC_IsNewCardPresent())
+  { // If a new tag is placed close to the RFID reader, continue
+    // delay(2000);
+    Serial.println("No new card");
+    return false;
+  }
+  if (!outboundMfrc522.PICC_ReadCardSerial())
+  { // When a tag is placed, get UID and continue
+    // delay(2000);
+    Serial.println("No card serial");
+    return false;
+  }
+
+  tagID = "";
+  for (uint8_t i = 0; i < 4; i++)
+  {                                                            // The MIFARE tag in use has a 4 byte UID
+    tagID.concat(String(outboundMfrc522.uid.uidByte[i], HEX)); // Adds the 4 bytes in a single string variable
+  }
+  tagID.toUpperCase();
+
+  // Serial.println("Tag ID: " + tagID);
+
+  outboundMfrc522.PICC_HaltA(); // Stop reading
+  return true;
+}
+
+const char *SERVER_ADDRESS = "172.20.10.9";
 const uint16_t SERVER_PORT = 3000;
 String postInboundRoute = "/iot/inbound";
 
-void postTag(String tagID) {
-  if (WiFi.status() == WL_CONNECTED) {
+void postTag(String tagID)
+{
+  if (WiFi.status() == WL_CONNECTED)
+  {
     Serial.println("Posting tag - Wifi Strength: " + String(WiFi.RSSI()));
     WiFiClient client;
 
-    if (!client.connect(SERVER_ADDRESS, SERVER_PORT)) {
+    if (!client.connect(SERVER_ADDRESS, SERVER_PORT))
+    {
       Serial.println("Connection failed.");
       return;
     }
 
     // Send POST request
-    if (client.connect(SERVER_ADDRESS, SERVER_PORT)) { // Use c_str() to convert String to const char*
+    if (client.connect(SERVER_ADDRESS, SERVER_PORT))
+    {                                  // Use c_str() to convert String to const char*
       StaticJsonDocument<200> jsonDoc; // Adjust the size as needed
       jsonDoc["sensor"] = "ESP8266";
       jsonDoc["role"] = "inbound";
@@ -76,60 +118,99 @@ void postTag(String tagID) {
       client.println();
       client.println(jsonStr);
 
-      while (client.connected()) {
-          String line = client.readStringUntil('\n');
-          Serial.println(line);
+      while (client.connected())
+      {
+        String line = client.readStringUntil('\n');
+        Serial.println(line);
       }
       client.stop();
-    } else {
+    }
+    else
+    {
       Serial.println("POST Tag failed. Tag: " + tagID);
     }
   }
 }
 
-
 // Replace with your network credentials (STATION)
-const char* ssid = "SaeForWork";
-const char* password = "08102001";
-void initWifi() {
-  // WiFi.mode(WIFI_STA);
+const char *ssid = "SaeForWork";
+const char *password = "08102001";
+void initWifi()
+{
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi ..");
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     Serial.print('.');
-    delay(1000);
+    delay(2000);
   }
   Serial.println("WiFi connected");
   Serial.println(WiFi.localIP());
   Serial.println(WiFi.SSID());
 }
 
-void setup() {
-	Serial.begin(115200);		// Initialize serial communications with the PC
-	while (!Serial);		  // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
-	SPI.begin();			    // Init SPI bus
-	mfrc522.PCD_Init();		// Init MFRC522
+void initRFID()
+{
+  SPI.begin();               // Init SPI bus
+  inboundMrfc522.PCD_Init(); // Init MFRC522
+  Serial.println("RFID reader initialized");
 
-  initWifi();
+  delay(4);
 
-  // WiFiManager wifiManager;
-  // if (!wifiManager.autoConnect()) {
-  //   Serial.println("Failed to connect wifi and hit timeout.");
-  //   // Reset and try again, or do something else
-  //   ESP.reset();
-  //   delay(1000);
-  // }
-  // Serial.println("Done Setup!");
-  // Serial.println("Connected to: " + WiFi.SSID());
+  outboundMfrc522.PCD_Init();
+  Serial.println("RFID reader 2 initialized");
+  delay(4);
+
+  byte v = inboundMrfc522.PCD_ReadRegister(inboundMrfc522.VersionReg);
+  if (v == 0x00 || v == 0xFF)
+  {
+    Serial.println("Could not find MFRC522 board. Check wiring.");
+  }
+  else
+  {
+    Serial.print("RFID reader found, version ");
+    Serial.println(v, HEX);
+  }
 }
 
-void loop() {
-  
-  if (getUID()) 
+void setup()
+{
+  Serial.begin(115200); // Initialize serial communications with the PC
+  while (!Serial)
+    ; // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+  delay(5000);
+  Serial.println("Setting up RFID reader");
+  WiFi.mode(WIFI_STA);
+
+  delay(4);
+  initRFID();
+}
+
+void loop()
+{
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    initWifi();
+  }
+  if (getUIDInbound())
   {
     Serial.println("Tag " + tagID + " detected");
-    // getRequest();
-    postTag(tagID);
-    delay(2000);
+    // postTag(tagID);
+    delay(3000);
+  }
+  else
+  {
+    Serial.println("No tag detected");
+  }
+
+  if (getUIDOutbound())
+  {
+    Serial.println("Outbound: Tag " + tagID + " detected");
+    // postTag(tagID);
+    delay(3000);
+  }
+  else
+  {
+    Serial.println("No tag detected");
   }
 }
