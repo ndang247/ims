@@ -52,8 +52,10 @@ table {
   width: 100%;
 }
 
-td,
-th {
+#product-details td,
+#product-details th,
+#supplier-details td,
+#supplier-details th {
   text-align: left;
   padding: 1rem;
   /* border: 1px solid #dddddd; */

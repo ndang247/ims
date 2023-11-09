@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, Breadcrumb, Tooltip, Spin, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { postInboundBarcode, getCurrentInbound, clearInboundBarcode } from "../api";
+import {
+  postInboundBarcode,
+  getCurrentInbound,
+  clearInboundBarcode,
+} from "../api";
 import { ICurrentBarcodeData, IInventory } from "@src/types";
-import { Loading } from ".";
 
 const InboundPage: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
@@ -33,8 +36,8 @@ const InboundPage: React.FC = () => {
       eventSource.close();
       return;
     }
-    
-    setInboundLoading(true)
+
+    setInboundLoading(true);
     eventSource.onmessage = (event) => {
       let data = JSON.parse(event.data);
       if (data) {
@@ -44,13 +47,13 @@ const InboundPage: React.FC = () => {
         setCurrentInventory(data);
         setLastFetched(new Date());
       }
-      setInboundLoading(false)
+      setInboundLoading(false);
     };
 
     eventSource.onerror = (error) => {
       console.error("EventSource failed:", error);
       eventSource.close();
-      setInboundLoading(false)
+      setInboundLoading(false);
     };
   }, [currentBarcode]);
 
@@ -103,10 +106,10 @@ const InboundPage: React.FC = () => {
   };
 
   const handleClearButtonClick = async () => {
-    setCurrentBarcode("")
-    setCurrentBarcodeData(undefined)
-    setErrorText("")
-    setCurrentInventory(undefined)
+    setCurrentBarcode("");
+    setCurrentBarcodeData(undefined);
+    setErrorText("");
+    setCurrentInventory(undefined);
 
     try {
       setLoading(true);
@@ -118,7 +121,7 @@ const InboundPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -153,7 +156,11 @@ const InboundPage: React.FC = () => {
         </span>
         <span>{currentBarcode}</span>
         <span>{currentBarcodeData?.title ?? ""}</span>
-        {inboundLoading ? <Spin /> : <span>Inventory: {currentInventory?.parcel_quantity}</span>}
+        {inboundLoading ? (
+          <Spin />
+        ) : (
+          <span>Inventory: {currentInventory?.parcel_quantity}</span>
+        )}
         <div
           style={{
             display: "flex",
@@ -208,7 +215,6 @@ const InboundPage: React.FC = () => {
       >
         Clear
       </Button>
-
     </div>
   );
 };

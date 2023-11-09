@@ -4,6 +4,7 @@ import {
   Parcels,
   Sidebar,
   InboundPage,
+  OutboundManagement,
   LoginPage,
   SignupPage,
   OutletPage,
@@ -75,6 +76,7 @@ const App = () => {
           <Route path="/items" element={<Items />} />
           <Route path="/items/:id" element={<ProductDetails />} />
           <Route path="/inbound" element={<InboundPage />} />
+          <Route path="/outbound" element={<OutboundManagement />} />
           <Route path="/outlet" element={<OutletOrderManagement />} />
 
           <Route path="/users" element={<UserManagement />} />

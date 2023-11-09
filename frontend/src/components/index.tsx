@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import Items from "./Items";
 import Parcels from "./Parcels";
 import InboundPage from "./InboundPage";
+import OutboundManagement from "./OutboundManagement";
 import ProductDisplay from "./ProductDisplay";
 import LoginPage from "./LoginPage";
 import SignupPage from "./SignUpPage";
@@ -22,6 +23,7 @@ export {
   Items,
   Parcels,
   InboundPage,
+  OutboundManagement,
   ProductDisplay,
   LoginPage,
   SignupPage,

@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div style={{ marginBottom: "1rem" }} className="container">
       <Breadcrumb
         style={{ margin: "16px 0" }}
         items={[

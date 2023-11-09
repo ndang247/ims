@@ -3,9 +3,11 @@ import {
   HomeOutlined,
   DropboxOutlined,
   BarcodeOutlined,
-  TagOutlined,
   UserOutlined,
   AuditOutlined,
+  MenuFoldOutlined,
+  LoginOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
@@ -24,26 +26,20 @@ const managerItems: MenuItem[] = [
     <DropboxOutlined />
   ),
   getMenuItem(<Link to="/items">Items</Link>, "items", <BarcodeOutlined />),
-  getMenuItem(<Link to="/inbound">Inbound</Link>, "inbound", <TagOutlined />),
-  getMenuItem(
-    <Link to="/users">User Management</Link>,
-    "users",
-    <UserOutlined />
-  ),
-  getMenuItem(
-    <Link to="/outlet">Outlet Order Management</Link>,
-    "outlet_orders",
-    <AuditOutlined />
-  ),
-  // getMenuItem("User", "sub1", <UserOutlined />, [
-  //   getMenuItem("Tom", "3"),
-  //   getMenuItem("Bill", "4"),
-  //   getMenuItem("Alex", "5"),
-  // ]),
-  // getMenuItem("Team", "sub2", <TeamOutlined />, [
-  //   getMenuItem("Team 1", "6"),
-  //   getMenuItem("Team 2", "8"),
-  // ]),
+  getMenuItem(<Link to="/inbound">Inbound</Link>, "inbound", <LoginOutlined />),
+  getMenuItem("Manage", "sub1", <MenuFoldOutlined />, [
+    getMenuItem(
+      <Link to="/outbound">Outbound</Link>,
+      "outbound",
+      <LogoutOutlined />
+    ),
+    getMenuItem(<Link to="/users">User</Link>, "users", <UserOutlined />),
+    getMenuItem(
+      <Link to="/outlet">Outlet Order</Link>,
+      "outlet_orders",
+      <AuditOutlined />
+    ),
+  ]),
 ];
 
 const outletItems: MenuItem[] = [

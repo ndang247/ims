@@ -184,3 +184,13 @@ export interface ILowInventoryBarChartProps {
   lowInventoryItems: IInventory[];
 }
 //
+
+// Pallet
+export interface IPallet {
+  order: IOutletOrder;
+  capacity: number;
+  status: string;
+  datetimecreated: Date;
+  datetimeupdated: Date;
+}
+//
