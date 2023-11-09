@@ -186,9 +186,7 @@ const addUser = async (req, res) => {
     });
   }
 
-  if (
-    !["owner", "manager", "worker", "outlet", "supplier", ""].includes(role)
-  ) {
+  if (!["manager", "staff", "outlet", "supplier", ""].includes(role)) {
     return res.status(400).json({
       status: "Not Found",
       message: "Invalid role type",
