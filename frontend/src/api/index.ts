@@ -1,8 +1,8 @@
 import axios from "axios";
-import { IOutletOrder, IUser } from "../types";
+import { IOutletOrder, IPallet, IUser } from "../types";
 
 const api = axios.create({
-  baseURL: "https://ims-be.onrender.com/api/v1",
+  baseURL: "http://localhost:8080/api/v1",
   headers: {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
@@ -48,15 +48,15 @@ export const postInboundBarcode = async (barcode: string) => {
 export const clearInboundBarcode = async () => {
   try {
     const response = await api.post("/inbound/clear", {
-      warehouse_id: DEFAULT_WAREHOUSE_ID
-  })
-  return response;
+      warehouse_id: DEFAULT_WAREHOUSE_ID,
+    });
+    return response;
   } catch (error) {
     console.log("Error clear inbound barcode");
     console.log(error);
     throw error;
   }
-}
+};
 
 export const getCurrentInbound = async () => {
   const response = await api.get("/inbound/get", {
@@ -167,7 +167,7 @@ export const getWarehouses = async () => {
 
 export const getInventoryStream = async (barcode: string) => {
   const eventSource = new EventSource(
-    `https://ims-be.onrender.com/api/v1/inventory/${barcode}/stream`
+    `http://localhost:8080/api/v1/inventory/${barcode}/stream`
   );
 
   eventSource.onmessage = (event) => {
@@ -323,6 +323,26 @@ export class OutletOrder {
     try {
       const response = await api.post(`/outlet/order/${id}/delete`);
       return response.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+}
+
+export class Pallet {
+  static async createPallet(data: IPallet) {
+    try {
+      const response = await api.post("/pallet/create", data);
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+
+  static async getPallets() {
+    try {
+      const response = await api.get("/pallets");
+      return response.data.pallets as IPallet[];
     } catch (error: any) {
       throw error.response.data;
     }

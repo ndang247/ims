@@ -187,7 +187,8 @@ export interface ILowInventoryBarChartProps {
 
 // Pallet
 export interface IPallet {
-  order: IOutletOrder;
+  _id: string;
+  order?: IOutletOrder;
   capacity: number;
   status: string;
   datetimecreated: Date;
