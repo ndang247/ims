@@ -74,6 +74,25 @@ const postInboundBarcode = async (req, res) => {
   return res.status(200).json({ status: "Success", updated: true });
 };
 
+const clearInboundBarcode = async (req, res) => {
+  let { warehouse_id } = req.body;
+
+  console.log("Clear inbound process:", warehouse_id);
+
+  let inbound = await Inbound.findOne({
+    warehouse_id: warehouse_id,
+  });
+
+  if (!inbound) {
+    return res.status(200).json({ status: "Success", updated: false });
+  }
+
+  inbound.barcode_input = "";
+  await inbound.save();
+
+  return res.status(200).json({ status: "Success", updated: true });
+};
+
 const getInbound = async (req, res) => {
   let { warehouse_id } = req.query;
 
@@ -111,4 +130,5 @@ const getInbound = async (req, res) => {
 module.exports = {
   postInboundBarcode,
   getInbound,
+  clearInboundBarcode,
 };

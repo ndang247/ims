@@ -9,7 +9,6 @@ const inboundSchema = new mongoose.Schema(
     },
     barcode_input: {
       type: String,
-      required: true,
     },
     datetimecreated: {
       type: Date,
