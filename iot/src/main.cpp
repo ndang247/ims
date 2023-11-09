@@ -85,7 +85,7 @@ const char *SERVER_ADDRESS = "172.20.10.9";
 const uint16_t SERVER_PORT = 3000;
 String postInboundRoute = "/iot/inbound";
 
-void postTag(String tagID)
+boolean registerTagInbound(String tagID)
 {
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -95,7 +95,7 @@ void postTag(String tagID)
     if (!client.connect(SERVER_ADDRESS, SERVER_PORT))
     {
       Serial.println("Connection failed.");
-      return;
+      return false;
     }
 
     // Send POST request
@@ -127,12 +127,16 @@ void postTag(String tagID)
         Serial.println(line);
       }
       client.stop();
+      return true;
     }
     else
     {
       Serial.println("POST Tag failed. Tag: " + tagID);
+      return false;
     }
   }
+
+  return false;
 }
 
 boolean checkMRFC(MFRC522 mrfc522, String name)
@@ -221,10 +225,22 @@ void loop()
   {
     Serial.println("Tag " + tagID + " detected");
     digitalWrite(LOADING_PIN, HIGH);
-    postTag(tagID);
+    const boolean success = registerTagInbound(tagID);
     digitalWrite(LOADING_PIN, LOW);
-    digitalWrite(SUCCESS_PIN, HIGH);
+    if (success)
+    {
+      digitalWrite(SUCCESS_PIN, HIGH);
+      Serial.println("Tag " + tagID + " registered");
+    }
+    else
+    {
+      digitalWrite(ERROR_PIN, HIGH);
+      Serial.println("Tag " + tagID + " failed to register");
+    }
+
     delay(3000);
+
+    digitalWrite(ERROR_PIN, LOW);
     digitalWrite(SUCCESS_PIN, LOW);
   }
   else
