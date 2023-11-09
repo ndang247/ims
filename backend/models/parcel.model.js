@@ -16,11 +16,17 @@ const parcelSchema = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
+    pallet: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Pallet",
+      required: true,
+    },
     status: {
       type: String,
       enum: [
         "in_warehouse",
         "on_shelf",
+        "loaded_on_pallet",
         "out_for_delivery",
         "delivered",
         "archived",
