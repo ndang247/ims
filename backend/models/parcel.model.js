@@ -19,7 +19,6 @@ const parcelSchema = new mongoose.Schema(
     pallet: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Pallet",
-      required: true,
     },
     status: {
       type: String,
