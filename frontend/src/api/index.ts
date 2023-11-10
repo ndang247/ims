@@ -1,6 +1,8 @@
 import axios from "axios";
 import { IOutletOrder, IPallet, IUser } from "../types";
 
+export const BASE_URL = "http://localhost:8080/api/v1"
+
 const api = axios.create({
   baseURL: "http://localhost:8080/api/v1",
   headers: {
@@ -167,7 +169,7 @@ export const getWarehouses = async () => {
 
 export const getInventoryStream = async (barcode: string) => {
   const eventSource = new EventSource(
-    `http://localhost:8080/api/v1/inventory/${barcode}/stream`
+    `${BASE_URL}/inventory/${barcode}/stream`
   );
 
   eventSource.onmessage = (event) => {
@@ -339,9 +341,13 @@ export class Pallet {
     }
   }
 
-  static async getPallets() {
+  static async getPallets(orderId?: string) {
     try {
-      const response = await api.get("/pallets");
+      let url = "/pallets"
+      if (orderId && orderId.trim().length !== 0) {
+        url += `?order=${orderId}`
+      }
+      const response = await api.get(url);
       return response.data.pallets as IPallet[];
     } catch (error: any) {
       throw error.response.data;

@@ -42,6 +42,7 @@ export interface IParcel {
     _id: string;
     name: string;
   };
+  product: IProduct
 }
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
@@ -189,9 +190,17 @@ export interface ILowInventoryBarChartProps {
 export interface IPallet {
   _id: string;
   order?: IOutletOrder;
+  name: string;
   capacity: number;
   status: string;
   datetimecreated: Date;
   datetimeupdated: Date;
 }
 //
+
+// Outbound Stream
+export interface IOutboundStream {
+  pallet?: IPallet,
+  parcels: IParcel[],
+  datetimeupdated: string
+}
