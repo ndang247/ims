@@ -12,7 +12,6 @@ import {
   Popconfirm,
 } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import type { ColumnsType } from "antd/es/table";
 import { IOutboundStream, IPallet } from "@src/types";
 import { BASE_URL, Pallet } from "../api";
 
@@ -21,8 +20,9 @@ const OutboundManagement: React.FC = () => {
   const [selectedPallet, setSelectedPallet] = useState<IPallet | null>(null);
   const [streamOutbound, setStreamOutbound] = useState<IOutboundStream>({
     pallet: undefined,
-    parcels: []
-  })
+    parcels: [],
+    datetimeupdated: new Date().toLocaleString(),
+  });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [errorText, setErrorText] = useState("");
@@ -37,7 +37,10 @@ const OutboundManagement: React.FC = () => {
 
   useEffect(() => {
     init();
-    outboundStreamInit()
+  }, [selectedPallet, outboundLoading]);
+
+  useEffect(() => {
+    outboundStreamInit();
   }, []);
 
   async function init() {
@@ -62,42 +65,65 @@ const OutboundManagement: React.FC = () => {
   function outboundStreamInit() {
     const eventSource = new EventSource(
       `${BASE_URL}/stream/outbound?token=${localStorage.getItem("token")}`
-    )
+    );
 
     setOutboundLoading(true);
 
     eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      console.log('Outbound Stream', data);
+      const data = JSON.parse(event.data);
+      console.log("Outbound Stream", data);
       if (data) {
         setStreamOutbound({
           pallet: data.pallet ?? undefined,
           parcels: data.parcels ?? [],
-          datetimeupdated: new Date().toLocaleString()
-        })
+          datetimeupdated: new Date().toLocaleString(),
+        });
         setLastFetched(new Date());
       }
-      setOutboundLoading(false)
-    }
+      setOutboundLoading(false);
+    };
 
     eventSource.onerror = (error) => {
       console.log("EventSource failed", error);
-      eventSource.close()
-      setOutboundLoading(false)
-    }
+      eventSource.close();
+      setOutboundLoading(false);
+    };
   }
 
-  const confirm = (
+  const confirm = async (
     _: React.MouseEvent<HTMLElement> | undefined,
     record: IPallet
   ) => {
-    setIsStarted(true);
-    setSelectedPallet(record);
+    try {
+      setOutboundLoading(true);
+      const res = await Pallet.updatePalletStatus(record._id, "activated");
+      setIsStarted(true);
+      setSelectedPallet(res.pallet);
+      if (streamOutbound.pallet) {
+        setOutboundLoading(false);
+      }
+    } catch (err: any) {
+      message.error(err.error);
+    }
   };
 
   const cancel = (_: React.MouseEvent<HTMLElement> | undefined) => {
     setIsStarted(false);
     setSelectedPallet(null);
+  };
+
+  const stopOutbound = async (record: IPallet) => {
+    try {
+      setOutboundLoading(true);
+      await Pallet.updatePalletStatus(record._id, "deactivated");
+      setIsStarted(false);
+      setSelectedPallet(null);
+      if (!streamOutbound.pallet) {
+        setOutboundLoading(false);
+      }
+    } catch (err: any) {
+      message.error(err.error);
+    }
   };
 
   const columns = [
@@ -161,49 +187,55 @@ const OutboundManagement: React.FC = () => {
       render: (_: any, record: IPallet) => {
         return (
           <>
-            {isStarted ? (
-              <Button
-                style={{
-                  backgroundColor: `${
-                    record._id !== selectedPallet?._id ? "" : "#fd1d32"
-                  }`,
-                  borderColor: `${
-                    record._id !== selectedPallet?._id ? "" : "#fd1d32"
-                  }`,
-                  color: "white",
-                }}
-                onClick={() => {
-                  setIsStarted(false);
-                }}
-                disabled={record._id !== selectedPallet?._id}
-              >
-                STOP
-              </Button>
-            ) : (
-              <Popconfirm
-                title="Start outbound with this pallet?"
-                description="Are you sure to start loading parcels onto this pallet?"
-                onConfirm={(e: React.MouseEvent<HTMLElement> | undefined) =>
-                  confirm(e, record)
-                }
-                onCancel={(e: React.MouseEvent<HTMLElement> | undefined) =>
-                  cancel(e)
-                }
-                okText="Yes"
-                cancelText="No"
-              >
+            {record.status !== "out_for_delivery" &&
+              (record.status === "activated" ? (
                 <Button
                   style={{
-                    backgroundColor: "rgb(103 233 40)",
-                    borderColor: "rgb(103 233 40)",
+                    backgroundColor: "#fd1d32",
+                    borderColor: "#fd1d32",
                     color: "white",
                   }}
+                  onClick={() => stopOutbound(record)}
+                >
+                  STOP
+                </Button>
+              ) : (
+                <Popconfirm
+                  title="Start outbound with this pallet?"
+                  description="Are you sure to start loading parcels onto this pallet?"
+                  onConfirm={(e: React.MouseEvent<HTMLElement> | undefined) =>
+                    confirm(e, record)
+                  }
+                  onCancel={(e: React.MouseEvent<HTMLElement> | undefined) =>
+                    cancel(e)
+                  }
+                  okText="Yes"
+                  cancelText="No"
                   disabled={isStarted}
                 >
-                  START
-                </Button>
-              </Popconfirm>
-            )}
+                  <Button
+                    style={{
+                      backgroundColor: `${
+                        selectedPallet && record._id !== selectedPallet?._id
+                          ? "#dddddd"
+                          : "rgb(103 233 40)"
+                      }`,
+                      borderColor: `${
+                        selectedPallet && record._id !== selectedPallet?._id
+                          ? "#dddddd"
+                          : "rgb(103 233 40)"
+                      }`,
+                      color: "white",
+                    }}
+                    disabled={
+                      Object.keys(selectedPallet ?? {}).length !== 0 &&
+                      record._id !== selectedPallet?._id
+                    }
+                  >
+                    START
+                  </Button>
+                </Popconfirm>
+              ))}
           </>
         );
       },
@@ -251,7 +283,7 @@ const OutboundManagement: React.FC = () => {
             title: <a href="/">Dashboard</a>,
           },
           {
-            title: <a href="/outbound-management">Outbound</a>,
+            title: <a href="/outbound">Outbound</a>,
           },
         ]}
       />
@@ -273,27 +305,44 @@ const OutboundManagement: React.FC = () => {
         <span className="pb-2" style={{ color: "grey" }}>
           Scanned parcels will be added to this pallet.
         </span>
-        {streamOutbound.pallet ? (<>
-          <span>ID: {streamOutbound.pallet._id}</span>
-          <span>Name: {streamOutbound.pallet.name}</span>
-          {outboundLoading ? <Spin /> : <span>Capacity: {streamOutbound.pallet.capacity}</span>}
-        </>) : (
+        {streamOutbound.pallet ? (
           <>
-          <span>No activated parcel</span>
+            <span>ID: {streamOutbound.pallet._id}</span>
+            <span>Name: {streamOutbound.pallet.name}</span>
+            {outboundLoading ? (
+              <Spin />
+            ) : (
+              <span>Capacity: {streamOutbound.pallet.capacity}</span>
+            )}
+          </>
+        ) : (
+          <>
+            <span>No activated pallet</span>
+            {outboundLoading && <Spin />}
           </>
         )}
 
-        {streamOutbound.pallet &&
+        {streamOutbound.pallet && (
           <div>
-            <span>{streamOutbound.parcels.length} parcels in pallet {streamOutbound.pallet.name}</span>
+            <span>
+              {streamOutbound.parcels.length} parcels in pallet{" "}
+              {streamOutbound.pallet.name}
+            </span>
             {streamOutbound.parcels.map((parcel) => {
-              return <div className="border p-2 rounded-2 d-flex flex-column mb-2" key={parcel._id}>
-                <span style={{ fontSize: "14px" }}>{parcel.product.barcode}</span>
-                <span>{parcel.product.upc_data.items[0].title}</span>
-              </div>
+              return (
+                <div
+                  className="border p-2 rounded-2 d-flex flex-column mb-2"
+                  key={parcel._id}
+                >
+                  <span style={{ fontSize: "14px" }}>
+                    {parcel.product.barcode}
+                  </span>
+                  <span>{parcel.product.upc_data.items[0].title}</span>
+                </div>
+              );
             })}
           </div>
-        }
+        )}
         <div
           style={{
             display: "flex",

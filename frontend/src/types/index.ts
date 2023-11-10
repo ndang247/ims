@@ -42,7 +42,7 @@ export interface IParcel {
     _id: string;
     name: string;
   };
-  product: IProduct
+  product: IProduct;
 }
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
@@ -200,7 +200,8 @@ export interface IPallet {
 
 // Outbound Stream
 export interface IOutboundStream {
-  pallet?: IPallet,
-  parcels: IParcel[],
-  datetimeupdated: string
+  pallet?: IPallet;
+  parcels: IParcel[];
+  datetimeupdated: string;
 }
+//

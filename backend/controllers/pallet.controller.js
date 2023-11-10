@@ -121,7 +121,10 @@ const updatePallet = async (req, res) => {
     if (status && status === "activated") {
       const activatedPallet = await Pallet.findOne({ status: "activated" });
 
-      if (activatedPallet._id != pallet._id) {
+      if (
+        activatedPallet &&
+        activatedPallet._id.toString() !== pallet._id.toString()
+      ) {
         activatedPallet.status = "deactivated";
         await activatedPallet.save();
       }

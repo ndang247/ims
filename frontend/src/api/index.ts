@@ -1,7 +1,7 @@
 import axios from "axios";
 import { IOutletOrder, IPallet, IUser } from "../types";
 
-export const BASE_URL = "http://localhost:8080/api/v1"
+export const BASE_URL = "http://localhost:8080/api/v1";
 
 const api = axios.create({
   baseURL: "http://localhost:8080/api/v1",
@@ -343,12 +343,23 @@ export class Pallet {
 
   static async getPallets(orderId?: string) {
     try {
-      let url = "/pallets"
+      let url = "/pallets";
       if (orderId && orderId.trim().length !== 0) {
-        url += `?order=${orderId}`
+        url += `?order=${orderId}`;
       }
       const response = await api.get(url);
       return response.data.pallets as IPallet[];
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+
+  static async updatePalletStatus(id: string, status: string) {
+    try {
+      const response = await api.post(`/pallet/update/${id}`, {
+        status,
+      });
+      return response.data;
     } catch (error: any) {
       throw error.response.data;
     }
