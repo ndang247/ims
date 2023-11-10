@@ -141,7 +141,7 @@ const inventoryStream = async (req, res) => {
 };
 
 setInterval(async () => {
-  console.log("Do send something");
+  console.log("Stream Inbound");
   inventoryStreamClients.forEach(async (client) => {
     try {
       const { res, barcode } = client;
@@ -191,6 +191,7 @@ const outboundStream = async (req, res) => {
 };
 
 setInterval(async () => {
+  console.log("Stream Outbound");
   outboundStreamClients.forEach(async (client) => {
     try {
       const { res } = client;
@@ -200,10 +201,25 @@ setInterval(async () => {
       const activatedPallet = await Pallet.findOne({ status: "activated" });
 
       data.pallet = activatedPallet ?? null;
+      data.parcels = [];
 
-      const palletParcels = await Parcel.find({ pallet: activatedPallet.id });
+      if (activatedPallet) {
+        let palletParcels = await Parcel.find({
+          pallet: activatedPallet.id,
+        }).populate("product");
 
-      data.parcels = palletParcels ?? [];
+        palletParcels = palletParcels.map((parcel) => {
+          return {
+            ...parcel,
+            product: {
+              ...parcel.product,
+              upc_data: JSON.parse(parcel.product.upc_data),
+            },
+          };
+        });
+
+        data.parcels = palletParcels;
+      }
 
       /**
        * pallet: Pallet object

@@ -5,7 +5,7 @@ import {
   ExclamationCircleOutlined,
   BorderOutlined,
 } from "@ant-design/icons";
-import { OutletOrder } from "../../api";
+import { OutletOrder, BASE_URL } from "../../api";
 import { IDashboardData, IOutletOrder } from "@src/types";
 import { Loading, LowInventoryBarChart } from "../../components";
 import "./Dashboard.css";
@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `http://localhost:8080/api/v1/stream/dashboard?token=${localStorage.getItem(
+      `${BASE_URL}/stream/dashboard?token=${localStorage.getItem(
         "token"
       )}`
     );

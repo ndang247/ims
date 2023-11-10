@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Input, Breadcrumb, Tooltip, Spin, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import {
+  BASE_URL,
   postInboundBarcode,
   getCurrentInbound,
   clearInboundBarcode,
@@ -27,7 +28,7 @@ const InboundPage: React.FC = () => {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `http://localhost:8080/api/v1/stream/inventory/${currentBarcode}?token=${localStorage.getItem(
+      `${BASE_URL}/stream/inventory/${currentBarcode}?token=${localStorage.getItem(
         "token"
       )}`
     );

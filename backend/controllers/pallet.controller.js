@@ -73,6 +73,10 @@ const getOnePallet = async (req, res) => {
   }
 };
 
+/**
+ * Query:
+ *    order: order_id to query pallets for specific order
+ */
 const getAllPallets = async (req, res) => {
   try {
     let queryObj = {};
@@ -91,7 +95,7 @@ const getAllPallets = async (req, res) => {
 
     res.status(200).json({
       status: "Success",
-      pallets: palletsWithParcels
+      pallets: palletsWithParcels,
     });
   } catch (error) {
     errorLogger("pallet.controller", "getAllPallets").error({

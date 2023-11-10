@@ -13,18 +13,23 @@ import {
 } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { IPallet } from "@src/types";
-import { Pallet } from "../api";
+import { IOutboundStream, IPallet } from "@src/types";
+import { BASE_URL, Pallet } from "../api";
 
 const OutboundManagement: React.FC = () => {
   const [pallets, setPallets] = useState<IPallet[]>([]);
   const [selectedPallet, setSelectedPallet] = useState<IPallet | null>(null);
+  const [streamOutbound, setStreamOutbound] = useState<IOutboundStream>({
+    pallet: undefined,
+    parcels: []
+  })
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [errorText, setErrorText] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [outboundLoading, setOutboundLoading] = useState(false);
+  const [lastFetched, setLastFetched] = useState<Date>();
 
   const [isStarted, setIsStarted] = useState(false);
 
@@ -32,6 +37,7 @@ const OutboundManagement: React.FC = () => {
 
   useEffect(() => {
     init();
+    outboundStreamInit()
   }, []);
 
   async function init() {
@@ -50,6 +56,34 @@ const OutboundManagement: React.FC = () => {
     } catch (err: any) {
       console.log("Failed:", err);
       message.error(err.error);
+    }
+  }
+
+  function outboundStreamInit() {
+    const eventSource = new EventSource(
+      `${BASE_URL}/stream/outbound?token=${localStorage.getItem("token")}`
+    )
+
+    setOutboundLoading(true);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      console.log('Outbound Stream', data);
+      if (data) {
+        setStreamOutbound({
+          pallet: data.pallet ?? undefined,
+          parcels: data.parcels ?? [],
+          datetimeupdated: new Date().toLocaleString()
+        })
+        setLastFetched(new Date());
+      }
+      setOutboundLoading(false)
+    }
+
+    eventSource.onerror = (error) => {
+      console.log("EventSource failed", error);
+      eventSource.close()
+      setOutboundLoading(false)
     }
   }
 
@@ -239,9 +273,27 @@ const OutboundManagement: React.FC = () => {
         <span className="pb-2" style={{ color: "grey" }}>
           Scanned parcels will be added to this pallet.
         </span>
-        <span>pallet_id</span>
-        <span>pallet_name</span>
-        {outboundLoading ? <Spin /> : <span>Parcel Quantity:</span>}
+        {streamOutbound.pallet ? (<>
+          <span>ID: {streamOutbound.pallet._id}</span>
+          <span>Name: {streamOutbound.pallet.name}</span>
+          {outboundLoading ? <Spin /> : <span>Capacity: {streamOutbound.pallet.capacity}</span>}
+        </>) : (
+          <>
+          <span>No activated parcel</span>
+          </>
+        )}
+
+        {streamOutbound.pallet &&
+          <div>
+            <span>{streamOutbound.parcels.length} parcels in pallet {streamOutbound.pallet.name}</span>
+            {streamOutbound.parcels.map((parcel) => {
+              return <div className="border p-2 rounded-2 d-flex flex-column mb-2" key={parcel._id}>
+                <span style={{ fontSize: "14px" }}>{parcel.product.barcode}</span>
+                <span>{parcel.product.upc_data.items[0].title}</span>
+              </div>
+            })}
+          </div>
+        }
         <div
           style={{
             display: "flex",
@@ -252,7 +304,7 @@ const OutboundManagement: React.FC = () => {
           }}
         >
           <span>Last Updated:</span>
-          <span>Last Fetched:</span>
+          <span>Last Fetched: {lastFetched?.toLocaleString()}</span>
         </div>
       </div>
       <h5 className="mt-2">
