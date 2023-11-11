@@ -25,6 +25,8 @@ const OutletOrderManagement = () => {
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
 
+  const [modalLoading, setModalLoading] = useState(false);
+
   const handleStatusChange = (value: string) => {
     let message = "";
     switch (value) {
@@ -36,11 +38,11 @@ const OutletOrderManagement = () => {
         break;
       case "processed":
         message =
-          "The order will be seen as processed and is ready for delivery.";
+          "The order will be seen as processed to a pallet and is ready for delivery.";
         break;
       case "out_for_delivery":
         message =
-          "The order will be seen as out for delivery and is with the truck driver or delivery person.";
+          "The order will be seen as out for delivery and is with the truck driver or delivery person. Inventory will be deducted for each parcel.";
         break;
       case "delivered":
         message =
@@ -219,6 +221,7 @@ const OutletOrderManagement = () => {
 
   const handleOk = async () => {
     try {
+      setModalLoading(true);
       await form.validateFields();
       const values = form.getFieldsValue() as IOutletOrder;
       console.log("Handle ok, values", values);
@@ -232,14 +235,33 @@ const OutletOrderManagement = () => {
         await OutletOrder.createOutletOrder(values);
       }
 
-      form.resetFields();
-      setStatusMessage("");
-      await init();
-      setIsModalVisible(false);
+      await closeViewModal()
     } catch (error: any) {
       message.error(error.message);
+    } finally {
+      setModalLoading(false);
     }
   };
+
+  const handleSetOrderForDelivery = async () => {
+    try {
+      setModalLoading(true);
+      await OutletOrder.updateToDelivery(selectedOrder?._id as string)
+      message.success("Successfully update outlet order to delivery")
+      await closeViewModal()
+    } catch (error: any) {
+      message.error(error.message)
+    } finally {
+      setModalLoading(false);
+    }
+  }
+
+  const closeViewModal = async ()  => {
+    form.resetFields();
+    setStatusMessage("");
+    await init();
+    setIsModalVisible(false);
+  }
 
   return (
     <>
@@ -291,7 +313,7 @@ const OutletOrderManagement = () => {
         }
         open={isModalVisible}
         onOk={handleOk}
-        okText="Submit"
+        okText="Update"
         onCancel={() => {
           form.resetFields();
           setStatusMessage("");
@@ -321,8 +343,8 @@ const OutletOrderManagement = () => {
               <Option value="pending">Pending</Option>
               <Option value="accepted">Accepted & Processing</Option>
               <Option value="processed">Processed</Option>
-              <Option value="out_for_delivery">Out For Delivery</Option>
-              <Option value="delivered">Delivered</Option>
+              {/* <Option value="out_for_delivery">Out For Delivery</Option>
+              <Option value="delivered">Delivered</Option> */}
               <Option value="rejected">Rejected</Option>
             </Select>
           </Form.Item>
@@ -334,6 +356,8 @@ const OutletOrderManagement = () => {
           <Form.Item label="Comment" name="comment">
             <Input.TextArea />
           </Form.Item>
+
+          <hr />
 
           {/* Pallets */}
           {assignedPallets?.length > 0 && (
@@ -361,6 +385,17 @@ const OutletOrderManagement = () => {
               );
             })}
           </div>
+
+          <Button
+            type="primary"
+            loading={modalLoading}
+            onClick={handleSetOrderForDelivery}
+          >
+            Confirm Pallet and Submit Pallet for Delivery
+          </Button>
+          <br />
+          <span style={{ color: 'grey', fontStyle: 'italic'}}>This will also set the status of all parcels with attached pallets to Out For Delivery, including the current outlet order.</span>
+          <hr />
         </Form>
       </Modal>
     </>

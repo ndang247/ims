@@ -1,6 +1,7 @@
 const OutletOrder = require("../models/outlet_order.model");
 const Pallet = require("../models/pallet.model");
 const Parcel = require("../models/parcel.model");
+const Inventory = require("../models/inventory.model");
 
 const outletOrderController = {
   // Create new Outlet Order
@@ -26,7 +27,7 @@ const outletOrderController = {
     } catch (error) {
       res.status(400).json({
         status: "Error",
-        error: error.message,
+        message: error.message,
       });
     }
   },
@@ -60,7 +61,7 @@ const outletOrderController = {
       if (!updatedOrder) {
         return res.status(404).json({
           status: "Not Found",
-          error: "Order not found",
+          message: "Order not found",
         });
       }
 
@@ -71,7 +72,7 @@ const outletOrderController = {
     } catch (error) {
       res.status(400).json({
         status: "Error",
-        error: error.message,
+        message: error.message,
       });
     }
   },
@@ -81,18 +82,18 @@ const outletOrderController = {
       const orderId = req.params.id;
       const outletOrder = await OutletOrder.findById(orderId);
       if (!outletOrder) {
-        res.status(400).json({
+        return res.status(400).json({
           status: "Error",
-          error: "Order not found!",
+          message: "Order not found!",
         });
       }
 
       // Check if the order's status is one of the statuses that allows updating to "out_for_delivery"
-      const validStatuses = ["in_warehouse", "on_shelf", "loaded_on_pallet"];
+      const validStatuses = ["accepted", "processed"];
       if (!validStatuses.includes(outletOrder.status)) {
-        res.status(400).json({
+        return res.status(400).json({
           status: "Error",
-          error: "Order status does not allow update to out_for_delivery",
+          message: "Order status does not allow update to out_for_delivery",
         });
       }
 
@@ -128,9 +129,9 @@ const outletOrderController = {
         const deliveredParcelQuantity = productParcelCount[productId];
 
         if (deliveredParcelQuantity > inventory.parcel_quantity) {
-          res.status(404).json({
+          return res.status(404).json({
             status: "Error",
-            error: `Delivered product ${productId} has larger quantity than current inventory. Please recheck inventory for product ${productId}.`,
+            message: `Delivered product ${productId} has larger quantity than current inventory. Please recheck inventory for product ${productId}.`,
           });
         }
         inventory.parcel_quantity -= deliveredParcelQuantity;
@@ -166,7 +167,7 @@ const outletOrderController = {
       console.error("Error updating order to out_for_delivery:", error);
       res.status(400).json({
         status: "Error",
-        error: error.message,
+        message: error.message,
       });
     }
   },
@@ -262,7 +263,7 @@ const outletOrderController = {
       if (!order) {
         return res.status(404).json({
           status: "Not Found",
-          error: "Order not found",
+          message: "Order not found",
         });
       }
 
@@ -288,7 +289,7 @@ const outletOrderController = {
     } catch (error) {
       res.status(400).json({
         status: "Error",
-        error: error.message,
+        message: error.message,
       });
     }
   },
@@ -325,7 +326,7 @@ const outletOrderController = {
     } catch (error) {
       res.status(400).json({
         status: "Error",
-        error: error.message,
+        message: error.message,
       });
     }
   },
@@ -339,7 +340,7 @@ const outletOrderController = {
       if (!deletedOrder) {
         return res.status(404).json({
           staus: "Not Found",
-          error: "Order not found",
+          message: "Order not found",
         });
       }
 
@@ -350,7 +351,7 @@ const outletOrderController = {
     } catch (error) {
       res.status(400).json({
         staus: "Error",
-        error: error.message,
+        message: error.message,
       });
     }
   },
@@ -388,7 +389,7 @@ const outletOrderController = {
     } catch (error) {
       res.status(400).json({
         status: "Error",
-        error: error.message,
+        message: error.message,
       });
     }
   },
