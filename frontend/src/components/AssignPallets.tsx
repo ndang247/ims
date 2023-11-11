@@ -18,11 +18,16 @@ const AssignPallets: React.FC = () => {
     init();
   }, []);
 
+  useEffect(() => {
+    if (selectedPallets.length > 0) {
+      viewParels();
+    }
+  }, [pallets]);
+
   async function init() {
     try {
       setLoading(true);
-      await fetchPallets();
-      await fetchOutletOrder();
+      await Promise.all([fetchPallets(), fetchOutletOrder()]);
       setLoading(false);
     } catch (err: any) {
       console.log("Failed:", err);
@@ -43,6 +48,11 @@ const AssignPallets: React.FC = () => {
       console.log("Pallets with key:", palletsWithKey);
 
       setPallets(palletsWithKey);
+
+      const selected = palletsWithKey
+        .filter((pallet) => pallet.order?._id === orderID)
+        .map((pallet) => pallet._id);
+      setSelectedPallets(selected);
     } catch (err: any) {
       console.log("Failed:", err);
       message.error(err.error);
@@ -103,6 +113,11 @@ const AssignPallets: React.FC = () => {
       for (const palletID of selectedPallets) {
         const res = await Pallet.assignOrderToPallet(palletID, orderID ?? "");
         console.log(res);
+        message.success(res.status);
+        // Wait for 3 seconds before redirecting back to outlet order page
+        setTimeout(() => {
+          window.location.href = "/outlet";
+        }, 3000);
       }
     } catch (err: any) {
       message.error(err.error);
@@ -113,21 +128,24 @@ const AssignPallets: React.FC = () => {
     <div>
       <h5 className="mt-2">Select Pallets</h5>
 
-      <Select
-        mode="multiple"
-        style={{ width: "100%", marginBottom: "1rem" }}
-        onChange={handleChange}
-        // Show all the pallets that are not assigned to any order or currently assigned to the viewing order
-        // But do not leave select option blank
-        options={pallets
-          .filter((pallet) => !pallet.order || pallet.order._id === orderID)
-          .map((pallet) => {
-            return {
-              label: pallet.name,
-              value: pallet._id,
-            };
-          })}
-      />
+      {!loading && (
+        <Select
+          mode="multiple"
+          style={{ width: "100%", marginBottom: "1rem" }}
+          onChange={handleChange}
+          defaultValue={selectedPallets}
+          // Show all the pallets that are not assigned to any order or currently assigned to the viewing order
+          // But do not leave select option blank
+          options={pallets
+            .filter((pallet) => !pallet.order || pallet.order._id === orderID)
+            .map((pallet) => {
+              return {
+                label: pallet.name,
+                value: pallet._id,
+              };
+            })}
+        />
+      )}
 
       <Button className="mb-3" onClick={viewParels} disabled={loading}>
         {loading && <Spin className="me-2" />}

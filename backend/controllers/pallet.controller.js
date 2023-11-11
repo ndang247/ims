@@ -120,6 +120,31 @@ const getAllPallets = async (req, res) => {
   }
 };
 
+const getAllPalletsByOrder = async (req, res) => {
+  try {
+    const { orderID } = req.params;
+
+    if (!orderID) {
+      return res.status(400).json({
+        status: "Error",
+        error: "Please provide an order id",
+      });
+    }
+
+    const pallets = await Pallet.find({ order: orderID });
+
+    res.status(200).json({
+      status: "Success",
+      pallets,
+    });
+  } catch (error) {
+    errorLogger("pallet.controller", "getAllPalletsByOrder").error({
+      message: error,
+    });
+    res.status(400).json({ status: "Error", error: error.message });
+  }
+};
+
 const updatePallet = async (req, res) => {
   try {
     const { id } = req.params;
@@ -188,6 +213,7 @@ module.exports = {
   createPallet,
   getOnePallet,
   getAllPallets,
+  getAllPalletsByOrder,
   updatePallet,
   deletePallet,
 };

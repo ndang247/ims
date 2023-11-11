@@ -354,6 +354,15 @@ export class Pallet {
     }
   }
 
+  static async getAllPalletsByOrderID(orderID: string | null | undefined) {
+    try {
+      const response = await api.get(`/pallets/order/${orderID}`);
+      return response.data.pallets as IPallet[];
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+
   static async updatePalletStatus(id: string, status: string) {
     try {
       const response = await api.post(`/pallet/update/${id}`, {

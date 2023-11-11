@@ -11,13 +11,14 @@ import {
   Breadcrumb,
   message,
 } from "antd";
-import { OutletOrder } from "../api";
-import { IOutletOrder, IProductOrder } from "../types";
+import { OutletOrder, Pallet } from "../api";
+import { IOutletOrder, IPallet, IProductOrder } from "../types";
 
 const { Option } = Select;
 
 const OutletOrderManagement = () => {
   const [orders, setOrders] = useState<IOutletOrder[]>([]);
+  const [assignedPallets, setAssignedPallets] = useState<IPallet[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<IOutletOrder | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -201,11 +202,19 @@ const OutletOrderManagement = () => {
     return !!selectedOrder?._id;
   }, [selectedOrder]);
 
-  const showModal = (record: any) => {
-    setSelectedOrder(record);
-    console.log("Show Modal - Order", record);
-    setIsModalVisible(true);
-    form.setFieldsValue(record);
+  const showModal = async (record: IOutletOrder) => {
+    try {
+      setSelectedOrder(record);
+      console.log("Show Modal - Order", record);
+      setIsModalVisible(true);
+      form.setFieldsValue(record);
+
+      const orderPallets = await Pallet.getAllPalletsByOrderID(record._id);
+      setAssignedPallets(orderPallets);
+    } catch (err: any) {
+      console.log(err);
+      message.error(err.message);
+    }
   };
 
   const handleOk = async () => {
@@ -325,6 +334,20 @@ const OutletOrderManagement = () => {
           <Form.Item label="Comment" name="comment">
             <Input.TextArea />
           </Form.Item>
+
+          {/* Pallets */}
+          {assignedPallets?.length > 0 && (
+            <div>
+              <span className="fs-6">Assigned Pallets</span>
+              {assignedPallets?.map((pallet, key) => {
+                return (
+                  <div key={key} className="border rounded-1 p-1 m-2">
+                    {pallet._id} - {pallet.name}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Products */}
           <div>
