@@ -290,6 +290,15 @@ export class OutletOrder {
     }
   }
 
+  static async updateToDelivery(id: string) {
+    try {
+      const response = await api.post(`/outlet/order/${id}/deliver`);
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+
   // Get single Outlet Order by ID
   static async getSingleOutletOrder(id: string) {
     try {
