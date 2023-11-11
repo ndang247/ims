@@ -10,6 +10,7 @@ import {
   Divider,
   Breadcrumb,
   message,
+  Switch
 } from "antd";
 import { OutletOrder, Pallet } from "../api";
 import { IOutletOrder, IPallet, IProductOrder } from "../types";
@@ -26,6 +27,8 @@ const OutletOrderManagement = () => {
   const [statusMessage, setStatusMessage] = useState("");
 
   const [modalLoading, setModalLoading] = useState(false);
+  const [modalPalletsViewWithTotal, setModalPalletsViewWithTotal] = useState(true);
+  
 
   const handleStatusChange = (value: string) => {
     let message = "";
@@ -211,12 +214,17 @@ const OutletOrderManagement = () => {
       setIsModalVisible(true);
       form.setFieldsValue(record);
 
-      const orderPallets = await Pallet.getAllPalletsByOrderID(record._id);
-      setAssignedPallets(orderPallets);
+      const pallets = await Pallet.getPallets(record._id as string);
+      console.log('Pallets', pallets);
+      setAssignedPallets(pallets)
     } catch (err: any) {
       console.log(err);
       message.error(err.message);
     }
+  };
+
+  const onAssignedPalletsViewSwitch = (checked: boolean) => {
+    setModalPalletsViewWithTotal(checked)
   };
 
   const handleOk = async () => {
@@ -306,6 +314,7 @@ const OutletOrderManagement = () => {
         columns={columns}
       />
       <Modal
+        width={1000}
         title={
           isOrderSelected
             ? `Outlet Order from ${selectedOrder?.user.username ?? "N/A"}`
@@ -343,8 +352,8 @@ const OutletOrderManagement = () => {
               <Option value="pending">Pending</Option>
               <Option value="accepted">Accepted & Processing</Option>
               <Option value="processed">Processed</Option>
-              {/* <Option value="out_for_delivery">Out For Delivery</Option>
-              <Option value="delivered">Delivered</Option> */}
+              {selectedOrder?.status === "out_for_delivery" && <Option value="out_for_delivery">Out For Delivery</Option>}
+              {selectedOrder?.status === "out_for_delivery" && <Option value="delivered">Delivered</Option>}
               <Option value="rejected">Rejected</Option>
             </Select>
           </Form.Item>
@@ -359,23 +368,12 @@ const OutletOrderManagement = () => {
 
           <hr />
 
-          {/* Pallets */}
-          {assignedPallets?.length > 0 && (
-            <div>
-              <span className="fs-6">Assigned Pallets</span>
-              {assignedPallets?.map((pallet, key) => {
-                return (
-                  <div key={key} className="border rounded-1 p-1 m-2">
-                    {pallet._id} - {pallet.name}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Products */}
+          <div className="container">
+            <div className="row">
+              <div className="col-6">
+          {/* Orders */}
           <div>
-            <span className="fs-6">Products</span>
+            <span className="fs-6">Orders</span>
             {selectedOrder?.products.map((product, key) => {
               return (
                 <div key={key} className="border rounded-1 p-1 m-2">
@@ -385,6 +383,59 @@ const OutletOrderManagement = () => {
               );
             })}
           </div>
+              </div>
+              <div className="col-6">
+          {/* Pallets */}
+          {assignedPallets?.length > 0 && (
+            <div>
+              <span className="fs-6">
+                Assigned Pallets
+                <Switch className="ms-2" size="small"
+                  defaultChecked
+                  checkedChildren="Total"
+                  onChange={onAssignedPalletsViewSwitch} 
+                />
+              </span>
+              {modalPalletsViewWithTotal ? assignedPallets?.map((pallet, palletKey) => {
+                const productTally = pallet.parcels.reduce((acc, parcel) => {
+                  const productName = parcel.product.upc_data.items[0].title;
+                  acc[productName] = (acc[productName] || 0) + 1;
+                  return acc;
+                }, {});
+
+                const productList = Object.entries(productTally).map(([productName, quantity], productKey) => {
+                  return (
+                    <div key={productKey} className="border rounded-1 p-1 m-2">
+                      {productName} - Quantity: {quantity}
+                    </div>
+                  );
+                });
+
+                return (
+                  <div key={palletKey}>
+                    <span>{pallet.name}</span>
+                    {productList}
+                    <hr />
+                  </div>
+                );
+              }) : assignedPallets?.map((pallet, palletKey) => {
+                return <div key={palletKey}>
+                  <span>{pallet.name}</span>
+                  {pallet.parcels.map((parcel, parcelKey) => {
+                    return <div className="border rounded-1 p-1 m-2" key={parcelKey}>
+                      {parcel.product.upc_data.items[0].title}
+                    </div>
+                  })}
+                  <hr />
+                </div>
+              })}
+            </div> 
+          )}
+              </div>
+            </div>
+          </div>
+
+
 
           <Button
             type="primary"
