@@ -90,17 +90,15 @@ const AssignPallets: React.FC = () => {
       }
 
       // Create a dictionary of pallet name and parcels
-      if (parcels.length > 0) {
-        const dict = parcels.reduce((acc, parcel) => {
-          if (!acc[parcel.pallet.name]) {
-            acc[parcel.pallet.name] = [];
-          }
-          acc[parcel.pallet.name].push(parcel);
-          return acc;
-        }, {} as Record<string, IParcel[]>);
+      const dict = parcels.reduce((acc, parcel) => {
+        if (!acc[parcel.pallet.name]) {
+          acc[parcel.pallet.name] = [];
+        }
+        acc[parcel.pallet.name].push(parcel);
+        return acc;
+      }, {} as Record<string, IParcel[]>);
 
-        setParcelsByPalletName(dict);
-      }
+      setParcelsByPalletName(dict);
       setLoading(false);
     } catch (err: any) {
       console.log("Failed:", err);
