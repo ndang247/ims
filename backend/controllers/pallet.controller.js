@@ -87,7 +87,23 @@ const getAllPallets = async (req, res) => {
     const pallets = await Pallet.find(queryObj).populate("order");
 
     const palletsWithParcelsPromises = pallets.map(async (pallet) => {
-      const parcels = await Parcel.find({ pallet: pallet._id });
+      let parcels = await Parcel.find({ pallet: pallet._id }).populate(
+        "product"
+      );
+
+      if (parcels) {
+        parcels = parcels.map((parcel) => {
+          console.log(parcel);
+          return {
+            ...parcel.toObject(),
+            product: {
+              ...parcel.product.toObject(),
+              upc_data: JSON.parse(parcel.product.upc_data),
+            },
+          };
+        });
+      }
+
       return { ...pallet.toObject(), parcels };
     });
 

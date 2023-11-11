@@ -42,6 +42,7 @@ export interface IParcel {
     _id: string;
     name: string;
   };
+  status: string;
   product: IProduct;
 }
 export interface IParcelProps {
@@ -193,6 +194,7 @@ export interface IPallet {
   name: string;
   capacity: number;
   status: string;
+  parcels: IParcel[];
   datetimecreated: Date;
   datetimeupdated: Date;
 }

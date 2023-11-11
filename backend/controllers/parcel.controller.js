@@ -157,6 +157,7 @@ const getParcels = async (req, res) => {
           warehouse: 1,
           // shelf: 1,
           product: 1,
+          pallet: 1,
           status: 1,
           datetimecreated: 1,
           datetimeupdated: 1,
