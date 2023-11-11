@@ -255,7 +255,7 @@ const outletOrderController = {
   async getSingle(req, res) {
     try {
       const { id } = req.params;
-      const order = await OutletOrder.findById(id)
+      let order = await OutletOrder.findById(id)
         .populate("user")
         .populate("products.product");
 
@@ -265,6 +265,21 @@ const outletOrderController = {
           error: "Order not found",
         });
       }
+
+      order = order.toObject();
+      order.products = order.products.map((productItem) => {
+        if (typeof productItem.product.upc_data === "string") {
+          try {
+            // Parse the JSON string to JSON object
+            productItem.product.upc_data = JSON.parse(
+              productItem.product.upc_data
+            );
+          } catch (err) {
+            console.error("Error parsing JSON string: ", err);
+          }
+        }
+        return productItem;
+      });
 
       res.status(200).json({
         status: "Success",

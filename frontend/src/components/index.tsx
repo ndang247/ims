@@ -14,6 +14,7 @@ import ViewOrders from "./Outlet/ViewOrders";
 import ProductDetails from "./ProductDetails";
 import UserManagement from "./UserManagement";
 import OutletOrderManagement from "./OutletOrderManagementPage";
+import AssignPallets from "./AssignPallets";
 import Loading from "./Loading";
 
 export {
@@ -34,4 +35,5 @@ export {
   Loading,
   UserManagement,
   OutletOrderManagement,
+  AssignPallets,
 };

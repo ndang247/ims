@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IOutletOrder, IPallet, IUser } from "../types";
+import { IOutletOrder, IPallet, IParcel, IUser } from "../types";
 
 export const BASE_URL = "http://localhost:8080/api/v1";
 
@@ -294,7 +294,7 @@ export class OutletOrder {
   static async getSingleOutletOrder(id: string) {
     try {
       const response = await api.get(`/outlet/order/${id}`);
-      return response.data as IOutletOrder;
+      return response.data.order as IOutletOrder;
     } catch (error: any) {
       throw error.response.data;
     }
@@ -360,6 +360,17 @@ export class Pallet {
         status,
       });
       return response.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+}
+
+export class Parcel {
+  static async getParcelsByPalletID(palletID: string) {
+    try {
+      const response = await api.get(`/parcels/pallet/${palletID}`);
+      return response.data.parcels as IParcel[];
     } catch (error: any) {
       throw error.response.data;
     }

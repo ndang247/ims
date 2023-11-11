@@ -182,6 +182,19 @@ const OutletOrderManagement = () => {
         <Button onClick={() => showModal(record)}>View</Button>
       ),
     },
+    {
+      title: "Action",
+      key: "actions",
+      render: (_: any, record: any) => (
+        <Button
+          onClick={() =>
+            (window.location.href = `/outlet/order/${record._id}/attach-pallets`)
+          }
+        >
+          Attach Pallets
+        </Button>
+      ),
+    },
   ];
 
   const isOrderSelected = useMemo(() => {

@@ -93,7 +93,6 @@ const getAllPallets = async (req, res) => {
 
       if (parcels) {
         parcels = parcels.map((parcel) => {
-          console.log(parcel);
           return {
             ...parcel.toObject(),
             product: {

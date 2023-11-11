@@ -44,6 +44,7 @@ export interface IParcel {
   };
   status: string;
   product: IProduct;
+  pallet: IPallet;
 }
 export interface IParcelProps {
   displayBreadcrumb?: boolean;
