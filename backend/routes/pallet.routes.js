@@ -9,5 +9,9 @@ router.post("/pallet/update/:id", outletOrderController.updatePallet);
 router.post("/pallet/delete/:id", outletOrderController.deletePallet);
 router.get("/pallet/:id", outletOrderController.getOnePallet);
 router.get("/pallets", outletOrderController.getAllPallets);
+router.get(
+  "/pallets/order/:orderID",
+  outletOrderController.getAllPalletsByOrder
+);
 
 module.exports = router;

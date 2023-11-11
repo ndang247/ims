@@ -87,7 +87,22 @@ const getAllPallets = async (req, res) => {
     const pallets = await Pallet.find(queryObj).populate("order");
 
     const palletsWithParcelsPromises = pallets.map(async (pallet) => {
-      const parcels = await Parcel.find({ pallet: pallet._id });
+      let parcels = await Parcel.find({ pallet: pallet._id }).populate(
+        "product"
+      );
+
+      if (parcels) {
+        parcels = parcels.map((parcel) => {
+          return {
+            ...parcel.toObject(),
+            product: {
+              ...parcel.product.toObject(),
+              upc_data: JSON.parse(parcel.product.upc_data),
+            },
+          };
+        });
+      }
+
       return { ...pallet.toObject(), parcels };
     });
 
@@ -99,6 +114,31 @@ const getAllPallets = async (req, res) => {
     });
   } catch (error) {
     errorLogger("pallet.controller", "getAllPallets").error({
+      message: error,
+    });
+    res.status(400).json({ status: "Error", error: error.message });
+  }
+};
+
+const getAllPalletsByOrder = async (req, res) => {
+  try {
+    const { orderID } = req.params;
+
+    if (!orderID) {
+      return res.status(400).json({
+        status: "Error",
+        error: "Please provide an order id",
+      });
+    }
+
+    const pallets = await Pallet.find({ order: orderID });
+
+    res.status(200).json({
+      status: "Success",
+      pallets,
+    });
+  } catch (error) {
+    errorLogger("pallet.controller", "getAllPalletsByOrder").error({
       message: error,
     });
     res.status(400).json({ status: "Error", error: error.message });
@@ -173,6 +213,7 @@ module.exports = {
   createPallet,
   getOnePallet,
   getAllPallets,
+  getAllPalletsByOrder,
   updatePallet,
   deletePallet,
 };

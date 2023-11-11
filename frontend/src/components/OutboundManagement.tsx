@@ -328,11 +328,11 @@ const OutboundManagement: React.FC = () => {
               {streamOutbound.parcels.length} parcels in pallet{" "}
               {streamOutbound.pallet.name}
             </span>
-            {streamOutbound.parcels.map((parcel) => {
+            {streamOutbound.parcels.map((parcel, key) => {
               return (
                 <div
                   className="border p-2 rounded-2 d-flex flex-column mb-2"
-                  key={parcel._id}
+                  key={key}
                 >
                   <span style={{ fontSize: "14px" }}>
                     {parcel.product.barcode}
@@ -403,17 +403,30 @@ const OutboundManagement: React.FC = () => {
       <Table
         dataSource={pallets}
         columns={columns}
-        // expandable={{
-        //   expandedRowRender: (record) => {
-        //     return (
-        //       <>
-        //         <p style={{ margin: 0 }}>{record.description}</p>
-        //         <p style={{ margin: 0 }}>{record.description}</p>
-        //       </>
-        //     );
-        //   },
-        //   rowExpandable: (record) => record.name !== "Not Expandable",
-        // }}
+        expandable={{
+          expandedRowRender: (record) => {
+            return (
+              <>
+                {record.parcels.length > 0 &&
+                  record.parcels.map((parcel) => {
+                    return (
+                      <div
+                        className="border p-2 rounded-2 d-flex flex-column mb-2"
+                        key={parcel._id}
+                      >
+                        <span style={{ fontSize: "14px" }}>
+                          {parcel._id} --- {parcel.product.barcode} ---{" "}
+                          {parcel.product.upc_data.items[0].title} ---{" "}
+                          {parcel.status}
+                        </span>
+                      </div>
+                    );
+                  })}
+              </>
+            );
+          },
+          rowExpandable: (record) => record.parcels.length > 0,
+        }}
       />
     </div>
   );

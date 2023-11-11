@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IOutletOrder, IPallet, IUser } from "../types";
+import { IOutletOrder, IPallet, IParcel, IUser } from "../types";
 
 export const BASE_URL = "http://localhost:8080/api/v1";
 
@@ -294,7 +294,7 @@ export class OutletOrder {
   static async getSingleOutletOrder(id: string) {
     try {
       const response = await api.get(`/outlet/order/${id}`);
-      return response.data as IOutletOrder;
+      return response.data.order as IOutletOrder;
     } catch (error: any) {
       throw error.response.data;
     }
@@ -354,12 +354,43 @@ export class Pallet {
     }
   }
 
+  static async getAllPalletsByOrderID(orderID: string | null | undefined) {
+    try {
+      const response = await api.get(`/pallets/order/${orderID}`);
+      return response.data.pallets as IPallet[];
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+
   static async updatePalletStatus(id: string, status: string) {
     try {
       const response = await api.post(`/pallet/update/${id}`, {
         status,
       });
       return response.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+
+  static async assignOrderToPallet(id: string, orderID: string) {
+    try {
+      const response = await api.post(`/pallet/update/${id}`, {
+        order: orderID,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
+}
+
+export class Parcel {
+  static async getParcelsByPalletID(palletID: string) {
+    try {
+      const response = await api.get(`/parcels/pallet/${palletID}`);
+      return response.data.parcels as IParcel[];
     } catch (error: any) {
       throw error.response.data;
     }
