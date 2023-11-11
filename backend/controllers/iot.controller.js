@@ -3,6 +3,7 @@ const Parcel = require("../models/parcel.model");
 const Inventory = require("../models/inventory.model");
 const Product = require("../models/product.model");
 const Inbound = require("../models/inbound.model");
+const Pallet = require("../models/pallet.model");
 
 const { errorLogger } = require("../debug/debug");
 const { fetchUPCData } = require("../services/upc");
@@ -224,42 +225,55 @@ const postOutboundProcess = async (req, res) => {
   let { tagID } = value;
 
   console.log("Perform post outbound", req.body);
+  try {
+    const existingTag = await RFID.findOne({ id: tagID });
 
-  const existingTag = await RFID.findOne({ id: tagID });
+    if (!existingTag) {
+      return res
+        .status(404)
+        .json({ status: "Not Found", error: "Tag not found" });
+    }
 
-  if (!existingTag) {
+    if (existingTag.ref_object !== "Parcel") {
+      return res
+        .status(404)
+        .json({ status: "Error", error: "Tag is not a parcel" });
+    }
+
+    const currentParcel = await Parcel.findById(existingTag.ref_id);
+
+    if (!currentParcel) {
+      return res
+        .status(404)
+        .json({ status: "Not Found", error: "Parcel not found" });
+    }
+
+    const activatedPallet = await Pallet.findOne({ status: "activated" });
+
+    if (!activatedPallet) {
+      return res
+        .status(404)
+        .json({ status: "Not Found", error: "No activated pallet found" });
+    }
+
+    // Update parcel pallet
+    currentParcel.pallet = activatedPallet._id;
+    currentParcel.status = "loaded_on_pallet";
+
+    await currentParcel.save();
+
+    res
+      .status(200)
+      .json({ status: "Success", message: "Data processed successfully" });
+  } catch (error) {
+    console.log("Error when processing outbound data:", error);
+    errorLogger("iot.controller", "postOutboundProcess").error({
+      message: error,
+    });
     return res
-      .status(404)
-      .json({ status: "Not Found", error: "Tag not found" });
+      .status(500)
+      .json({ status: "Error", error: "Error when processing outbound data" });
   }
-
-  if (existingTag.ref_object !== "Parcel") {
-    return res
-      .status(404)
-      .json({ status: "Error", error: "Tag is not a parcel" });
-  }
-
-  const currentParcel = await Parcel.findById(existingTag.ref_id);
-
-  if (!currentParcel) {
-    return res
-      .status(404)
-      .json({ status: "Not Found", error: "Parcel not found" });
-  }
-
-  const activatedPallet = await Pallet.findOne({ status: "activated" });
-
-  if (!activatedPallet) {
-    return res
-      .status(404)
-      .json({ status: "Not Found", error: "No activated pallet found" });
-  }
-
-  // Update parcel pallet
-  currentParcel.pallet = activatedPallet._id;
-  currentParcel.status = "loaded_on_pallet";
-
-  await currentParcel.save();
 };
 
 module.exports = {

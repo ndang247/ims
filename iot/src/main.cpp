@@ -84,6 +84,7 @@ boolean getUIDOutbound()
 const char *SERVER_ADDRESS = "172.20.10.9";
 const uint16_t SERVER_PORT = 3000;
 String postInboundRoute = "/iot/inbound";
+String postOutboundRoute = "/iot/outbound";
 
 boolean registerTagInbound(String tagID)
 {
@@ -114,6 +115,60 @@ boolean registerTagInbound(String tagID)
       serializeJson(jsonDoc, jsonStr);
 
       client.println("POST " + postInboundRoute + " HTTP/1.1");
+      client.println("Host: " + String(SERVER_ADDRESS));
+      client.println("Content-Type: application/json");
+      client.print("Content-Length: ");
+      client.println(jsonStr.length());
+      client.println();
+      client.println(jsonStr);
+
+      while (client.connected())
+      {
+        String line = client.readStringUntil('\n');
+        Serial.println(line);
+      }
+      client.stop();
+      return true;
+    }
+    else
+    {
+      Serial.println("POST Tag failed. Tag: " + tagID);
+      return false;
+    }
+  }
+
+  return false;
+}
+
+boolean postTagOutbound(String tagID)
+{
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Serial.println("Posting outbound tag - Wifi Strength: " + String(WiFi.RSSI()));
+    WiFiClient client;
+
+    if (!client.connect(SERVER_ADDRESS, SERVER_PORT))
+    {
+      Serial.println("Connection failed.");
+      return false;
+    }
+
+    // Send POST request
+    if (client.connect(SERVER_ADDRESS, SERVER_PORT))
+    {                                  // Use c_str() to convert String to const char*
+      StaticJsonDocument<200> jsonDoc; // Adjust the size as needed
+      jsonDoc["sensor"] = "ESP8266";
+      jsonDoc["role"] = "outbound";
+
+      StaticJsonDocument<200> sensorValueDoc;
+      sensorValueDoc["tagID"] = tagID;
+
+      jsonDoc["value"] = sensorValueDoc;
+
+      String jsonStr;
+      serializeJson(jsonDoc, jsonStr);
+
+      client.println("POST " + postOutboundRoute + " HTTP/1.1");
       client.println("Host: " + String(SERVER_ADDRESS));
       client.println("Content-Type: application/json");
       client.print("Content-Length: ");
@@ -251,9 +306,22 @@ void loop()
   if (getUIDOutbound())
   {
     Serial.println("Outbound: Tag " + tagID + " detected");
-    // postTag(tagID);
-    digitalWrite(SUCCESS_PIN, HIGH);
+    digitalWrite(LOADING_PIN, HIGH);
+    const boolean success = postTagOutbound(tagID);
+    digitalWrite(LOADING_PIN, LOW);
+    if (success)
+    {
+      digitalWrite(SUCCESS_PIN, HIGH);
+      Serial.println("Tag" + tagID + " outbound scanned");
+    }
+    else
+    {
+      digitalWrite(ERROR_PIN, HIGH);
+      Serial.println("Tag " + tagID + " failed for outbound scan");
+    }
     delay(3000);
+
+    digitalWrite(ERROR_PIN, LOW);
     digitalWrite(SUCCESS_PIN, LOW);
   }
   else
