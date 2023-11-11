@@ -364,6 +364,17 @@ export class Pallet {
       throw error.response.data;
     }
   }
+
+  static async assignOrderToPallet(id: string, orderID: string) {
+    try {
+      const response = await api.post(`/pallet/update/${id}`, {
+        order: orderID,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data;
+    }
+  }
 }
 
 export class Parcel {

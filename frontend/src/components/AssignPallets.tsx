@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Spin, message, Select, List, Avatar } from "antd";
+import { Button, Spin, message, Select, List, Avatar, Popconfirm } from "antd";
 import { IOutletOrder, IPallet, IParcel } from "@src/types";
 import { OutletOrder, Pallet, Parcel } from "../api";
 import { useParams } from "react-router-dom";
@@ -80,15 +80,17 @@ const AssignPallets: React.FC = () => {
       }
 
       // Create a dictionary of pallet name and parcels
-      const dict = parcels.reduce((acc, parcel) => {
-        if (!acc[parcel.pallet.name]) {
-          acc[parcel.pallet.name] = [];
-        }
-        acc[parcel.pallet.name].push(parcel);
-        return acc;
-      }, {} as Record<string, IParcel[]>);
+      if (parcels.length > 0) {
+        const dict = parcels.reduce((acc, parcel) => {
+          if (!acc[parcel.pallet.name]) {
+            acc[parcel.pallet.name] = [];
+          }
+          acc[parcel.pallet.name].push(parcel);
+          return acc;
+        }, {} as Record<string, IParcel[]>);
 
-      setParcelsByPalletName(dict);
+        setParcelsByPalletName(dict);
+      }
       setLoading(false);
     } catch (err: any) {
       console.log("Failed:", err);
@@ -96,7 +98,16 @@ const AssignPallets: React.FC = () => {
     }
   };
 
-  const handleSubmit = async () => {};
+  const confirm = async (_: React.MouseEvent<HTMLElement> | undefined) => {
+    try {
+      for (const palletID of selectedPallets) {
+        const res = await Pallet.assignOrderToPallet(palletID, orderID ?? "");
+        console.log(res);
+      }
+    } catch (err: any) {
+      message.error(err.error);
+    }
+  };
 
   return (
     <div>
@@ -106,16 +117,19 @@ const AssignPallets: React.FC = () => {
         mode="multiple"
         style={{ width: "100%", marginBottom: "1rem" }}
         onChange={handleChange}
-        options={pallets.map((pallet) => {
-          return !pallet.order ? { label: pallet.name, value: pallet._id } : {};
-        })}
+        // Show all the pallets that are not assigned to any order or currently assigned to the viewing order
+        // But do not leave select option blank
+        options={pallets
+          .filter((pallet) => !pallet.order || pallet.order._id === orderID)
+          .map((pallet) => {
+            return {
+              label: pallet.name,
+              value: pallet._id,
+            };
+          })}
       />
 
-      <Button
-        className="mb-3"
-        onClick={viewParels}
-        disabled={selectedPallets.length === 0}
-      >
+      <Button className="mb-3" onClick={viewParels} disabled={loading}>
         {loading && <Spin className="me-2" />}
         View Parcels
       </Button>
@@ -217,15 +231,19 @@ const AssignPallets: React.FC = () => {
         {loading && <Spin className="me-2" />}
         Cancel
       </Button>
-      <Button
-        className="my-2 me-2"
-        type="primary"
-        // onClick={showModal}
-        disabled={loading || selectedPallets.length === 0}
+      <Popconfirm
+        title="Confirm Assignment"
+        description={`Assign selected pallets to ${order?.user.fullname}'s order?`}
+        onConfirm={(e: React.MouseEvent<HTMLElement> | undefined) => confirm(e)}
+        okText="Yes"
+        cancelText="No"
+        disabled={loading}
       >
-        {loading && <Spin className="me-2" />}
-        Save
-      </Button>
+        <Button className="my-2 me-2" type="primary" disabled={loading}>
+          {loading && <Spin className="me-2" />}
+          Save
+        </Button>
+      </Popconfirm>
     </div>
   );
 };
