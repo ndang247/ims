@@ -1,4 +1,6 @@
 const OutletOrder = require("../models/outlet_order.model");
+const Pallet = require("../models/pallet.model");
+const Parcel = require("../models/parcel.model");
 
 const outletOrderController = {
   // Create new Outlet Order
@@ -67,6 +69,101 @@ const outletOrderController = {
         updatedOrder,
       });
     } catch (error) {
+      res.status(400).json({
+        status: "Error",
+        error: error.message,
+      });
+    }
+  },
+
+  async updateOutletOrderStatusToOutForDelivery(req, res) {
+    try {
+      const orderId = req.params.id;
+      const outletOrder = await OutletOrder.findById(orderId);
+      if (!outletOrder) {
+        res.status(400).json({
+          status: "Error",
+          error: "Order not found!",
+        });
+      }
+
+      // Check if the order's status is one of the statuses that allows updating to "out_for_delivery"
+      const validStatuses = ["in_warehouse", "on_shelf", "loaded_on_pallet"];
+      if (!validStatuses.includes(outletOrder.status)) {
+        res.status(400).json({
+          status: "Error",
+          error: "Order status does not allow update to out_for_delivery",
+        });
+      }
+
+      // Get Pallets for the OutletOrder
+      const pallets = await Pallet.find({ order: outletOrder._id });
+
+      // Get Parcels from the Pallet(s)
+      const parcels = await Parcel.find({
+        pallet: { $in: pallets.map((pallet) => pallet._id) },
+      });
+
+      // Extract product IDs from parcels and remove duplicates
+      let productIds = [...new Set(parcels.map((parcel) => parcel.product))];
+
+      // Get Inventories for the products
+      const inventories = await Inventory.find({
+        product: { $in: productIds },
+      });
+
+      // Calculate parcel quantity of each product
+      const productParcelCount = parcels.reduce((acc, parcel) => {
+        const productId = parcel.product.toString();
+        acc[productId] = (acc[productId] || 0) + 1;
+        return acc;
+      }, {});
+
+      console.log("productParcelCount", productParcelCount);
+
+      // Update inventory for all products
+      let inventorySavePromises = [];
+      for (const inventory of inventories) {
+        const productId = inventory.product.toString();
+        const deliveredParcelQuantity = productParcelCount[productId];
+
+        if (deliveredParcelQuantity > inventory.parcel_quantity) {
+          res.status(404).json({
+            status: "Error",
+            error: `Delivered product ${productId} has larger quantity than current inventory. Please recheck inventory for product ${productId}.`,
+          });
+        }
+        inventory.parcel_quantity -= deliveredParcelQuantity;
+        inventorySavePromises.push(inventory.save());
+      }
+
+      await Promise.all(inventorySavePromises);
+
+      // Update status of all Pallets to "out_for_delivery"
+      let palletsParcelsSavePromises = [];
+      for (const pallet of pallets) {
+        pallet.status = "out_for_delivery";
+        palletsParcelsSavePromises.push(pallet.save());
+      }
+
+      // Update status of all Parcels to "out_for_delivery"
+      for (const parcel of parcels) {
+        parcel.status = "out_for_delivery";
+        palletsParcelsSavePromises.push(parcel.save());
+      }
+
+      await Promise.all(palletsParcelsSavePromises);
+
+      // Update status of OutletOrder to "out_for_delivery"
+      outletOrder.status = "out_for_delivery";
+      await outletOrder.save();
+
+      res.status(200).json({
+        status: "Success",
+        order: outletOrder,
+      });
+    } catch (error) {
+      console.error("Error updating order to out_for_delivery:", error);
       res.status(400).json({
         status: "Error",
         error: error.message,
@@ -158,7 +255,7 @@ const outletOrderController = {
   async getSingle(req, res) {
     try {
       const { id } = req.params;
-      const order = await OutletOrder.findById(id)
+      let order = await OutletOrder.findById(id)
         .populate("user")
         .populate("products.product");
 
@@ -168,6 +265,21 @@ const outletOrderController = {
           error: "Order not found",
         });
       }
+
+      order = order.toObject();
+      order.products = order.products.map((productItem) => {
+        if (typeof productItem.product.upc_data === "string") {
+          try {
+            // Parse the JSON string to JSON object
+            productItem.product.upc_data = JSON.parse(
+              productItem.product.upc_data
+            );
+          } catch (err) {
+            console.error("Error parsing JSON string: ", err);
+          }
+        }
+        return productItem;
+      });
 
       res.status(200).json({
         status: "Success",

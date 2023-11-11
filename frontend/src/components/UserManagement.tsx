@@ -289,7 +289,6 @@ const UserManagement: React.FC = () => {
           <Form.Item label="Role" name="role" required>
             <Select onChange={handleRoleChanged}>
               <Option value="manager">Manager</Option>
-              <Option value="owner">Owner</Option>
               <Option value="staff">Staff</Option>
               <Option value="outlet">Outlet</Option>
               <Option value="supplier">Supplier</Option>

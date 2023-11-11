@@ -157,6 +157,7 @@ const getParcels = async (req, res) => {
           warehouse: 1,
           // shelf: 1,
           product: 1,
+          pallet: 1,
           status: 1,
           datetimecreated: 1,
           datetimeupdated: 1,
@@ -201,7 +202,163 @@ const getParcels = async (req, res) => {
       parcels,
     });
   } catch (error) {
-    errorLogger("parcel.controller", "createParcel").error({
+    errorLogger("parcel.controller", "getParcels").error({
+      message: error,
+    });
+    res.status(500).json({ status: "Error", error: error.message });
+  }
+};
+
+const getParcelsByPalletID = async (req, res) => {
+  try {
+    const { palletID } = req.params;
+    console.log("Pallet ID:", palletID);
+
+    if (!palletID) {
+      return res.status(400).json({
+        status: "Error",
+        message: "Pallet ID is required",
+      });
+    }
+
+    // Construct the aggregation pipeline
+    let parcel_pipeline = [
+      {
+        $lookup: {
+          from: "warehouses",
+          let: { warehouse_id: "$warehouse" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$warehouse_id"],
+                },
+              },
+            },
+          ],
+          as: "warehouse",
+        },
+      },
+      {
+        $unwind: {
+          path: "$warehouse",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          // Join the Parcel with the Product collection based on the product field
+          from: "products",
+          localField: "product",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $unwind: "$product", // Parcel with 1 product instead of array of products
+      },
+      {
+        $match: {
+          pallet: new mongoose.Types.ObjectId(palletID),
+        },
+      },
+      // Populate pallet
+      {
+        $lookup: {
+          from: "pallets",
+          let: { pallet_id: "$pallet" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$pallet_id"],
+                },
+              },
+            },
+          ],
+          as: "pallet",
+        },
+      },
+      {
+        $unwind: {
+          path: "$pallet",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ];
+
+    // RFID added
+    parcel_pipeline = parcel_pipeline.concat([
+      {
+        $lookup: {
+          from: "rfids", // This should match the name of the RFID collection
+          let: { parcel_id: "$_id" },
+          pipeline: [
+            {
+              // Find the RFID with the same ref_id and ref_object as the Parcel
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$ref_id", "$$parcel_id"] },
+                    { $eq: ["$ref_object", "Parcel"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "rfid",
+        },
+      },
+      {
+        $unwind: {
+          path: "$rfid",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          // Include fields you want in the result
+          _id: 1,
+          warehouse: 1,
+          // shelf: 1,
+          product: 1,
+          pallet: 1,
+          status: 1,
+          datetimecreated: 1,
+          datetimeupdated: 1,
+          rfid: "$rfid",
+        },
+      },
+    ]);
+
+    let parcels = await Parcel.aggregate(parcel_pipeline);
+
+    parcels = parcels.map((parcel) => {
+      const formattedDateTimeCreated = formatDate(
+        new Date(parcel.datetimecreated)
+      );
+      const formattedDateTimeUpdated = formatDate(
+        new Date(parcel.datetimeupdated)
+      );
+
+      return {
+        ...parcel,
+        product: {
+          ...parcel.product,
+          upc_data: JSON.parse(parcel.product.upc_data),
+        },
+        // Convert datetime to local time
+        datetimecreated: formattedDateTimeCreated,
+        datetimeupdated: formattedDateTimeUpdated,
+      };
+    });
+
+    res.status(200).json({
+      status: "Success",
+      parcels,
+    });
+  } catch (error) {
+    errorLogger("parcel.controller", "getParcelsByPalletID").error({
       message: error,
     });
     res.status(500).json({ status: "Error", error: error.message });
@@ -219,4 +376,5 @@ function formatDate(date) {
 module.exports = {
   createParcel,
   getParcels,
+  getParcelsByPalletID,
 };

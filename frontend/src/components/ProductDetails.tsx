@@ -29,7 +29,7 @@ const ProductDetails: React.FC = () => {
       return;
     }
     const eventSource = new EventSource(
-      `https://ims-be.onrender.com/api/v1/stream/inventory/${
+      `http://localhost:8080/api/v1/stream/inventory/${
         product.barcode
       }?token=${localStorage.getItem("token")}`
     );
@@ -146,7 +146,7 @@ const ProductDetails: React.FC = () => {
                   <div style={{ display: "flex", flexDirection: "row" }}>
                     <div style={{ flex: "70%" }}>
                       <div>
-                        <table>
+                        <table id="product-details">
                           <thead>
                             <tr>
                               <th colSpan={3}>Primary Details</th>
@@ -179,7 +179,7 @@ const ProductDetails: React.FC = () => {
 
                       <br />
                       <div>
-                        <table>
+                        <table id="supplier-details">
                           <thead>
                             <tr>
                               <th colSpan={3}>Supplier Details</th>

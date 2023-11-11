@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, Breadcrumb, Tooltip, Spin, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { postInboundBarcode, getCurrentInbound } from "../api";
+import {
+  BASE_URL,
+  postInboundBarcode,
+  getCurrentInbound,
+  clearInboundBarcode,
+} from "../api";
 import { ICurrentBarcodeData, IInventory } from "@src/types";
 
 const InboundPage: React.FC = () => {
@@ -15,21 +20,25 @@ const InboundPage: React.FC = () => {
   const [lastFetched, setLastFetched] = useState<Date>();
 
   const [loading, setLoading] = useState(false);
+  const [inboundLoading, setInboundLoading] = useState(false);
 
   useEffect(() => {
     init();
   }, []);
 
   useEffect(() => {
-    if (!currentBarcode) {
-      return;
-    }
     const eventSource = new EventSource(
-      `https://ims-be.onrender.com/api/v1/stream/inventory/${currentBarcode}?token=${localStorage.getItem(
+      `${BASE_URL}/stream/inventory/${currentBarcode}?token=${localStorage.getItem(
         "token"
       )}`
     );
 
+    if (!currentBarcode) {
+      eventSource.close();
+      return;
+    }
+
+    setInboundLoading(true);
     eventSource.onmessage = (event) => {
       let data = JSON.parse(event.data);
       if (data) {
@@ -39,12 +48,13 @@ const InboundPage: React.FC = () => {
         setCurrentInventory(data);
         setLastFetched(new Date());
       }
-      // Update your frontend state here
+      setInboundLoading(false);
     };
 
     eventSource.onerror = (error) => {
       console.error("EventSource failed:", error);
       eventSource.close();
+      setInboundLoading(false);
     };
   }, [currentBarcode]);
 
@@ -96,6 +106,24 @@ const InboundPage: React.FC = () => {
     }
   };
 
+  const handleClearButtonClick = async () => {
+    setCurrentBarcode("");
+    setCurrentBarcodeData(undefined);
+    setErrorText("");
+    setCurrentInventory(undefined);
+
+    try {
+      setLoading(true);
+      await clearInboundBarcode();
+    } catch (error: any) {
+      if (error?.response?.data?.error) {
+        setErrorText(error?.response?.data?.error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <Breadcrumb
@@ -129,7 +157,11 @@ const InboundPage: React.FC = () => {
         </span>
         <span>{currentBarcode}</span>
         <span>{currentBarcodeData?.title ?? ""}</span>
-        <span>Invetory: {currentInventory?.parcel_quantity}</span>
+        {inboundLoading ? (
+          <Spin />
+        ) : (
+          <span>Inventory: {currentInventory?.parcel_quantity}</span>
+        )}
         <div
           style={{
             display: "flex",
@@ -168,13 +200,21 @@ const InboundPage: React.FC = () => {
       )}
 
       <Button
-        className="my-2"
+        className="my-2 me-2"
         type="primary"
         onClick={handleButtonClick}
         disabled={loading}
       >
         {loading && <Spin className="me-2" />}
         Update Inbound Barcode
+      </Button>
+      <Button
+        className="my-2 text-bg-warning"
+        type="primary"
+        onClick={handleClearButtonClick}
+        disabled={loading}
+      >
+        Clear
       </Button>
     </div>
   );

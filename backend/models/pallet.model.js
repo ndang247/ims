@@ -1,14 +1,24 @@
 const mongoose = require("mongoose");
 
-const inboundSchema = new mongoose.Schema(
+const palletSchema = new mongoose.Schema(
   {
-    warehouse: {
+    order: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Warehouse",
+      ref: "OutletOrder",
+    },
+    name: {
+      type: String,
       required: true,
     },
-    barcode_input: {
+    capacity: {
+      type: Number,
+      required: true,
+    },
+    status: {
       type: String,
+      enum: ["activated", "out_for_delivery", "deactivated"],
+      default: "deactivated",
+      required: true,
     },
     datetimecreated: {
       type: Date,
@@ -27,7 +37,6 @@ const inboundSchema = new mongoose.Schema(
   }
 );
 
-const Inbound =
-  mongoose.model.Inbound || mongoose.model("Inbound", inboundSchema);
+const Pallet = mongoose.model("Pallet", palletSchema);
 
-module.exports = Inbound;
+module.exports = Pallet;

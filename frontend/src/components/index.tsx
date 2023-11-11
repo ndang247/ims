@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import Items from "./Items";
 import Parcels from "./Parcels";
 import InboundPage from "./InboundPage";
+import OutboundManagement from "./OutboundManagement";
 import ProductDisplay from "./ProductDisplay";
 import LoginPage from "./LoginPage";
 import SignupPage from "./SignUpPage";
@@ -13,6 +14,7 @@ import ViewOrders from "./Outlet/ViewOrders";
 import ProductDetails from "./ProductDetails";
 import UserManagement from "./UserManagement";
 import OutletOrderManagement from "./OutletOrderManagementPage";
+import AssignPallets from "./AssignPallets";
 import Loading from "./Loading";
 
 export {
@@ -22,6 +24,7 @@ export {
   Items,
   Parcels,
   InboundPage,
+  OutboundManagement,
   ProductDisplay,
   LoginPage,
   SignupPage,
@@ -32,4 +35,5 @@ export {
   Loading,
   UserManagement,
   OutletOrderManagement,
+  AssignPallets,
 };

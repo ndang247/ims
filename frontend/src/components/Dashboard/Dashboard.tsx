@@ -5,7 +5,7 @@ import {
   ExclamationCircleOutlined,
   BorderOutlined,
 } from "@ant-design/icons";
-import { OutletOrder } from "../../api";
+import { OutletOrder, BASE_URL } from "../../api";
 import { IDashboardData, IOutletOrder } from "@src/types";
 import { Loading, LowInventoryBarChart } from "../../components";
 import "./Dashboard.css";
@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `https://ims-be.onrender.com/api/v1/stream/dashboard?token=${localStorage.getItem(
+      `${BASE_URL}/stream/dashboard?token=${localStorage.getItem(
         "token"
       )}`
     );
@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div style={{ marginBottom: "1rem" }} className="container">
       <Breadcrumb
         style={{ margin: "16px 0" }}
         items={[
