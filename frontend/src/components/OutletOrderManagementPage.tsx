@@ -10,6 +10,7 @@ import {
   Divider,
   Breadcrumb,
   message,
+  Switch
 } from "antd";
 import { OutletOrder, Pallet } from "../api";
 import { IOutletOrder, IPallet, IProductOrder } from "../types";
@@ -25,6 +26,10 @@ const OutletOrderManagement = () => {
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
 
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalPalletsViewWithTotal, setModalPalletsViewWithTotal] = useState(true);
+  
+
   const handleStatusChange = (value: string) => {
     let message = "";
     switch (value) {
@@ -36,11 +41,11 @@ const OutletOrderManagement = () => {
         break;
       case "processed":
         message =
-          "The order will be seen as processed and is ready for delivery.";
+          "The order will be seen as processed to a pallet and is ready for delivery.";
         break;
       case "out_for_delivery":
         message =
-          "The order will be seen as out for delivery and is with the truck driver or delivery person.";
+          "The order will be seen as out for delivery and is with the truck driver or delivery person. Inventory will be deducted for each parcel.";
         break;
       case "delivered":
         message =
@@ -209,16 +214,22 @@ const OutletOrderManagement = () => {
       setIsModalVisible(true);
       form.setFieldsValue(record);
 
-      const orderPallets = await Pallet.getAllPalletsByOrderID(record._id);
-      setAssignedPallets(orderPallets);
+      const pallets = await Pallet.getPallets(record._id as string);
+      console.log('Pallets', pallets);
+      setAssignedPallets(pallets)
     } catch (err: any) {
       console.log(err);
       message.error(err.message);
     }
   };
 
+  const onAssignedPalletsViewSwitch = (checked: boolean) => {
+    setModalPalletsViewWithTotal(checked)
+  };
+
   const handleOk = async () => {
     try {
+      setModalLoading(true);
       await form.validateFields();
       const values = form.getFieldsValue() as IOutletOrder;
       console.log("Handle ok, values", values);
@@ -232,14 +243,33 @@ const OutletOrderManagement = () => {
         await OutletOrder.createOutletOrder(values);
       }
 
-      form.resetFields();
-      setStatusMessage("");
-      await init();
-      setIsModalVisible(false);
+      await closeViewModal()
     } catch (error: any) {
       message.error(error.message);
+    } finally {
+      setModalLoading(false);
     }
   };
+
+  const handleSetOrderForDelivery = async () => {
+    try {
+      setModalLoading(true);
+      await OutletOrder.updateToDelivery(selectedOrder?._id as string)
+      message.success("Successfully update outlet order to delivery")
+      await closeViewModal()
+    } catch (error: any) {
+      message.error(error.message)
+    } finally {
+      setModalLoading(false);
+    }
+  }
+
+  const closeViewModal = async ()  => {
+    form.resetFields();
+    setStatusMessage("");
+    await init();
+    setIsModalVisible(false);
+  }
 
   return (
     <>
@@ -284,6 +314,7 @@ const OutletOrderManagement = () => {
         columns={columns}
       />
       <Modal
+        width={1000}
         title={
           isOrderSelected
             ? `Outlet Order from ${selectedOrder?.user.username ?? "N/A"}`
@@ -291,7 +322,7 @@ const OutletOrderManagement = () => {
         }
         open={isModalVisible}
         onOk={handleOk}
-        okText="Submit"
+        okText="Update"
         onCancel={() => {
           form.resetFields();
           setStatusMessage("");
@@ -321,8 +352,8 @@ const OutletOrderManagement = () => {
               <Option value="pending">Pending</Option>
               <Option value="accepted">Accepted & Processing</Option>
               <Option value="processed">Processed</Option>
-              <Option value="out_for_delivery">Out For Delivery</Option>
-              <Option value="delivered">Delivered</Option>
+              {selectedOrder?.status === "out_for_delivery" && <Option value="out_for_delivery">Out For Delivery</Option>}
+              {selectedOrder?.status === "out_for_delivery" && <Option value="delivered">Delivered</Option>}
               <Option value="rejected">Rejected</Option>
             </Select>
           </Form.Item>
@@ -335,23 +366,14 @@ const OutletOrderManagement = () => {
             <Input.TextArea />
           </Form.Item>
 
-          {/* Pallets */}
-          {assignedPallets?.length > 0 && (
-            <div>
-              <span className="fs-6">Assigned Pallets</span>
-              {assignedPallets?.map((pallet, key) => {
-                return (
-                  <div key={key} className="border rounded-1 p-1 m-2">
-                    {pallet._id} - {pallet.name}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          <hr />
 
-          {/* Products */}
+          <div className="container">
+            <div className="row">
+              <div className="col-6">
+          {/* Orders */}
           <div>
-            <span className="fs-6">Products</span>
+            <span className="fs-6">Orders</span>
             {selectedOrder?.products.map((product, key) => {
               return (
                 <div key={key} className="border rounded-1 p-1 m-2">
@@ -361,6 +383,70 @@ const OutletOrderManagement = () => {
               );
             })}
           </div>
+              </div>
+              <div className="col-6">
+          {/* Pallets */}
+          {assignedPallets?.length > 0 && (
+            <div>
+              <span className="fs-6">
+                Assigned Pallets
+                <Switch className="ms-2" size="small"
+                  defaultChecked
+                  checkedChildren="Total"
+                  onChange={onAssignedPalletsViewSwitch} 
+                />
+              </span>
+              {modalPalletsViewWithTotal ? assignedPallets?.map((pallet, palletKey) => {
+                const productTally = pallet.parcels.reduce((acc, parcel) => {
+                  const productName = parcel.product.upc_data.items[0].title;
+                  acc[productName] = (acc[productName] || 0) + 1;
+                  return acc;
+                }, {});
+
+                const productList = Object.entries(productTally).map(([productName, quantity], productKey) => {
+                  return (
+                    <div key={productKey} className="border rounded-1 p-1 m-2">
+                      {productName} - Quantity: {quantity}
+                    </div>
+                  );
+                });
+
+                return (
+                  <div key={palletKey}>
+                    <span>{pallet.name}</span>
+                    {productList}
+                    <hr />
+                  </div>
+                );
+              }) : assignedPallets?.map((pallet, palletKey) => {
+                return <div key={palletKey}>
+                  <span>{pallet.name}</span>
+                  {pallet.parcels.map((parcel, parcelKey) => {
+                    return <div className="border rounded-1 p-1 m-2" key={parcelKey}>
+                      {parcel.product.upc_data.items[0].title}
+                    </div>
+                  })}
+                  <hr />
+                </div>
+              })}
+            </div> 
+          )}
+              </div>
+            </div>
+          </div>
+
+
+
+          <Button
+            type="primary"
+            loading={modalLoading}
+            onClick={handleSetOrderForDelivery}
+          >
+            Confirm Pallet and Submit Pallet for Delivery
+          </Button>
+          <br />
+          <span style={{ color: 'grey', fontStyle: 'italic'}}>This will also set the status of all parcels with attached pallets to Out For Delivery, including the current outlet order.</span>
+          <hr />
         </Form>
       </Modal>
     </>

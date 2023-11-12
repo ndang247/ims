@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Breadcrumb, message, Tabs } from "antd";
-import { getParcels, getProductByID } from "../api";
+import { getParcels, getProductByID, BASE_URL } from "../api";
 import {
   IGroupedParcels,
   IParcel,
@@ -29,7 +29,7 @@ const ProductDetails: React.FC = () => {
       return;
     }
     const eventSource = new EventSource(
-      `http://localhost:8080/api/v1/stream/inventory/${
+      `${BASE_URL}/stream/inventory/${
         product.barcode
       }?token=${localStorage.getItem("token")}`
     );
