@@ -27,12 +27,11 @@ const Dashboard: React.FC = () => {
   });
 
   const [orders, setOrders] = useState<IOutletOrder[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `${BASE_URL}/stream/dashboard?token=${localStorage.getItem(
-        "token"
-      )}`
+      `${BASE_URL}/stream/dashboard?token=${localStorage.getItem("token")}`
     );
 
     eventSource.onmessage = (event) => {
@@ -61,6 +60,7 @@ const Dashboard: React.FC = () => {
 
   const init = async () => {
     try {
+      setLoading(true);
       const fetchedOrders = await OutletOrder.getManyOutletOrders();
       // For each order append the key property to the order i.e. key: 1 for the first order then so on
       const ordersWithKey = fetchedOrders
@@ -74,6 +74,7 @@ const Dashboard: React.FC = () => {
       console.log("ordersWithKey", ordersWithKey);
 
       setOrders(ordersWithKey);
+      setLoading(false);
       console.log(orders);
     } catch (error) {
       console.log(error);
@@ -129,8 +130,17 @@ const Dashboard: React.FC = () => {
               className="p-2"
               style={{ height: "200px", overflowY: "auto", resize: "vertical" }}
             >
-              {!orders.length && (
+              {loading && (
                 <Loading description="Please wait while we load outlet orders." />
+              )}
+
+              {orders.length === 0 && (
+                <div className="d-flex flex-column">
+                  <Title level={5}>Pending Outlet Orders</Title>
+                  <div>
+                    <span>No pending outlet orders.</span>
+                  </div>
+                </div>
               )}
 
               {orders.length > 0 && (
