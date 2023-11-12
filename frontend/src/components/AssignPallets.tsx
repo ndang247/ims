@@ -109,7 +109,10 @@ const AssignPallets: React.FC = () => {
   const confirm = async (_: React.MouseEvent<HTMLElement> | undefined) => {
     try {
       for (const palletID of selectedPallets) {
-        const res = await Pallet.assignOrderToPallet(palletID, orderID ?? "");
+        const res = await Pallet.assignOrderToPallet(
+          palletID,
+          orderID as string
+        );
         console.log(res);
         message.success(res.status);
         // Wait for 3 seconds before redirecting back to outlet order page
