@@ -59,6 +59,7 @@ const updateInventory = async (req, res) => {
     await inventory.save();
   } else if (previousStatus === "out_for_delivery" && !status) {
     inventory.parcel_quantity += 1;
+    parcel.pallet = null;
     await inventory.save();
   }
 
