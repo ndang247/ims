@@ -2,6 +2,7 @@ const OutletOrder = require("../models/outlet_order.model");
 const Pallet = require("../models/pallet.model");
 const Parcel = require("../models/parcel.model");
 const Inventory = require("../models/inventory.model");
+const RFID = require("../models/rfid.model");
 
 const outletOrderController = {
   // Create new Outlet Order
@@ -58,6 +59,13 @@ const outletOrderController = {
         { new: true }
       );
 
+      if (status === "delivered") {
+        return outletOrderController.updateOutletOrderStatusToDelivered(
+          req,
+          res
+        );
+      }
+
       if (!updatedOrder) {
         return res.status(404).json({
           status: "Not Found",
@@ -70,6 +78,53 @@ const outletOrderController = {
         updatedOrder,
       });
     } catch (error) {
+      res.status(400).json({
+        status: "Error",
+        message: error.message,
+      });
+    }
+  },
+
+  async updateOutletOrderStatusToDelivered(req, res) {
+    try {
+      const orderId = req.params.id;
+      const outletOrder = await OutletOrder.findById(orderId);
+      if (!outletOrder) {
+        return res.status(400).json({
+          status: "Error",
+          message: "Order not found!",
+        });
+      }
+
+      // Get Pallets for the OutletOrder
+      const pallets = await Pallet.find({ order: outletOrder._id });
+
+      // Get Parcels from the Pallet(s)
+      const parcels = await Parcel.find({
+        pallet: { $in: pallets.map((pallet) => pallet._id) },
+      });
+
+      let statusUpdatePromises = [];
+      for (const parcel of parcels) {
+        parcel.status = "delivered";
+        const rfidTag = await RFID.findOne({
+          ref_id: parcel._id,
+          ref_object: "Parcel",
+        });
+        if (rfidTag) {
+          await rfidTag.deleteOne();
+        }
+        statusUpdatePromises.push(parcel.save());
+      }
+
+      await Promise.all(statusUpdatePromises);
+
+      return res.status(200).json({
+        status: "Success",
+        order: outletOrder,
+      });
+    } catch (error) {
+      console.error("Error updating order to delivered:", error);
       res.status(400).json({
         status: "Error",
         message: error.message,
