@@ -1,10 +1,10 @@
 import axios from "axios";
 import { IOutletOrder, IPallet, IParcel, IUser } from "../types";
 
-export const BASE_URL = "http://localhost:8080/api/v1";
+export const BASE_URL = "https://ims-be.onrender.com/api/v1";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: "https://ims-be.onrender.com/api/v1",
   headers: {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
