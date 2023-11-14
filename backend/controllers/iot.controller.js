@@ -42,22 +42,24 @@ const updateInventory = async (req, res) => {
   await parcel.save();
   console.log("Save parcel sucessfully:", parcel);
 
+  const inventory = await Inventory.findOne({ product: parcel.product });
+
+  if (!inventory) {
+    return res
+      .status(404)
+      .json({ status: "Not Found", message: "Inventory not found" });
+  }
   // If status is turned into out_for_delivery or archived
   if (
     (previousStatus === "in_warehouse" || previousStatus === "on_shelf") &&
     (status === "out_for_delivery" || status === "archived")
   ) {
-    // Get inventory with product_id
-    const inventory = await Inventory.findOne({ product: parcel.product });
-
-    if (!inventory) {
-      return res
-        .status(404)
-        .json({ status: "Not Found", message: "Inventory not found" });
-    }
-
     // Deduct parcel_quantity by 1
     inventory.parcel_quantity -= 1;
+    await inventory.save();
+  } else if (previousStatus === "out_for_delivery" && !status) {
+    inventory.parcel_quantity += 1;
+    parcel.pallet = null;
     await inventory.save();
   }
 
