@@ -55,7 +55,7 @@ const Parcels: React.FC<IParcelProps> = ({
       cellRenderer: (params: any) => (
         <img
           style={{ height: "100px", width: "100px" }}
-          src={params.data.product.upc_data.items[0].images[1]}
+          src={params.data.product.upc_data.items[0].images[0]}
           alt=""
         />
       ),
