@@ -349,7 +349,10 @@ const OutletOrderManagement = () => {
             name="status"
             rules={[{ required: true, message: "Please select the status!" }]}
           >
-            <Select onChange={handleStatusChange}>
+            <Select
+              onChange={handleStatusChange}
+              disabled={selectedOrder?.status === "delivered"}
+            >
               <Option value="pending">Pending</Option>
               <Option value="accepted">Accepted & Processing</Option>
               <Option value="processed">Processed</Option>

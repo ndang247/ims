@@ -130,14 +130,20 @@ const Dashboard: React.FC = () => {
               className="p-2"
               style={{ height: "200px", overflowY: "auto", resize: "vertical" }}
             >
-              {orders.length === 0 && (
+              {loading && (
+                <Loading description="Please wait while we load orders." />
+              )}
+
+              {orders.length === 0 && !loading && (
                 <div className="d-flex flex-column">
                   <Title level={5}>Pending Outlet Orders</Title>
-                  <span className="border p-2 rounded-2">No Pending Orders</span>
+                  <span className="border p-2 rounded-2">
+                    No Pending Orders
+                  </span>
                 </div>
               )}
 
-              {orders.length > 0 && (
+              {orders.length > 0 && !loading && (
                 <div className="d-flex flex-column">
                   <Title level={5}>Pending Outlet Orders</Title>
                   <div>
