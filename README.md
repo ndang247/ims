@@ -19,15 +19,15 @@ A Smart Inventory System leveraging RFID technology to enhance efficiency in Inb
 ## 📸 Screenshots
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/1_dashboard.png" alt="Dashboard" width="50%">
-  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/2_parcels_page.png" alt="Parcels Page" width="50%">
-  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/3_items_page.png" alt="Items Page" width="50%">
-  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/outbound_management.png" alt="Outbound Management" width="50%">
+  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/1_dashboard.png" alt="Dashboard" width="47%">
+  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/2_parcels_page.png" alt="Parcels Page" width="47%">
+  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/3_items_page.png" alt="Items Page" width="47%">
+  <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/outbound_management.png" alt="Outbound Management" width="47%">
 </div>
 
 ---
 
-<div style="display: flex; flex-direction: row;">
+<div style="display: flex; flex-direction: row; gap: 10px">
   <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/IMG_4855.jpg" alt="RFID System" width="40%">
   <img src="https://github.com/johnnycuongn/Inventory-Management-Sytem/blob/main/github_resources/IMG_4854.jpg" alt="RFID System from above" width="40%">
 </div>
